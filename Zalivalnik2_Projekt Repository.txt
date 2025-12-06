@@ -1,0 +1,170 @@
+Zalivalnik2_Projekt Repository
+
+origin https://github.com/Miran444/Zalivalnik2_Projekt.git
+
+
+Miran444: Glede na to da imam odprt račun na GitHub in ga nisem še nikoli uporabljal, bi bila zdaj prilika da to poizkusim. Rad bi da ta prejekt prenesem na GitHub. Lahko pomagaš?
+
+GitHub Copilot: Seveda, z veseljem pomagam. Prenos projekta na GitHub je odličen način za shranjevanje, sledenje spremembam in morebitno sodelovanje. Postopek bomo razdelili na preproste korake, ki jih boste izvedli v brskalniku in v terminalu znotraj Visual Studio Code.
+
+---
+
+### Zelo pomembno: Varnost pred vsem!
+
+Vaša datoteka [`index.js`]index.js ) vsebuje občutljive podatke (`firebaseConfig`), vključno z vašim `apiKey`. **Teh podatkov nikoli ne smete objaviti na javnem GitHub repozitoriju.** Kdorkoli bi jih lahko zlorabil za dostop do vaše Firebase baze.
+
+To bomo rešili tako, da bomo te podatke ločili v posebno datoteko, ki jo bomo nato ignorirali.
+
+**1. Ustvarite novo datoteko:**
+V mapi [`public/scripts/`](public/scripts/ ) ustvarite novo datoteko z imenom `firebase-config.js`.
+
+**2. Premaknite konfiguracijo:**
+Iz datoteke [`index.js`]index.js ) izrežite celoten objekt `firebaseConfig` in ga prilepite v novo datoteko `firebase-config.js`. V tej novi datoteki ga tudi izvozite.
+
+Vsebina datoteke `public/scripts/firebase-config.js` naj bo:
+````javascript
+export const firebaseConfig = {
+  apiKey: "AIzaSyDzTD6IjH7gSuAiHyRQoZtc-A-VTIT-4Iw",
+  authDomain: "zalivalnik2.firebaseapp.com",
+  databaseURL: "https://zalivalnik2-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "zalivalnik2",
+  storageBucket: "zalivalnik2.firebasestorage.app",
+  messagingSenderId: "887041285936",
+  appId: "1:887041285936:web:fb5cfb9c992f34e61032f5"
+};
+````
+
+**3. Posodobite index.js:**
+V datoteki [`index.js`]index.js ) sedaj uvozite konfiguracijo iz nove datoteke.
+
+````javascript
+// ...existing code...
+import { createTemperatureChart, createHumidityChart, createSoilMoistureChart } from "./charts-definition.js";
+import { firebaseConfig } from "./firebase-config.js"; // DODAJTE TO VRSTICO
+
+
+/* ---------------------------
+   Firebase config + init
+   --------------------------- */
+// CELOTEN OBJEKT "firebaseConfig" ODSTRANITE OD TUKAJ
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+// ...existing code...
+````
+
+**4. Ustvarite .gitignore datoteko:**
+To je ključna datoteka, ki Gitu pove, katere datoteke naj ignorira. V korenski mapi vašega projekta (`c:\Projekti\Zalivalnik_4\Projekt\Project Folder Zalivalnik2\`) ustvarite novo datoteko z imenom .gitignore (pomembna je pika na začetku).
+
+V to datoteko dodajte ime datoteke s konfiguracijo:
+````
+# Ignoriraj datoteko z občutljivimi Firebase ključi
+public/scripts/firebase-config.js
+````
+
+Zdaj ste pripravljeni na varen prenos projekta na GitHub.
+
+---
+
+### Koraki za prenos na GitHub
+
+#### 1. Korak: Ustvarite nov repozitorij na GitHub-u
+
+1.  Prijavite se v vaš račun na [GitHub.com](https://github.com).
+2.  V zgornjem desnem kotu kliknite na ikono **+** in izberite **New repository**.
+3.  **Repository name:** Vpišite ime za vaš projekt, npr. `Zalivalnik-Projekt`.
+4.  **Description:** (Neobvezno) Dodajte kratek opis.
+5.  Pustite repozitorij nastavljen na **Public**.
+6.  **Pomembno:** Pustite vse spodnje kljukice **prazne** (ne dodajajte `README`, .gitignore ali licence).
+7.  Kliknite gumb **Create repository**.
+
+GitHub vam bo sedaj prikazal stran z navodili. Potrebovali boste URL vašega repozitorija, ki je videti nekako takole: `https://github.com/VaseUporabniskoIme/Zalivalnik-Projekt.git`.
+
+#### 2. Korak: Priprava lokalnega projekta (v VS Code)
+
+1.  **Odprite terminal** v VS Code s pritiskom na `Ctrl + `` (znak levo od številke 1).
+2.  V terminalu poženite naslednje ukaze, enega za drugim.
+
+    *   **Inicializirajte Git v vašem projektu:**
+        ```bash
+        git init
+        ```
+
+    *   **Dodajte vse datoteke v sledenje** (pika pomeni "vse v tej mapi"):
+        ```bash
+        git add .
+        ```
+PS C:\Projekti\Zalivalnik_4\Projekt\Project Folder Zalivalnik2> git config --global user.name "Miran444"
+PS C:\Projekti\Zalivalnik_4\Projekt\Project Folder Zalivalnik2> git config --global user.email "miranbudal@gmail.com"
+PS C:\Projekti\Zalivalnik_4\Projekt\Project Folder Zalivalnik2> git commit -m "Prva verzija projekta Zalivalnik"
+    *   **Naredite prvi "commit"** (to je kot shranjevanje točke v zgodovini projekta):
+        ```bash
+        git commit -m "Prva verzija projekta Zalivalnik"
+        ```
+
+#### 3. Korak: Povezava in nalaganje na GitHub
+
+1.  **Povežite vaš lokalni projekt z GitHub repozitorijem.** Zamenjajte `URL_VASEGA_REPOZITORIJA` z URL-jem, ki ste ga dobili v prvem koraku.
+    ```bash
+    git remote add origin URL_VASEGA_REPOZITORIJA
+    ```
+    *Primer:* `git remote add origin https://github.com/janez-novak/Zalivalnik-Projekt.git`
+
+2.  **Preimenujte glavno vejo v `main`**, kar je sodoben standard:
+    ```bash
+    git branch -M main
+    ```
+
+3.  **Naložite ("push") vaš projekt na GitHub:**
+    ```bash
+    git push -u origin main
+    ```
+
+Ko se ta ukaz uspešno izvede, osvežite stran vašega repozitorija na GitHub-u. Videli boste vse datoteke vašega projekta, razen `firebase-config.js`, ki je bila pravilno ignorirana. Vaš projekt je sedaj varno na GitHub-u
+
+Koraki za shranjevanje sprememb na GitHub
+Vse ukaze poženite v terminalu znotraj Visual Studio Code.
+
+1. Korak: Preverite status sprememb
+Ta ukaz vam bo pokazal, katere datoteke ste spremenili od zadnjega shranjevanja.
+git status
+Git vam bo verjetno izpisal, da sta bili datoteki index.html in index.js spremenjeni (izpisani bosta z rdečo barvo).
+
+2. Korak: Dodajte spremenjene datoteke v "čakalnico"
+S tem ukazom Gitu poveste, da želite vse trenutne spremembe vključiti v naslednji "paket" (commit). Pika . pomeni "vse datoteke v tej mapi in podmapah".
+git add .
+
+3. Korak: Ustvarite "commit" (shranite spremembe)
+Sedaj boste ustvarili novo točko v zgodovini projekta. Pomembno je, da napišete jasno sporočilo, ki opisuje, kaj ste naredili. To vam bo v prihodnosti zelo pomagalo pri iskanju sprememb.
+git commit -m "Poenostavitev vmesnika za urnik in dodan gumb Opusti"
+
+4. Korak: Naložite spremembe na GitHub
+S tem ukazom boste nov "commit" (paket sprememb) poslali iz vašega računalnika na strežnike GitHuba.
+git push origin main
+
+Ko se ta ukaz uspešno izvede, lahko osvežite stran vašega projekta na GitHubu. Videli boste, da so se datoteke posodobile in da je zraven njih izpisano vaše sporočilo iz prejšnjega koraka: "Poenostavitev vmesnika za urnik in dodan gumb Opusti".
+
+Ta cikel (spremeni kodo -> git add -> git commit -> git push) je osnova dela z Gitom in GitHubom.
+
+
+Razlaga problema
+Napaka [rejected] main -> main (fetch first) pomeni:
+
+"GitHub je zavrnil tvoje nalaganje, ker ima on (GitHub) na svoji main veji spremembe, ki jih ti (na svojem računalniku) nimaš. Najprej moraš te spremembe prenesti k sebi, jih združiti s svojimi, in šele nato lahko vse skupaj naložiš nazaj."
+
+To se je zgodilo, ker ste verjetno naredili spremembo neposredno na spletni strani GitHub (na primer dodali README.md datoteko), potem ko ste že naredili spremembe na svojem računalniku.
+
+Zdaj obstajata dve rahlo različni zgodovini projekta: ena na vašem računalniku in ena na GitHubu. Git vas s to napako varuje, da ne bi po nesreči povozili sprememb, ki so na GitHubu.
+
+Rešitev (v terminalu VS Code)
+Naredili bomo točno to, kar predlaga Git: najprej bomo potegnili spremembe z GitHuba in jih združili z vašimi.
+
+1. Korak: Prenesite in združite spremembe z GitHuba
+Poženite ukaz pull. Ta ukaz bo prenesel spremembe z GitHuba in jih poskusil samodejno združiti z vašimi.
+git pull origin main
+Ker so bile spremembe verjetno v različnih datotekah (npr. vi ste spreminjali .js datoteko, na GitHubu pa se je dodala .md datoteka), bo Git to združil brez težav. Morda se vam bo odprlo okno za vpis sporočila za "merge commit" - če se, ga lahko kar zaprete.
+
+2. Korak: Ponovno naložite spremembe na GitHub
+Sedaj, ko je vaša lokalna verzija projekta posodobljena in vsebuje tako vaše spremembe kot tiste z GitHuba, lahko vse skupaj varno naložite.
+git push origin main
+Tokrat bo ukaz uspešen, saj bo vaša lokalna zgodovina vsebovala vse, kar je na GitHubu, plus vaše nove spremembe.

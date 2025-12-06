@@ -1,0 +1,10 @@
+<script>start("c:\\Projekti\\Zalivalnik_4\\Projekt\\Zalivalnik_4_lora_rele\\lib\\XPowersLib\\");</script>
+<script>onHasParentDirectory();</script>
+<script>addRow("examples","examples",1,0,"0 B",1746371538,"5/4/25, 5:12:18 PM");</script>
+<script>addRow("src","src",1,0,"0 B",1746371538,"5/4/25, 5:12:18 PM");</script>
+<script>addRow(".piopm",".piopm",0,162,"162 B",1745379882,"4/23/25, 5:44:42 AM");</script>
+<script>addRow("keywords.txt","keywords.txt",0,35769,"34.9 kB",1745379882,"4/23/25, 5:44:42 AM");</script>
+<script>addRow("library.json","library.json",0,4025,"3.9 kB",1745379882,"4/23/25, 5:44:42 AM");</script>
+<script>addRow("library.properties","library.properties",0,345,"345 B",1745379882,"4/23/25, 5:44:42 AM");</script>
+<script>addRow("LICENSE","LICENSE",0,1065,"1.0 kB",1745379882,"4/23/25, 5:44:42 AM");</script>
+<script>addRow("README.md","README.md",0,5547,"5.4 kB",1745379882,"4/23/25, 5:44:42 AM");</script>
