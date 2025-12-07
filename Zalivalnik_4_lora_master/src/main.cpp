@@ -64,6 +64,8 @@ enum class InitState
   WAIT_FOR_FIREBASE_RESPONSE, // Čakaj na odgovor od Firebase
   COMPARE_AND_SEND_LORA,      // Primerjaj urnike in po potrebi pošlji LoRa ukaz
   WAIT_FOR_UPDATE_URNIK,      // Čakaj na potrditev RESPONSE_UPDATE_URNIK od Rele modula
+  FIREBASE_UPDATE_STATUS,     // Pošlji zahtevo za posodobitev stanja kanala v Firebase
+  WAIT_FOR_FIREBASE_UPDATE_STATUS, // Čakaj na odgovor od Firebase za posodobitev stanja kanala
   INIT_DONE,                  // Inicializacija končana
   WAIT_FOR_INIT_COMPLETE,     // Čakaj na dokončanje inicializacije
   DONE,                       // Inicializacija končana
@@ -524,7 +526,7 @@ void manageReleInitialization()
   //============================================================================
   case InitState::WAIT_FOR_TIME_RESPONSE:
     //============================================================================
-    if (check_init_wait_state(lora_response_received, InitState::SEND_STATUS_REQUEST, InitState::SEND_TIME, "odgovor za čas"))
+    if (check_init_wait_state(lora_response_received, InitState::SEND_SENSORS_REQUEST, InitState::SEND_TIME, "odgovor za čas"))
     {
       lora_response_received = false; // Vedno počistimo zastavico po obdelavi
       // if (init_retry_count == 2) // Če je bil to zadnji poskus
@@ -532,25 +534,6 @@ void manageReleInitialization()
       //   init_retry_count = 0; // Ponastavimo števec poskusov zato da pošiljamo neprekinjeno
 
       // }
-    }
-    break;
-
-  //============================================================================
-  case InitState::SEND_STATUS_REQUEST:
-    //============================================================================
-    Serial.println("[INIT] Korak 2: Posiljam zahtevo za status relejev...");
-    displayLogOnLine(LINE_ERROR_WARNING, "[INIT] Status");
-    Rele_readRelaysStatus();
-    initState_timeout_start = millis();
-    currentInitState = InitState::WAIT_FOR_STATUS_RESPONSE;
-    break;
-
-  //============================================================================
-  case InitState::WAIT_FOR_STATUS_RESPONSE:
-    //============================================================================
-    if (check_init_wait_state(lora_response_received, InitState::SEND_SENSORS_REQUEST, InitState::SEND_STATUS_REQUEST, "odgovor za status"))
-    {
-      lora_response_received = false;
     }
     break;
 
@@ -654,7 +637,7 @@ void manageReleInitialization()
     if (currentChannelInProcess >= 8)
     {
       // Končali smo z vsemi kanali, obvestimo Rele, da je inicializacija končana
-      currentInitState = InitState::INIT_DONE;
+      currentInitState = InitState::SEND_STATUS_REQUEST;
       currentChannelInProcess = 0; // Resetiramo za morebitno kasnejšo uporabo
     }
     else
@@ -694,6 +677,62 @@ void manageReleInitialization()
       currentInitState = InitState::COMPARE_AND_SEND_LORA; // Naslednji krog
     }
 
+    break;
+
+
+  //============================================================================
+  case InitState::SEND_STATUS_REQUEST:
+    //============================================================================
+    Serial.println("[INIT] Korak 2: Posiljam zahtevo za status relejev...");
+    displayLogOnLine(LINE_ERROR_WARNING, "[INIT] Status");
+    Rele_readRelaysStatus();
+    initState_timeout_start = millis();
+    currentInitState = InitState::WAIT_FOR_STATUS_RESPONSE;
+    break;
+
+  //============================================================================
+  case InitState::WAIT_FOR_STATUS_RESPONSE:
+    //============================================================================
+    if (check_init_wait_state(lora_response_received, InitState::FIREBASE_UPDATE_STATUS, InitState::SEND_STATUS_REQUEST, "odgovor za status"))
+    { 
+      lora_response_received = false;
+    }
+    // Odgovor v Lora_handle_received_packet, - RESPONSE_STATUS.
+
+    break;
+
+  //============================================================================
+  case InitState::FIREBASE_UPDATE_STATUS:
+    //============================================================================
+    Serial.printf("[INIT] Posodabljanje stanja v Firebase za kanal %d...\n", currentChannelInProcess + 1);
+    logMsg = "[INIT] Posodabljanje K" + String(currentChannelInProcess + 1);
+    displayLogOnLine(LINE_ERROR_WARNING, logMsg);
+    Firebase_Update_Relay_State(currentChannelInProcess + 1, kanal[currentChannelInProcess].state); // Pošljemo zahtevo za posodobitev stanja v Firebase za trenutni kanal
+
+    currentInitState = InitState::WAIT_FOR_FIREBASE_UPDATE_STATUS;
+    initState_timeout_start = millis(); // za timeout
+    firebase_response_received = false; // Resetiramo zastavico
+    break;
+
+  //============================================================================
+  case InitState::WAIT_FOR_FIREBASE_UPDATE_STATUS:
+    //============================================================================
+    // Za Firebase uporabimo `firebase_response_received` zastavico
+    if (check_init_wait_state(firebase_response_received, InitState::FIREBASE_UPDATE_STATUS, InitState::FIREBASE_UPDATE_STATUS, "odgovor iz Firebase"))
+    {
+      firebase_response_received = false;
+      // Posebna logika za to stanje
+      if (currentInitState == InitState::FIREBASE_UPDATE_STATUS)
+      { // Če je bil klic uspešen
+        currentChannelInProcess++;
+        if (currentChannelInProcess >= 8)
+        {
+          Serial.println("[INIT] Vsi statusi kanalov iz Firebase uspesno posodobljeni.");
+          currentInitState = InitState::INIT_DONE;
+          currentChannelInProcess = 0;
+        }
+      }
+    }
     break;
 
   //============================================================================
@@ -842,6 +881,7 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
 #ifdef IS_MASTER
         // Shranimo v strukturo kanalov
         kanal[i].state = is_on;
+        //Firebase_Update_Relay_State(i, kanal[i].state); // Posodobimo stanje v Firebase
 #endif
       }
       lora_response_received = true; // nastavimo zastavico za inicializacijski avtomat
@@ -997,11 +1037,12 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
       for (int i = 0; i < 8; i++)
       {
         bool is_on = bitRead(status.relayStates, i);
-        Firebase_Update_Relay_State(i + 1, is_on); // Posodobimo stanje na Firebase
+        
         // Preverimo če je prišlo do spremembe stanja
         if (kanal[i].state != is_on)
         {
           Serial.printf("  Rele %d novo stanje: %s\n", i + 1, is_on ? "ON" : "OFF");
+          Firebase_Update_Relay_State(i + 1, is_on); // Posodobimo stanje na Firebase
 #ifdef IS_MASTER
           kanal[i].state = is_on; // Posodobimo lokalno stanje
 #endif
