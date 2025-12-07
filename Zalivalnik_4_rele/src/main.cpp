@@ -41,7 +41,7 @@ const uint8_t DEBOUNCE_DELAY = 30; // in milliseconds
 #define RELAY_TX_PIN 18 // Prilagodite glede na vaše potrebe
 
 // Constants for notification retry logic
-const unsigned long NOTIFICATION_ACK_TIMEOUT = 3000; // 3 sekunde za čakanje na ACK
+const unsigned long NOTIFICATION_ACK_TIMEOUT = 5000; // 5 sekunde za čakanje na ACK
 const uint8_t MAX_NOTIFICATION_RETRIES = 3;          // Največje število ponovitev
 
 // ----------------------------------------------------------------------------
@@ -124,6 +124,9 @@ uint8_t notification_retry_count = 0;
 // zastavica da je sistemski čas nastavljen
 bool system_time_set = false;
 bool init_done_flag = false; // zastavica za zaključek inicializacije
+bool obdelava_paketa = false; // zastavica za obdelavo paketa v glavnem zanki
+uint8_t relay_states_bitmask = 0; // Bitmaska za trenutno stanje relejev
+
 // ----------------------------------------------------------------------------
 // Definition of the LED component
 // ----------------------------------------------------------------------------
@@ -315,30 +318,36 @@ uint16_t calculate_crc(const uint8_t* data, size_t len) {
 // ----------------------------------------------------------------------------
 // Pripravi in pošlji odgovor nazaj na Lora_rele (bridge)
 // ----------------------------------------------------------------------------
-void send_response_to_bridge(uint16_t request_id, CommandType cmd, const void* payload_data, size_t payload_size) {
-    LoRaPacket packet;
-    packet.syncWord = LORA_SYNC_WORD;
-    packet.messageId = request_id;
-    packet.command = cmd;
-    
-    memset(packet.payload, 0, sizeof(packet.payload));
-    if (payload_data != nullptr && payload_size > 0) {
-        memcpy(packet.payload, payload_data, payload_size);
-    }
+void send_response_to_bridge(uint16_t request_id, CommandType cmd, const void *payload_data, size_t payload_size)
+{
+  LoRaPacket packet;
+  packet.syncWord = LORA_SYNC_WORD;
+  packet.messageId = request_id;
+  packet.command = cmd;
 
-    packet.crc = calculate_crc((const uint8_t*)&packet, offsetof(LoRaPacket, crc));
-    Serial.printf("Sending response to bridge: Message ID: %u, Command: %u, Payload Size: %zu, CRC: 0x%04X\n",
-                  packet.messageId, static_cast<uint8_t>(packet.command), payload_size, packet.crc);
-
-    // Check if the relaySerial is available for writing
-  int avByte = relaySerial.availableForWrite();
-  if (avByte >= sizeof(LoRaPacket)) {
-      relaySerial.write((const uint8_t*)&packet, sizeof(LoRaPacket));
-  } else {
-      Serial.println("Not enough space in relaySerial buffer.");
+  memset(packet.payload, 0, sizeof(packet.payload));
+  if (payload_data != nullptr && payload_size > 0)
+  {
+    memcpy(packet.payload, payload_data, payload_size);
   }
-}
 
+  packet.crc = calculate_crc((const uint8_t *)&packet, offsetof(LoRaPacket, crc));
+  Serial.printf("Sending response to bridge: Message ID: %u, Command: %u, Payload Size: %zu, CRC: 0x%04X\n",
+                packet.messageId, static_cast<uint8_t>(packet.command), payload_size, packet.crc);
+
+  // Check if the relaySerial is available for writing
+  int avByte = relaySerial.availableForWrite();
+  if (avByte >= sizeof(LoRaPacket))
+  {
+    relaySerial.write((const uint8_t *)&packet, sizeof(LoRaPacket));
+  }
+  else
+  {
+    Serial.println("Not enough space in relaySerial buffer.");
+  }
+
+  obdelava_paketa = false;  // smo končali z obdelavo paketa
+}
 
 // ----------------------------------------------------------------------------
 // Pripravi in pošlji obvestilo (notification) na Lora_rele (bridge)
@@ -378,6 +387,8 @@ void send_notification_to_bridge(CommandType cmd, const void* payload_data, size
         Serial.println("Napaka: Ni dovolj prostora v bufferju za pošiljanje obvestila.");
         notification_awaiting_ack = false; // Prekliči pošiljanje
     }
+
+    //Pričakujemo odgovor v handle_packet_from_bridge CommandType::ACK_NOTIFICATION
 }
 
 
@@ -574,6 +585,18 @@ void Read_SHT4X(uint8_t sensor_nr)
 }
 
 // ----------------------------------------------------------------------------
+// Funkcija za izpis urnika na serijski monitor
+// ----------------------------------------------------------------------------
+void PrintUrnik()
+{
+  Serial.println("[UR] Izpis urnika:");
+  for (int i = 0; i < 8; i++)
+  {
+    Serial.printf("Kanal %d: Start: %s, End: %s, State: %d\n", i + 1, kanal[i].start, kanal[i].end, kanal[i].state);
+  }
+}
+
+// ----------------------------------------------------------------------------
 // Funkcija za preverjanje gumba
 // ----------------------------------------------------------------------------
 void handleButton() {
@@ -621,13 +644,12 @@ void handleButton() {
 // preveri stanje relejev glede na urnik
 // ----------------------------------------------------------------------------
 // This function checks the relay states based on the schedule and updates them accordingly
-// It also sends a notification if any relay state changes
 // Function is called periodically in the main loop every second
-void checkRelayStates()
+bool checkRelayStates()
 {
 
   bool state_changed = false; // Zastavica za sledenje spremembam
-  uint8_t relay_states_bitmask = 0; // Bitmaska za trenutno stanje relejev
+  relay_states_bitmask = 0; // Bitmaska za trenutno stanje relejev
   char buffer[6]; // Buffer za formatiran čas "HH:MM"
 
   secondsFromMidnight = getSecondsFromMidnight(); // Posodobi secondsFromMidnight
@@ -635,6 +657,11 @@ void checkRelayStates()
   //  Preveri vsak kanal
   for (int i = 0; i < 8; i++)
   {
+    if (kanal[i].state) // Če je kanal trenutno vklopljen 
+    {
+      bitSet(relay_states_bitmask, i); // Posodobi bitmasko
+    }
+
     // Pretvori čas vklopa in izklopa v sekunde od začetka dneva
     int startSeconds = kanal[i].start_sec;
     int endSeconds = kanal[i].end_sec;
@@ -677,18 +704,8 @@ void checkRelayStates()
     }
   }
 
-  // Če se je stanje kateregakoli releja spremenilo, pošlji obvestilo
-  if (state_changed)
-  {
+  return state_changed;
 
-    // Pripravi payload s trenutnim stanjem vseh relejev
-    RelayStatusPayload status_payload;
-    status_payload.relayStates = relay_states_bitmask;
-
-    // funccija že vsebuje logiko za preverjanje čakalne vrste
-    send_notification_to_bridge(CommandType::NOTIFY_RELAY_STATE_CHANGED, &status_payload, sizeof(status_payload)); // Pošlji obvestilo z novim stanjem vseh relejev
-
-  }
 }
 
 // ---------------------------------------------------------------------------------------
@@ -707,6 +724,7 @@ void handle_packet_from_bridge(const LoRaPacket &packet)
   }
 
   Serial.printf("Prejet veljaven paket ID: %d, Ukaz: %d\n", packet.messageId, (int)packet.command);
+  obdelava_paketa = true; // Nastavi zastavico da obdelujemo paket
 
   // 2. Obdelava glede na tip ukaza
   switch (packet.command)
@@ -718,6 +736,7 @@ void handle_packet_from_bridge(const LoRaPacket &packet)
     {
       Serial.printf("Prejeto ACK za obvestilo ID: %d. Uspešno.\n", packet.messageId);
       notification_awaiting_ack = false; // Uspešno potrjeno, ponastavi stanje
+      obdelava_paketa = false; // Končaj obdelavo paketa
     }
     else
     {
@@ -768,16 +787,14 @@ void handle_packet_from_bridge(const LoRaPacket &packet)
   case CommandType::CMD_GET_STATUS:
     // Pošlji stanje vseh relejev kot bitmask
     {
+      // Najprej preberemo stanje vseh relejev z funkcijo checkRelayStates
+      checkRelayStates(); // Pridobimo trenutno stanje relejev v relay_states_bitmask
+      PrintUrnik(); // Izpišemo urnik za debug
+
+      // Pripravi payload s trenutnim stanjem vseh relejev
       RelayStatusPayload status_payload;
-      uint8_t relay_states_bitmask = 0;
-      for (int i = 0; i < 8; i++)
-      {
-        if (kanal[i].state)
-        {
-          bitSet(relay_states_bitmask, i);
-        }
-      }
       status_payload.relayStates = relay_states_bitmask;
+
       send_response_to_bridge(packet.messageId, CommandType::RESPONSE_STATUS, &status_payload, sizeof(status_payload));
       break;
     }
@@ -1062,10 +1079,8 @@ void setup()
   Read_SHT4X(1); // read the SHT4x sensor
 
   // Print the schedule to the serial monitor
-  for (int i = 0; i < 8; i++)
-  {
-    Serial.printf("Kanal %d: Start: %s, End: %s, State: %d\n", i + 1, kanal[i].start, kanal[i].end, kanal[i].state);
-  }
+  PrintUrnik();
+
   milisekunda = millis(); // initialize the milisekunda variable
   lastCheckTime = millis(); // Inicializacija časovnika za checkRelayStates
 }
@@ -1080,9 +1095,18 @@ void loop()
   {
     lastCheckTime = millis(); // Ponastavi časovnik
 
-    // Tukaj obravnavaj stanje relejev samo če je inicicializacija zaključena in je sistemski čas nastavljen
-    if (init_done_flag && system_time_set)
-      checkRelayStates();
+    // Tukaj obravnavaj stanje relejev samo če je inicicializacija zaključena, sistemski čas nastavljen in ni v teku obdelava paketa
+    if (init_done_flag && system_time_set && !obdelava_paketa)
+      if (checkRelayStates()) // Če je prišlo do spremembe stanja
+      {
+        // Pripravi payload s trenutnim stanjem vseh relejev
+        RelayStatusPayload status_payload;
+        status_payload.relayStates = relay_states_bitmask;
+
+        // funkcija že vsebuje logiko za preverjanje čakalne vrste
+        obdelava_paketa = true; // Nastavi zastavico da obdelujemo paket
+        send_notification_to_bridge(CommandType::NOTIFY_RELAY_STATE_CHANGED, &status_payload, sizeof(status_payload)); // Pošlji obvestilo z novim stanjem vseh relejev  
+      }
 
      
   }
