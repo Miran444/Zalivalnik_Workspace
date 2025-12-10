@@ -8,6 +8,7 @@
 #include <Arduino.h>
 #include "SPIFFS.h"
 #include "Adafruit_SHT4x.h"
+#include "INA3221.h"
 #include <stdio.h>
 #include <Preferences.h>
 #include <HardwareSerial.h>
@@ -40,6 +41,18 @@ const uint8_t DEBOUNCE_DELAY = 30; // in milliseconds
 #define RELAY_RX_PIN 5  // Prilagodite glede na vaše potrebe
 #define RELAY_TX_PIN 18 // Prilagodite glede na vaše potrebe
 
+// Mask/Enable Register bit flags for INA3221
+#define INA3221_CONV_READY (1UL << 0)     ///< Conversion Ready
+#define INA3221_TIMECONT_ALERT (1UL << 1) ///< Timing Control Alert
+#define INA3221_POWER_VALID (1UL << 2)    ///< Power Valid Alert
+#define INA3221_WARN_CH3 (1UL << 3)       ///< Warning Alert for Channel 3
+#define INA3221_WARN_CH2 (1UL << 4)       ///< Warning Alert for Channel 2
+#define INA3221_WARN_CH1 (1UL << 5)       ///< Warning Alert for Channel 1
+#define INA3221_SUMMATION (1UL << 6)      ///< Summation Alert
+#define INA3221_CRITICAL_CH3 (1UL << 7)   ///< Critical Alert for Channel 3
+#define INA3221_CRITICAL_CH2 (1UL << 8)   ///< Critical Alert for Channel 2
+#define INA3221_CRITICAL_CH1 (1UL << 9)   ///< Critical Alert for Channel 1
+
 // Constants for notification retry logic
 const unsigned long NOTIFICATION_ACK_TIMEOUT = 5000; // 5 sekunde za čakanje na ACK
 const uint8_t MAX_NOTIFICATION_RETRIES = 3;          // Največje število ponovitev
@@ -58,13 +71,14 @@ unsigned long lastSensorReadTime = 0; // čas zadnjega branja senzorev
 unsigned long lastLoRaSendTime = 0; // čas zadnjega pošiljanja preko LoRa
 unsigned long lastDisplayUpdateTime = 0; // čas zadnje posodobitve zaslona
 unsigned long lastRelayCheckTime = 0; // čas zadnje kontrole relejev
+unsigned long lastINA3221ReadTime = 0; // čas zadnjega branja INA3221 senzorja
 int secondsFromMidnight = 0; // trenutni čas od polnoči v sekundah
 
 // Create an instance of the SHT4x sensor
 Adafruit_SHT4x sht4x = Adafruit_SHT4x();
 
-// Create an instance of the SHT4x sensor
-Adafruit_SHT4x sht4xSensor = Adafruit_SHT4x();
+// Create an INA3221 object
+INA3221 INA(0x40);
 
 // global variables for temperature and humidity
 float Temperature; // temperature
@@ -487,8 +501,6 @@ uint32_t getSecondsFromMidnight()
 // ----------------------------------------------------------------------------
 void initSHT4x()
 {
-  // Initialize the I2C bus
-  Wire.begin(SDA_PIN, SCL_PIN); // SDA, SCL
   if (!sht4x.begin())
   {
     Serial.println("Could not find a valid SHT4x sensor, check wiring!");
@@ -498,9 +510,8 @@ void initSHT4x()
     }
   }
 
-  Serial.println("Found SHT4x sensor");
-  Serial.print("Serial number 0x");
-  Serial.println(sht4x.readSerial(), HEX);
+  Serial.printf("Found SHT4x I2C address : 0x%04X\n", SHT4x_DEFAULT_ADDR);
+  Serial.printf("Serial number: 0x%04X\n", sht4x.readSerial());
 
   // You can have 3 different precisions, higher precision takes longer
   sht4x.setPrecision(SHT4X_HIGH_PRECISION);
@@ -545,7 +556,6 @@ void initSHT4x()
     Serial.println("Low heat for 0.1 second");
     break;
   }
-  Wire.end();
 }
 
 // ----------------------------------------------------------------------------
@@ -556,11 +566,8 @@ void Read_SHT4X(uint8_t sensor_nr)
   sensors_event_t humidity, temp;
   bool Read_success = false;
 
-  // Initialize the I2C bus
-  Wire.begin(SDA_PIN, SCL_PIN); // SDA, SCL
   // sht4x.getEvent(&humidity, &temp); // read the sensor
   Read_success = sht4x.getEvent(&humidity, &temp); // read the sensor
-  Wire.end();
 
   // Store the temperature and humidity values with two decimal places
   Temperature = round(temp.temperature * 100) / 100.0;
@@ -581,6 +588,114 @@ void Read_SHT4X(uint8_t sensor_nr)
   else
   {
     Serial.println("Error reading sensor!");
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Funkcija za inicializacijo INA3221 senzorja
+// ----------------------------------------------------------------------------
+void initINA3221()
+{
+
+  if (!INA.begin() )
+  {
+    Serial.println("could not connect. Fix and Reboot");
+  }
+  else
+  {
+    Serial.printf("INA3221 Found at I2C address: \t0x%04X\n", INA.getAddress());
+  }
+
+  Serial.printf("DieID: \t0x%04X\n", INA.getDieID());
+  Serial.printf("ManID: \t0x%04X\n", INA.getManufacturerID());
+  Serial.printf(" Conf: \t0x%04X\n", INA.getConfiguration());
+
+  // Settings
+  Serial.println("Setting up INA3221...");
+  INA.setMode(7); // Set to continuous shunt and bus measurement mode
+  Serial.printf("Mode set to: %d\n", INA.getMode());
+
+  // Set average of samples
+  INA.setAverage(2); // 0=1,1=4,2=16,3=64,4=128,5=256,6=512,7=1024
+  Serial.printf("Averaging set to: %d\n", INA.getAverage());
+
+  INA.setWarningAlert(0, 38 * 1000);  // Channel 1 Warning at 38mV
+
+  //  overwrite default shunts.
+  INA.setShuntR(0, 0.10213);
+  Serial.printf("Shunt R0 set to: %.5f Ohms\n", INA.getShuntR(0));
+  INA.setShuntR(1, 0.10063);
+  Serial.printf("Shunt R1 set to: %.5f Ohms\n", INA.getShuntR(1));
+  INA.setShuntR(2, 0.10189);
+  Serial.printf("Shunt R2 set to: %.5f Ohms\n", INA.getShuntR(2));
+
+  Serial.println("\nCHAN\tCRITIC\tWARNING");
+  Serial.println("\n    \t mV  \t mV");
+  for (int ch = 0; ch < 3; ch++)
+  {
+    Serial.print(ch);
+    Serial.print("\t");
+    Serial.print(INA.getCriticalAlert(ch) / 1000.0);
+    Serial.print("\t");
+    Serial.print(INA.getWarningAlert(ch) / 1000.0);
+    Serial.println();
+  }
+
+  Serial.printf("SV_SUM: %.3f\nShunt Voltage (mV)", INA.getShuntVoltageSum() / 1000.0);
+  Serial.printf("SV_LIMIT: \t%.3f\n", INA.getShuntVoltageSumLimit() / 1000.0);
+
+  Serial.printf("Mask/ Enable: %04X\n", INA.getMaskEnable());
+  Serial.printf("Power Limit (mV): UPPER: %.3f, LOWER: %.3f\n", INA.getPowerUpperLimit() / 1000.0, INA.getPowerLowerLimit() / 1000.0);
+  Serial.println("INA3221 setup done.");  
+  Serial.println("-----------------------------------");
+}
+
+// ----------------------------------------------------------------------------
+// Funkcija za branje INA3221 senzorja
+// ----------------------------------------------------------------------------
+void Read_INA3221()
+{
+  float sumCurrent = 0.0;
+
+  // Display voltage and current (in mA) for all three channels
+  Serial.println("\nCHAN\tBUS\tSHUNT\tCURRENT\tPOWER");
+  Serial.println("\t   V \t   mV \t   mA \t   W");
+  for (int ch = 0; ch < 3; ch++)
+  {
+    Serial.print(ch);
+    Serial.print("\t");
+    Serial.print(INA.getBusVoltage(ch), 3);
+    Serial.print("\t");
+    Serial.print(INA.getShuntVoltage_mV(ch), 3);
+    Serial.print("\t");
+    sumCurrent += INA.getCurrent_mA(ch);
+    Serial.print(INA.getCurrent_mA(ch), 3);
+    Serial.print("\t");
+    Serial.print(INA.getPower(ch), 3);
+    Serial.println();
+  }
+  Serial.printf("Total Current: %.3f\n", sumCurrent);
+  Serial.printf("Total Shunt Voltage (mV): %.3f\n", INA.getShuntVoltageSum() / 1000.0);
+
+  uint16_t flags = INA.getMaskEnable();
+
+  if (flags & INA3221_CRITICAL_CH1) {
+    Serial.println("   !!! Channel 1 Critical Current !!!");
+  }
+  if (flags & INA3221_CRITICAL_CH2) {
+    Serial.println("   !!! Channel 2 Critical Current !!!");
+  }
+  if (flags & INA3221_CRITICAL_CH3) {
+    Serial.println("   !!! Channel 3 Critical Current !!!");
+  }
+    if (flags & INA3221_WARN_CH1) {
+    Serial.println("   ... Channel 1 Warning Current ...");
+  }
+  if (flags & INA3221_WARN_CH2) {
+    Serial.println("   ... Channel 2 Warning Current ...");
+  }
+  if (flags & INA3221_WARN_CH3) {
+    Serial.println("   ... Channel 3 Warning Current ...");
   }
 }
 
@@ -1040,6 +1155,10 @@ void setup()
   while (!Serial)
     delay(10); // Wait for Serial port to connect
 
+  // Inicializacija I2C vodila - DODAJTE TO
+  Wire.begin(SDA_PIN, SCL_PIN);
+  Serial.println("I2C vodilo inicializirano.");
+
   // Nastavi okoljsko spremenljivko TZ za Srednjeevropski čas (CET/CEST)
   // CET-1CEST,M3.5.0,M10.5.0/3
   // CET: Ime standardnega časa
@@ -1075,8 +1194,10 @@ void setup()
   print_local_time();
 
   // Initialize the SHT4x sensor
-  initSHT4x();
+  initSHT4x();  // Initialize the SHT4x sensor
+  initINA3221();  // Initialize the INA3221 sensor
   Read_SHT4X(1); // read the SHT4x sensor
+  Read_INA3221(); // read the INA3221 sensor
 
   // Print the schedule to the serial monitor
   PrintUrnik();
@@ -1119,6 +1240,12 @@ void loop()
 
   // Preberi podatke iz relaySerial in obdelaj pakete
   ReadFromRelaySerial();
+
+  //vsakih 10sec preberi INA3221 senzor
+  if (millis() - lastINA3221ReadTime >= 10000) {
+    lastINA3221ReadTime = millis();
+    Read_INA3221();
+  }
 
   if (error_flag)
     onboard_led.blink(200, 200); // LED blinka z napako
