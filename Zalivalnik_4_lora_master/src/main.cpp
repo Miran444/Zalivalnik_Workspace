@@ -89,6 +89,11 @@ bool lora_response_received = false;     // Ali je bil prejet Lora odgovor
 bool firebase_response_received = false; // Ali smo prejeli odgovor iz Firebase?
 LoRaPacket last_received_packet;         // Shranimo zadnji prejeti paket za obdelavo v avtomatu
 
+
+bool reset_occured = false; // zastavica, da je prišlo do ponovnega zagona na Rele modulu
+bool system_time_set = false; // zastavica, da je bil sistemski čas nastavljen
+bool notification_awaiting_ack = false; // zastavica, da čakamo na potrditev obvestila
+
 // -------------------------------------------------------------
 // Definition of the Kanal (Relay) component
 // // Struktura za shranjevanje podatkov o relejih
@@ -1057,6 +1062,31 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
     }
 
   // ... obdelava ostalih tipov odgovorov in notifikacij ...
+    //=================================================================================================
+  case CommandType::NOTIFY_TIME_REQUEST:
+    //=================================================================================================
+    {
+      Serial.println("!!! OPOZORILO: Zahteva za čas na Rele enoti !!!");
+      // Pripravimo in pošljemo paket nazaj na Rele
+      Rele_sendUTC();                     // Pošljemo ukaz za sinhronizacijo časa
+      initState_timeout_start = millis(); // Zaženemo timer za timeout
+      break;
+    }
+
+    //=================================================================================================
+  case CommandType::NOTIFY_RESET_OCCURED:
+    //=================================================================================================
+    {
+      Serial.println("!!! OPOZORILO: Ponastavitev se je zgodila na Rele enoti !!!");
+      // Začnemo inicializacijski avtomat znova
+      // Najprej pošljemo nazaj ACK
+      uint8_t message_id = packet.messageId;
+      Lora_prepare_and_send_response(message_id, CommandType::ACK_NOTIFICATION, &message_id, sizeof(message_id));
+      reset_occured = true; // nastavimo zastavico za inicializacijski avtomat
+      // Ko bo sporočilo poslano , se bo inicializacijski avtomat zagnal znova v loop funkciji
+      break;
+    }
+
   default:
     Serial.println("Neznan ukaz v prejetem paketu.");
     break;
@@ -1258,6 +1288,16 @@ void loop()
         // Počisti zastavico, da ne obdelamo istih podatkov večkrat
         newChannelDataAvailable = false;
       }
+      //--------------------------------------------------------------------------------------------------
+      // Preveri, ali je prišlo do ponovnega zagona Rele modula
+      if (reset_occured && !lora_is_busy())
+      {
+        // Zaženemo inicializacijski avtomat znova
+        initState_timeout_start = millis(); // Zaženemo timer za timeout
+        currentInitState = InitState::START;
+        reset_occured = false; // Ponastavi zastavico
+      }
+
     }
   }
 

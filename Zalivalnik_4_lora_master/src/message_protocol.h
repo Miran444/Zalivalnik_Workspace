@@ -34,7 +34,10 @@ enum class CommandType : uint8_t {
     NOTIFY_TEMP_HIGH = 201,
     NOTIFY_RELAY_STATE_CHANGED = 202,
     NOTIFY_WATER_LEAK = 203,
-
+    NOTIFY_TIME_REQUEST = 204,
+    NOTIFY_SENSOR_ERROR = 206,
+    NOTIFY_RESET_OCCURED = 207,
+    
     // Potrditev notifikacije od Master -> Rele
     ACK_NOTIFICATION = 250
 };

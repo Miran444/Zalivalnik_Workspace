@@ -104,17 +104,6 @@ void lora_initialize(PacketHandlerCallback callback)
 // Pošlji paket prek LoRa
 bool lora_send_packet(const LoRaPacket &packet)
 {
-  // // Preverimo, ali lahko pošljemo paket
-  // if (loraIsTransmitting) {
-  //   Serial.println(F("[LORA] Napaka: Oddajnik že pošilja."));
-  //   return false; // Fizično zaseden
-  // }
-
-  // // Če čakamo na odgovor, lahko pošljemo samo odgovor, ne pa nove zahteve.
-  // if (loraIsWaitingResponse && !is_response_command(packet.command)) {
-  //   Serial.println(F("[LORA] Napaka: Čakam na odgovor, ne morem poslati nove zahteve."));
-  //   return false; // Logično zaseden
-  // }
 
     // Preverimo, ali je LoRa modul pripravljen za pošiljanje nove zahteve
   if (lora_is_busy()) {
