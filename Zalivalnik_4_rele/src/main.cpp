@@ -895,6 +895,7 @@ void handle_packet_from_bridge(const LoRaPacket &packet)
       response_payload.seconds_since_midnight = secondsFromMidnight;
       send_response_to_bridge(packet.messageId, CommandType::RESPONSE_TIME_SET, &response_payload, sizeof(response_payload));
       system_time_set = true; // Nastavi zastavico, da je sistemski čas nastavljen
+      notification_awaiting_ack = false; // Prekliči pošiljanje obvestila, če je bilo v teku (če pošljmo zahtevo po nastavitvi časa)
       break;
     }
 
@@ -1200,10 +1201,17 @@ void setup()
   Read_INA3221(); // read the INA3221 sensor
 
   // Print the schedule to the serial monitor
-  PrintUrnik();
+  // PrintUrnik();
 
   milisekunda = millis(); // initialize the milisekunda variable
   lastCheckTime = millis(); // Inicializacija časovnika za checkRelayStates
+
+  // Ker sistemski čas še ni nastavljen, pošljemo zahtevo za nastavitev časa
+  //send_notification_to_bridge(CommandType::NOTIFY_TIME_REQUEST, NULL, 0);
+
+  // Ker se je board ponovno zagnal, pošljemo zahtevo za inicijalizacijo
+  send_notification_to_bridge(CommandType::NOTIFY_RESET_OCCURED, NULL, 0);
+  // Pričakujemo, da se vrne ACK za to obvestilo
 }
 
 // ----------------------------------------------------------------------------
