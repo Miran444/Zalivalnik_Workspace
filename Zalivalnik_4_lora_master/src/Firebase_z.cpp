@@ -376,6 +376,68 @@ void Firebase_Update_Sensor_Data(unsigned long timestamp, float temp, float hum,
   // show_status(status);
 }
 
+//------------------------------------------------------------------------------------------------------------------------
+// Funkcija za posodobitev podatkov INA3221 senzorja v Firebase
+// Ta funkcija ustvari gnezdeno strukturo kot je opisano v zahtevi:
+// sensors/ina3221_device_1/readings/{timestamp}/...
+
+void Firebase_Update_INA3221_Data(const char* device_id, unsigned long timestamp, 
+                                  uint16_t alert_flags, float shunt_voltage_sum_mV, float total_current_mA,
+                                  float ch0_bus_V, float ch0_shunt_mV, float ch0_current_mA, float ch0_power_mW,
+                                  float ch1_bus_V, float ch1_shunt_mV, float ch1_current_mA, float ch1_power_mW,
+                                  float ch2_bus_V, float ch2_shunt_mV, float ch2_current_mA, float ch2_power_mW)
+{
+  object_t json;
+  object_t ch0_obj, ch1_obj, ch2_obj;
+  object_t ch0_bus, ch0_shunt, ch0_current, ch0_power;
+  object_t ch1_bus, ch1_shunt, ch1_current, ch1_power;
+  object_t ch2_bus, ch2_shunt, ch2_current, ch2_power;
+  object_t alert_obj, shunt_sum_obj, total_current_obj;
+  
+  JsonWriter writer;
+
+  // Ustvari objekte za ch0
+  writer.create(ch0_bus, "bus_voltage_V", number_t(ch0_bus_V, 3));
+  writer.create(ch0_shunt, "shunt_voltage_mV", number_t(ch0_shunt_mV, 3));
+  writer.create(ch0_current, "current_mA", number_t(ch0_current_mA, 3));
+  writer.create(ch0_power, "power_mW", number_t(ch0_power_mW, 3));
+  writer.join(ch0_obj, 4, ch0_bus, ch0_shunt, ch0_current, ch0_power);
+
+  // Ustvari objekte za ch1
+  writer.create(ch1_bus, "bus_voltage_V", number_t(ch1_bus_V, 3));
+  writer.create(ch1_shunt, "shunt_voltage_mV", number_t(ch1_shunt_mV, 3));
+  writer.create(ch1_current, "current_mA", number_t(ch1_current_mA, 3));
+  writer.create(ch1_power, "power_mW", number_t(ch1_power_mW, 3));
+  writer.join(ch1_obj, 4, ch1_bus, ch1_shunt, ch1_current, ch1_power);
+
+  // Ustvari objekte za ch2
+  writer.create(ch2_bus, "bus_voltage_V", number_t(ch2_bus_V, 3));
+  writer.create(ch2_shunt, "shunt_voltage_mV", number_t(ch2_shunt_mV, 3));
+  writer.create(ch2_current, "current_mA", number_t(ch2_current_mA, 3));
+  writer.create(ch2_power, "power_mW", number_t(ch2_power_mW, 3));
+  writer.join(ch2_obj, 4, ch2_bus, ch2_shunt, ch2_current, ch2_power);
+
+  // Ustvari glavne vrednosti (alert_flags, shunt_voltage_sum_mV, total_current_mA)
+  writer.create(alert_obj, "alert_flags", alert_flags);
+  writer.create(shunt_sum_obj, "shunt_voltage_sum_mV", number_t(shunt_voltage_sum_mV, 3));
+  writer.create(total_current_obj, "total_current_mA", number_t(total_current_mA, 3));
+
+  // Preoblikuj ch0_obj, ch1_obj, ch2_obj v object_t s ključi
+  object_t ch0_with_key, ch1_with_key, ch2_with_key;
+  writer.create(ch0_with_key, "ch0", ch0_obj);
+  writer.create(ch1_with_key, "ch1", ch1_obj);
+  writer.create(ch2_with_key, "ch2", ch2_obj);
+
+  // Združi vse v končni JSON objekt
+  writer.join(json, 6, alert_obj, shunt_sum_obj, total_current_obj, 
+              ch0_with_key, ch1_with_key, ch2_with_key);
+
+  // Ustvari pot v Firebase: /UserData/{uid}/sensors/{device_id}/readings/{timestamp}
+  String parentPath = databasePath + "/sensors/" + String(device_id) + "/readings/" + String(timestamp);
+
+  // Pošlji podatke v Firebase
+  Database.set<object_t>(aClient, parentPath, json, Firebase_processResponse, "updateINA3221Task");
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // Funkcija za obdelavo odgovora iz Firebase
@@ -456,6 +518,13 @@ void Firebase_processResponse(AsyncResult &aResult)
       uint8_t sensorReadIntervalMinutes = aResult.payload().toInt();
       set_Interval(sensorReadIntervalMinutes);  // Nastavimo interval branja senzorjev
       Serial.printf("[FIREBASE] Sensor read interval set to: %d minutes\n", sensorReadIntervalMinutes);
+      firebase_response_received = true; // označimo da je Firebase prejel podatke
+    }
+
+    if (aResult.uid() == "updateINA3221Task")
+    {
+      // Handle the updateINA3221Task response
+      Serial.println("[FIREBASE] INA3221 sensor data uploaded");
       firebase_response_received = true; // označimo da je Firebase prejel podatke
     }
     

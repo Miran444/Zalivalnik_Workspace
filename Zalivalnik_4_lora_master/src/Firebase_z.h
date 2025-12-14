@@ -19,6 +19,11 @@ void Firebase_readInterval();
 void Firebase_readKanalUrnik(uint8_t kanalIndex);
 void Firebase_Update_Relay_State(int kanal, bool state);
 void Firebase_Update_Sensor_Data(unsigned long timestamp, float temp, float hum, float soil_moisture);
+void Firebase_Update_INA3221_Data(const char* device_id, unsigned long timestamp, 
+                                  uint16_t alert_flags, float shunt_voltage_sum_mV, float total_current_mA,
+                                  float ch0_bus_V, float ch0_shunt_mV, float ch0_current_mA, float ch0_power_mW,
+                                  float ch1_bus_V, float ch1_shunt_mV, float ch1_current_mA, float ch1_power_mW,
+                                  float ch2_bus_V, float ch2_shunt_mV, float ch2_current_mA, float ch2_power_mW);
 void Firebase_processResponse(AsyncResult &aResult);
 void streamCallback(AsyncResult &aResult);
 

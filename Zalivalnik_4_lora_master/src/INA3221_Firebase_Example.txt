@@ -1,0 +1,131 @@
+===============================================================================
+PRIMER UPORABE: Firebase_Update_INA3221_Data
+===============================================================================
+
+Ta funkcija omogoča vpis podatkov INA3221 senzorja v Firebase v gnezdeni strukturi.
+
+-------------------------------------------------------------------------------
+STRUKTURA V FIREBASE:
+-------------------------------------------------------------------------------
+
+sensors/
+  ina3221_device_1/
+    readings/
+      1678886400/                    // Unix timestamp
+        alert_flags: 0
+        shunt_voltage_sum_mV: 150.0
+        total_current_mA: 200.0
+        ch0/
+          bus_voltage_V: 5.1
+          shunt_voltage_mV: 10.0
+          current_mA: 50.0
+          power_mW: 250.0
+        ch1/
+          bus_voltage_V: 5.0
+          shunt_voltage_mV: 12.0
+          current_mA: 60.0
+          power_mW: 300.0
+        ch2/
+          bus_voltage_V: 4.9
+          shunt_voltage_mV: 8.0
+          current_mA: 40.0
+          power_mW: 196.0
+      1678886460/                    // Naslednji timestamp
+        ...
+
+-------------------------------------------------------------------------------
+PRIMER UPORABE:
+-------------------------------------------------------------------------------
+
+// Primer 1: Pošljemo podatke iz INA3221 senzorja
+void posodobiINA3221Podatke() 
+{
+  // Pridobi trenutni čas (Unix timestamp)
+  unsigned long trenutniCas = time(nullptr);
+  
+  // Preberi podatke iz INA3221 senzorja (INA je globalni objekt)
+  uint16_t alert_flags = INA.getMaskEnable();
+  float shunt_sum = INA.getShuntVoltageSum() / 1000.0;  // pretvori v mV
+  
+  // Izračunaj skupni tok (vsota vseh 3 kanalov)
+  float total_current = INA.getCurrent_mA(0) + INA.getCurrent_mA(1) + INA.getCurrent_mA(2);
+  
+  // Preberi podatke za kanal 0
+  float ch0_bus = INA.getBusVoltage(0);
+  float ch0_shunt = INA.getShuntVoltage_mV(0);
+  float ch0_current = INA.getCurrent_mA(0);
+  float ch0_power = INA.getPower(0) * 1000.0; // pretvori W v mW
+  
+  // Preberi podatke za kanal 1
+  float ch1_bus = INA.getBusVoltage(1);
+  float ch1_shunt = INA.getShuntVoltage_mV(1);
+  float ch1_current = INA.getCurrent_mA(1);
+  float ch1_power = INA.getPower(1) * 1000.0;
+  
+  // Preberi podatke za kanal 2
+  float ch2_bus = INA.getBusVoltage(2);
+  float ch2_shunt = INA.getShuntVoltage_mV(2);
+  float ch2_current = INA.getCurrent_mA(2);
+  float ch2_power = INA.getPower(2) * 1000.0;
+  
+  // Pošlji podatke v Firebase
+  Firebase_Update_INA3221_Data(
+    "ina3221_device_1",      // ID naprave
+    trenutniCas,             // Unix timestamp
+    alert_flags,             // Alert flags
+    shunt_sum,               // Skupna shunt napetost v mV
+    total_current,           // Skupni tok v mA
+    ch0_bus, ch0_shunt, ch0_current, ch0_power,  // Podatki kanala 0
+    ch1_bus, ch1_shunt, ch1_current, ch1_power,  // Podatki kanala 1
+    ch2_bus, ch2_shunt, ch2_current, ch2_power   // Podatki kanala 2
+  );
+  
+  Serial.println("INA3221 podatki poslani v Firebase!");
+}
+
+// Primer 2: Uporaba v glavnem programu (loop)
+void loop() 
+{
+  static unsigned long zadnjiCasBranja = 0;
+  unsigned long trenutniCas = millis();
+  
+  // Beri INA3221 senzor vsakih 10 sekund
+  if (trenutniCas - zadnjiCasBranja >= 10000) 
+  {
+    zadnjiCasBranja = trenutniCas;
+    posodobiINA3221Podatke();
+  }
+}
+
+-------------------------------------------------------------------------------
+PARAMETRI FUNKCIJE:
+-------------------------------------------------------------------------------
+
+device_id            - ID naprave (npr. "ina3221_device_1", "ina3221_device_2")
+timestamp            - Unix timestamp (sekunde od 1.1.1970)
+alert_flags          - Alert flags iz INA3221 registra (16-bit)
+shunt_voltage_sum_mV - Skupna shunt napetost v miliVoltih
+total_current_mA     - Skupni tok v miliAmperih
+ch0_bus_V            - Bus napetost kanala 0 v Voltih
+ch0_shunt_mV         - Shunt napetost kanala 0 v miliVoltih
+ch0_current_mA       - Tok kanala 0 v miliAmperih
+ch0_power_mW         - Moč kanala 0 v miliWattih
+ch1_bus_V            - Bus napetost kanala 1 v Voltih
+ch1_shunt_mV         - Shunt napetost kanala 1 v miliVoltih
+ch1_current_mA       - Tok kanala 1 v miliAmperih
+ch1_power_mW         - Moč kanala 1 v miliWattih
+ch2_bus_V            - Bus napetost kanala 2 v Voltih
+ch2_shunt_mV         - Shunt napetost kanala 2 v miliVoltih
+ch2_current_mA       - Tok kanala 2 v miliAmperih
+ch2_power_mW         - Moč kanala 2 v miliWattih
+
+-------------------------------------------------------------------------------
+OPOMBE:
+-------------------------------------------------------------------------------
+
+1. Funkcija deluje asinhrono - odgovor bo prejet v Firebase_processResponse()
+2. Pot v Firebase: /UserData/{uid}/sensors/{device_id}/readings/{timestamp}
+3. Vse vrednosti se shranijo s 3 decimalnimi mesti natančnosti
+4. Alert flags se shrani kot integer (16-bit bitmask)
+
+===============================================================================
