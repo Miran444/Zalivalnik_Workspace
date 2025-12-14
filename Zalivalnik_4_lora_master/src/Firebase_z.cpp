@@ -505,23 +505,20 @@ void Firebase_processResponse(AsyncResult &aResult)
       PrikaziStanjeSenzorjevNaSerial();  // napišemo podatke
       firebase_response_received = true; // označimo da je Firebase prejel podatke
     }
-
-    if (aResult.uid() == "updateStateTask")
+    else if (aResult.uid() == "updateStateTask")
     {
       // Handle the updateStateTask response
       Serial.println("[FIREBASE] State data uploaded");
       firebase_response_received = true; // označimo da je Firebase prejel podatke
     }
-
-    if (aResult.uid() == "getChartIntervalTask")
+    else if (aResult.uid() == "getChartIntervalTask")
     {
       uint8_t sensorReadIntervalMinutes = aResult.payload().toInt();
       set_Interval(sensorReadIntervalMinutes);  // Nastavimo interval branja senzorjev
       Serial.printf("[FIREBASE] Sensor read interval set to: %d minutes\n", sensorReadIntervalMinutes);
       firebase_response_received = true; // označimo da je Firebase prejel podatke
     }
-
-    if (aResult.uid() == "updateINA3221Task")
+    else if (aResult.uid() == "updateINA3221Task")
     {
       // Handle the updateINA3221Task response
       Serial.println("[FIREBASE] INA3221 sensor data uploaded");
