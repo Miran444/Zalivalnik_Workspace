@@ -387,6 +387,12 @@ void Firebase_Update_INA3221_Data(const char* device_id, unsigned long timestamp
                                   float ch1_bus_V, float ch1_shunt_mV, float ch1_current_mA, float ch1_power_mW,
                                   float ch2_bus_V, float ch2_shunt_mV, float ch2_current_mA, float ch2_power_mW)
 {
+  // Validate device_id parameter
+  if (device_id == nullptr || strlen(device_id) == 0) {
+    Serial.println("[FIREBASE] Error: device_id cannot be null or empty");
+    return;
+  }
+
   object_t json;
   object_t ch0_obj, ch1_obj, ch2_obj;
   object_t ch0_bus, ch0_shunt, ch0_current, ch0_power;
