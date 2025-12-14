@@ -406,7 +406,7 @@ void Firebase_Update_INA3221_Data(const char* device_id, unsigned long timestamp
   // Note: The following code creates objects for each channel separately.
   // While this appears repetitive, it follows the FirebaseClient library pattern
   // for building nested JSON structures using object_t and JsonWriter.
-  // See commented examples in this file (set_async function) for similar patterns.
+  // See commented set_async() function at line 890 in this file for similar patterns.
 
   // Create objects for ch0
   writer.create(ch0_bus, "bus_voltage_V", number_t(ch0_bus_V, 3));
