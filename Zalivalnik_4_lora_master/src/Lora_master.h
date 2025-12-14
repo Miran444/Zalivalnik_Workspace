@@ -13,6 +13,7 @@
 // #include <ArduinoJson.h>
 
 
+
 // Struktura za shranjevanje podatkov o relejih
 struct Kanal
 {

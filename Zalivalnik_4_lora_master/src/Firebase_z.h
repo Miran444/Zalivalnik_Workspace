@@ -19,6 +19,7 @@ void Firebase_readInterval();
 void Firebase_readKanalUrnik(uint8_t kanalIndex);
 void Firebase_Update_Relay_State(int kanal, bool state);
 void Firebase_Update_Sensor_Data(unsigned long timestamp, float temp, float hum, float soil_moisture);
+void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload& data);
 void Firebase_processResponse(AsyncResult &aResult);
 void streamCallback(AsyncResult &aResult);
 
@@ -44,6 +45,7 @@ extern int get_intValue; // Spremenljivka za shranjevanje prebrane int vrednosti
 extern Kanal firebase_kanal[8]; // Polje struktur za kanale
 extern uint8_t currentChannelInProcess; // Trenutno obdelovan kanal
 extern bool firebase_response_received; // Zastavica, ki označuje, da je bil odgovor prejet
+extern bool firebase_sensor_update; // zastavica za posodobitev senzorjev v Firebase
 
 // -----------------------------------------
 

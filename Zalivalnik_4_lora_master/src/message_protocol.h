@@ -16,6 +16,7 @@ enum class CommandType : uint8_t {
     CMD_GET_WATER_CONSUMPTION = 8,
     CMD_TEST = 10,
     CMD_INIT_DONE = 12,
+    CMD_GET_INA_DATA = 13,
 
     // Odgovori od Rele -> Master
     RESPONSE_ACK = 100,
@@ -28,6 +29,7 @@ enum class CommandType : uint8_t {
     RESPONSE_TEST = 106,
     RESPONSE_INIT_DONE = 107,
     RESPONSE_WATER_CONSUMPTION = 108,
+    RESPONSE_INA_DATA = 110,
     
     // Notifikacije od Rele -> Master (brez zahteve)
     NOTIFY_LOW_BATT = 200,
@@ -37,7 +39,8 @@ enum class CommandType : uint8_t {
     NOTIFY_TIME_REQUEST = 204,
     NOTIFY_SENSOR_ERROR = 206,
     NOTIFY_RESET_OCCURED = 207,
-    
+    NOTIFY_INA_DATA = 208,
+
     // Potrditev notifikacije od Master -> Rele
     ACK_NOTIFICATION = 250
 };
@@ -115,6 +118,20 @@ struct LoRaPacket {
     CommandType command;
     uint8_t payload[LORA_PACKET_PAYLOAD_SIZE];
     uint16_t crc;
+};
+
+struct INA3221_ChannelData {
+    float bus_voltage;
+    float current_mA;
+    float power_mW;
+    float shunt_voltage_mV;
+};
+
+struct INA3221_DataPayload {
+    INA3221_ChannelData channels[3];
+    uint16_t alert_flags;
+    float shunt_voltage_sum_mV;
+    float total_current_mA;
 };
 
 // --- DODAJTE TO VRSTICO ---

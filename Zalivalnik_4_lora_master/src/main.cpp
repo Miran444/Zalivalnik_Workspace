@@ -89,10 +89,21 @@ bool lora_response_received = false;     // Ali je bil prejet Lora odgovor
 bool firebase_response_received = false; // Ali smo prejeli odgovor iz Firebase?
 LoRaPacket last_received_packet;         // Shranimo zadnji prejeti paket za obdelavo v avtomatu
 
-
+bool firebase_sensor_update = false; // zastavica za posodobitev senzorjev v Firebase
 bool reset_occured = false; // zastavica, da je prišlo do ponovnega zagona na Rele modulu
 bool system_time_set = false; // zastavica, da je bil sistemski čas nastavljen
 bool notification_awaiting_ack = false; // zastavica, da čakamo na potrditev obvestila
+
+// -- SPREMENLJIVKE IZ INA3221 SENZORJA --
+float ina3221_bus_voltage = 0.0;   // Napetost na I2C vodilu
+float ina3221_shunt_voltage = 0.0; // Napetost na shunt uporu
+float ina3221_current = 0.0;       // Tok, izmerjen z INA3221
+float ina3221_power = 0.0;         // Moč, izmerjena z INA3221
+float ina3221_total_current = 0.0;    // Tok na obremenitvi iz INA3221
+float ina3221_shunt_voltage_sum = 0.0; // Skupna napetost na shunt uporih
+
+// NOVO: Globalna spremenljivka za shranjevanje podatkov iz INA3221
+INA3221_DataPayload ina_data;
 
 // -------------------------------------------------------------
 // Definition of the Kanal (Relay) component
@@ -388,6 +399,18 @@ void Rele_readSensors()
   // Ta ukaz ne potrebuje nobenih podatkov v payloadu.
   Lora_prepare_and_send_packet(CommandType::CMD_GET_SENSORS, nullptr, 0);
   // Odgovor v Lora_handle_received_packet, - RESPONSE_SENSORS.
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Funkcija za pošiljanje ukaza za branje INA podatkov
+void Read_INA()
+{
+  Serial.println("Pripravljam paket za branje INA podatkov (CMD_GET_INA_DATA)...");
+
+  // Pošljemo paket z ukazom CMD_GET_INA_DATA.
+  // Ta ukaz ne potrebuje nobenih podatkov v payloadu.
+  Lora_prepare_and_send_packet(CommandType::CMD_GET_INA_DATA, nullptr, 0);
+  // Odgovor v Lora_handle_received_packet, - RESPONSE_INA_DATA.
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1062,6 +1085,43 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
     }
 
   // ... obdelava ostalih tipov odgovorov in notifikacij ...
+
+  //=================================================================================================
+  // NOVO: Obdelava podatkov iz INA3221 senzorja
+  //=================================================================================================
+  case CommandType::RESPONSE_INA_DATA:
+  {
+      Serial.println("Prejeti podatki iz INA3221 senzorja.");
+
+      // 1. Pošlji potrditev (ACK) nazaj na Rele
+      // uint8_t message_id = packet.messageId;
+      // Lora_prepare_and_send_response(message_id, CommandType::ACK_NOTIFICATION, &message_id, sizeof(message_id));
+
+      // 2. Preberi podatke iz payloada
+      memcpy(&ina_data, packet.payload, sizeof(INA3221_DataPayload));
+
+      // 3. Izpiši prejete podatke za preverjanje
+      String kanal_str[3] = {"Battery", "Solar", "Load"};
+      for (int i = 0; i < 3; i++) {
+          Serial.printf("  %s: Napetost: %.2f V, Tok: %.2f mA, Shunt napetost: %.2f mV, Moč: %.2f mW\n",
+                        kanal_str[i].c_str(),
+                        ina_data.channels[i].bus_voltage,
+                        ina_data.channels[i].current_mA,
+                        ina_data.channels[i].shunt_voltage_mV,
+                        ina_data.channels[i].power_mW);
+      }
+      Serial.printf("  Alert zastavice: 0x%04X\n", ina_data.alert_flags);
+      Serial.printf("  Shunt voltage Sum: %.3f \n", ina_data.shunt_voltage_sum_mV);
+      Serial.printf("  Total Current: %.3f \n", ina_data.total_current_mA);
+
+      // 4. Posodobi podatke v Firebase
+      timestamp = getTime(); // Pridobimo trenutni Unix časovni žig.
+      Firebase_Update_INA_Data(timestamp, ina_data);
+
+      break;
+  }
+
+
     //=================================================================================================
   case CommandType::NOTIFY_TIME_REQUEST:
     //=================================================================================================
@@ -1274,7 +1334,10 @@ void loop()
         {
           lastSync = millis();
           Rele_readSensors(); // Preberi senzorje in jih posodobi v Firebase
+          firebase_sensor_update = false; // Ponastavimo zastavico
+          // Počakamo da prebrane podatke senzorjev pošljemo v Firebase in šele nato pošljemo naslednji ukaz
         }
+
       }
       // --- konec periodičnih nalog ---
 
@@ -1298,6 +1361,14 @@ void loop()
         reset_occured = false; // Ponastavi zastavico
       }
 
+      //--------------------------------------------------------------------------------------------------
+      // Preveri, ali so sensorji posodobljeni v Firebase
+      if (currentInitState == InitState::STOP && firebase_sensor_update && !lora_is_busy())
+      {
+        // Pošlji ukaz za branje INA podatkov iz Rele modula
+        Read_INA();
+        firebase_sensor_update = false; // Ponastavimo zastavico
+      }
     }
   }
 
@@ -1305,5 +1376,16 @@ void loop()
   manageReleInitialization();
 
   // --- ONBOARD LED BLINK ---
-  onboard_led.blink(500, 500); // LED blinka vsakih 500 ms
+  if (currentInitState == InitState::ERROR)
+  {
+    onboard_led.blink(100, 100); // LED blinka vsakih 100 ms
+  }
+  else if (currentInitState == InitState::START || currentInitState == InitState::WAIT_FOR_INIT_COMPLETE)
+  {
+    onboard_led.blink(100, 900); // LED blinka vsakih 1000 ms
+  }
+  else
+  {
+    onboard_led.blink(500, 500); // LED blinka vsakih 500 ms
+  }
 }

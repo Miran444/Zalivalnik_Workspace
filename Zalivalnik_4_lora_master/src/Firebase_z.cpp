@@ -16,6 +16,7 @@ UserAuth user_auth(FIREBASE_API_KEY, FIREBASE_USER_EMAIL, FIREBASE_USER_PASSWORD
 // Database main path (to be updated in setup with the user UID)
 String databasePath;
 String SensorPath = "/Sensors";
+String INAPath = "/INA3221";
 String KanaliPath = "/Kanali";
 String ChartIntervalPath = "/charts/Interval";
 
@@ -70,6 +71,7 @@ void Firebase_Connect()
   // uid = FIREBASE_USER_UID;
   databasePath = "/UserData/" + uid;
   SensorPath = databasePath + "/Sensors";
+  INAPath = databasePath + "/INA3221";
   KanaliPath = databasePath + "/Kanali/kanal";
   ChartIntervalPath = databasePath + "/charts/Interval";
 
@@ -377,6 +379,75 @@ void Firebase_Update_Sensor_Data(unsigned long timestamp, float temp, float hum,
 }
 
 
+// NOVO: Funkcija za pošiljanje INA podatkov v Firebase
+//----------------------------------------------------------------------------------------------------------------------
+void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload &data)
+{
+  if (!app.ready())
+  {
+    Serial.println("Firebase ni pripravljen za pošiljanje INA podatkov.");
+    return;
+  }
+
+  Serial.println("Posodabljam INA3221 podatke v Firebase...");
+
+  object_t json, json0, json1, json2, ch0_0, ch0_1, ch0_2, ch0_3,
+      ch1_0, ch1_1, ch1_2, ch1_3,
+      ch2_0, ch2_1, ch2_2, ch2_3;
+
+  object_t obj_flags, obj_totalA, obj_sumV, obj_timestamp;
+  JsonWriter writer;
+
+    // Parent path for each sensor data entry
+  parentPath = INAPath + "/" + String(timestamp);
+
+  // Ustvarimo JSON objekte za vsak kanal posebej
+  writer.create(ch0_0, "/bus_voltage_V", number_t(data.channels[0].bus_voltage));
+  writer.create(ch0_1, "/shunt_voltage_mV", number_t(data.channels[0].shunt_voltage_mV));
+  writer.create(ch0_2, "/current_mA", number_t(data.channels[0].current_mA));
+  writer.create(ch0_3, "/power_mW", number_t(data.channels[0].power_mW));
+  writer.join(json0, 4 /* no. of object_t (s) to join */, ch0_0, ch0_1, ch0_2, ch0_3);
+  // Serial.println(json0.c_str());
+  // Database.set<object_t>(aClient, parentPath + "/ch0", json, Firebase_processResponse, "updateINA3221Task");
+
+  writer.create(ch1_0, "/bus_voltage_V", number_t(data.channels[1].bus_voltage));
+  writer.create(ch1_1, "/shunt_voltage_mV", number_t(data.channels[1].shunt_voltage_mV));
+  writer.create(ch1_2, "/current_mA", number_t(data.channels[1].current_mA));
+  writer.create(ch1_3, "/power_mW", number_t(data.channels[1].power_mW));
+  writer.join(json1, 4 /* no. of object_t (s) to join */, ch1_0, ch1_1, ch1_2, ch1_3);
+  // Serial.println(json1.c_str());
+  // Database.set<object_t>(aClient, parentPath + "/ch1", json1, Firebase_processResponse, "updateINA3221Task");
+
+  writer.create(ch2_0, "/bus_voltage_V", number_t(data.channels[2].bus_voltage));
+  writer.create(ch2_1, "/shunt_voltage_mV", number_t(data.channels[2].shunt_voltage_mV));
+  writer.create(ch2_2, "/current_mA", number_t(data.channels[2].current_mA));
+  writer.create(ch2_3, "/power_mW", number_t(data.channels[2].power_mW));
+  writer.join(json2, 4 /* no. of object_t (s) to join */, ch2_0, ch2_1, ch2_2, ch2_3);
+  // Serial.println(json2.c_str());
+  // Database.set<object_t>(aClient, parentPath + "/ch2", json2, Firebase_processResponse, "updateINA3221Task");
+
+  //Ustvarimo ostale JSON objekte
+  writer.create(obj_flags, "/alert_flags", number_t(data.alert_flags));
+  writer.create(obj_sumV, "/shunt_voltage_sum_mV", number_t(data.shunt_voltage_sum_mV));
+  writer.create(obj_totalA, "/total_current_mA", number_t(data.total_current_mA));
+  writer.create(obj_timestamp, "/timestamp", number_t(timestamp));
+
+  // Wrap channel objects with keys
+  object_t ch0_with_key, ch1_with_key, ch2_with_key;
+  writer.create(ch0_with_key, "ch0", json0);
+  writer.create(ch1_with_key, "ch1", json1);
+  writer.create(ch2_with_key, "ch2", json2);
+
+  // Join all into final JSON object
+  writer.join(json, 7 /* no. of object_t (s) to join */, ch0_with_key, ch1_with_key, ch2_with_key, obj_flags, obj_sumV, obj_totalA, obj_timestamp);
+  Serial.println(json.c_str());
+
+  // Send data to Firebase asynchronously
+  Database.set<object_t>(aClient, parentPath, json, Firebase_processResponse, "updateINA3221Task");
+
+  // Počakamo na odgovor v funkciji Firebase_processResponse
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // Funkcija za obdelavo odgovora iz Firebase
 void Firebase_processResponse(AsyncResult &aResult)
@@ -442,6 +513,7 @@ void Firebase_processResponse(AsyncResult &aResult)
       Serial.println("[FIREBASE] Sensor data uploaded");
       PrikaziStanjeSenzorjevNaSerial();  // napišemo podatke
       firebase_response_received = true; // označimo da je Firebase prejel podatke
+      firebase_sensor_update = true; // zastavica za posodobitev senzorjev v Firebase
     }
 
     if (aResult.uid() == "updateStateTask")
@@ -458,9 +530,19 @@ void Firebase_processResponse(AsyncResult &aResult)
       Serial.printf("[FIREBASE] Sensor read interval set to: %d minutes\n", sensorReadIntervalMinutes);
       firebase_response_received = true; // označimo da je Firebase prejel podatke
     }
+
+    if (aResult.uid() == "updateINA3221Task")
+    {
+      // Handle the updateINA3221Task response
+      Serial.println("[FIREBASE] INA3221 data uploaded");
+      firebase_response_received = true; // označimo da je Firebase prejel podatke
+    }
     
   }
 }
+
+
+
 //------------------------------------------------------------------------------------------------------------------------
 // Funkcija za posodobitev podatkov iz Firebase (chart interval)
 
@@ -571,8 +653,6 @@ void Firebase_processResponse(AsyncResult &aResult)
 //     status = Database.set<object_t>(aClient, parentPath, json);
 //     show_status(status);
 //   }
-// }
-
 // }
 
 // //------------------------------------------------------------------------------------------------------------------------
