@@ -653,7 +653,7 @@ void initINA3221()
 // ----------------------------------------------------------------------------
 // Funkcija za branje INA3221 senzorja
 // ----------------------------------------------------------------------------
-void Read_INA3221()
+void Read_INA3221(INA3221_DataPayload* payload = nullptr)
 {
   float sumCurrent = 0.0;
 
@@ -662,22 +662,41 @@ void Read_INA3221()
   Serial.println("\t   V \t   mV \t   mA \t   W");
   for (int ch = 0; ch < 3; ch++)
   {
+    float busVoltage = INA.getBusVoltage(ch);
+    float shuntVoltage = INA.getShuntVoltage_mV(ch);
+    float current = INA.getCurrent_mA(ch);
+    float power = INA.getPower(ch);
+
     Serial.print(ch);
     Serial.print("\t");
-    Serial.print(INA.getBusVoltage(ch), 3);
+    Serial.print(busVoltage, 3);
     Serial.print("\t");
-    Serial.print(INA.getShuntVoltage_mV(ch), 3);
+    Serial.print(shuntVoltage, 3);
     Serial.print("\t");
-    sumCurrent += INA.getCurrent_mA(ch);
-    Serial.print(INA.getCurrent_mA(ch), 3);
+    sumCurrent += current;
+    Serial.print(current, 3);
     Serial.print("\t");
-    Serial.print(INA.getPower(ch), 3);
+    Serial.print(power, 3);
     Serial.println();
+
+    if (payload) {
+      payload->channels[ch].bus_voltage = busVoltage;
+      payload->channels[ch].current_mA = current;
+      payload->channels[ch].shunt_voltage_mV = shuntVoltage;
+      payload->channels[ch].power_mW = power;
+    }
   }
+
+
   Serial.printf("Total Current: %.3f\n", sumCurrent);
   Serial.printf("Total Shunt Voltage (mV): %.3f\n", INA.getShuntVoltageSum() / 1000.0);
 
   uint16_t flags = INA.getMaskEnable();
+  if (payload) {
+    payload->alert_flags = flags;
+    payload->shunt_voltage_sum_mV = INA.getShuntVoltageSum();
+    payload->total_current_mA = sumCurrent;
+  }
 
   if (flags & INA3221_CRITICAL_CH1) {
     Serial.println("   !!! Channel 1 Critical Current !!!");
@@ -1014,10 +1033,30 @@ void handle_packet_from_bridge(const LoRaPacket &packet)
       uint8_t init_response = 0x01; // Primer odgovora
       send_response_to_bridge(packet.messageId, CommandType::RESPONSE_INIT_DONE, &init_response, sizeof(init_response));
       init_done_flag = true; // Nastavi zastavico, da je inicializacija zaključena
+      error_flag = false; // Ponastavi morebitno napako
       break;
     }
 
     //=======================================================================
+    case CommandType::CMD_GET_INA_DATA:
+    {
+      INA3221_DataPayload ina_payload;
+      Read_INA3221(&ina_payload); // Preberi podatke iz INA3221 in napolni payload
+      send_response_to_bridge(packet.messageId, CommandType::RESPONSE_INA_DATA, &ina_payload, sizeof(ina_payload));
+      break;
+    }
+
+    //=======================================================================
+    // case CommandType::CMD_RESET:
+    // {
+    //   Serial.println("Prejet CMD_RESET ukaz. Ponovni zagon naprave.");
+    //   uint8_t reset_response = 0x01; // Primer odgovora
+    //   send_response_to_bridge(packet.messageId, CommandType::RESPONSE_RESET, &reset_response, sizeof(reset_response));
+    //   delay(100); // Kratek zamik, da se odgovor lahko pošlje
+    //   ESP.restart(); // Ponovni zagon naprave
+    //   break;
+    // }
+
     // Dodajte tukaj obdelavo drugih ukazov, kot so
 
     // TODO: Dodajte še ostale ukaze (CMD_GET_URNIK, itd.)
@@ -1249,10 +1288,17 @@ void loop()
   // Preberi podatke iz relaySerial in obdelaj pakete
   ReadFromRelaySerial();
 
-  //vsakih 10sec preberi INA3221 senzor
+  //vsakih 10sec preberi INA3221 senzor in pošlji podatke
   if (millis() - lastINA3221ReadTime >= 10000) {
     lastINA3221ReadTime = millis();
-    Read_INA3221();
+    
+    // INA3221_DataPayload ina_payload;
+    // Read_INA3221(&ina_payload); // Preberi podatke v strukturo
+
+    // // Pošlji obvestilo z INA3221 podatki
+    // // Predpostavljam, da je v CommandType dodan NOTIFY_INA_DATA
+    // send_notification_to_bridge(CommandType::NOTIFY_INA_DATA, &ina_payload, sizeof(ina_payload));
+    // // Pričakujemo ACK za to obvestilo
   }
 
   if (error_flag)
