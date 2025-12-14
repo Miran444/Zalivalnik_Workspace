@@ -484,21 +484,7 @@ void Firebase_processResponse(AsyncResult &aResult)
       // channelBeingProcessed++;
       endSecReceived = true; // označimo, da smo prejeli end_sec
     }
-
-    // ko preberemo obe vrednosti enega kanala, lahko nadaljujemo
-    if (startSecReceived && endSecReceived)
-    {
-      Serial.printf("[FIREBASE] Prebrano iz Firebase za kanal %d: start=%d, end=%d\n",
-                    currentChannelInProcess + 1,
-                    firebase_kanal[currentChannelInProcess].start_sec,
-                    firebase_kanal[currentChannelInProcess].end_sec);
-      // channelBeingProcessed = 0; // reset za naslednji kanal
-      startSecReceived = false;
-      endSecReceived = false;
-      firebase_response_received = true;
-    }
-
-    if (aResult.uid() == "updateSensorTask")
+    else if (aResult.uid() == "updateSensorTask")
     {
       // Handle the updateSensorTask response
       Serial.println("[FIREBASE] Sensor data uploaded");
@@ -523,6 +509,19 @@ void Firebase_processResponse(AsyncResult &aResult)
       // Handle the updateINA3221Task response
       Serial.println("[FIREBASE] INA3221 sensor data uploaded");
       firebase_response_received = true; // označimo da je Firebase prejel podatke
+    }
+
+    // ko preberemo obe vrednosti enega kanala, lahko nadaljujemo
+    if (startSecReceived && endSecReceived)
+    {
+      Serial.printf("[FIREBASE] Prebrano iz Firebase za kanal %d: start=%d, end=%d\n",
+                    currentChannelInProcess + 1,
+                    firebase_kanal[currentChannelInProcess].start_sec,
+                    firebase_kanal[currentChannelInProcess].end_sec);
+      // channelBeingProcessed = 0; // reset za naslednji kanal
+      startSecReceived = false;
+      endSecReceived = false;
+      firebase_response_received = true;
     }
     
   }
