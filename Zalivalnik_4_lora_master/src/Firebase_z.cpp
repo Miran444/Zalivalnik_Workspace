@@ -378,8 +378,9 @@ void Firebase_Update_Sensor_Data(unsigned long timestamp, float temp, float hum,
 
 //------------------------------------------------------------------------------------------------------------------------
 // Funkcija za posodobitev podatkov INA3221 senzorja v Firebase
-// Ta funkcija ustvari gnezdeno strukturo kot je opisano v zahtevi:
-// sensors/ina3221_device_1/readings/{timestamp}/...
+// Ta funkcija ustvari gnezdeno strukturo kot je opisana v zahtevi.
+// Firebase path: /UserData/{uid}/sensors/{device_id}/readings/{timestamp}/...
+// Example: /UserData/abc123/sensors/ina3221_device_1/readings/1678886400/ch0/bus_voltage_V
 
 void Firebase_Update_INA3221_Data(const char* device_id, unsigned long timestamp, 
                                   uint16_t alert_flags, float shunt_voltage_sum_mV, float total_current_mA,
@@ -405,48 +406,48 @@ void Firebase_Update_INA3221_Data(const char* device_id, unsigned long timestamp
   // Note: The following code creates objects for each channel separately.
   // While this appears repetitive, it follows the FirebaseClient library pattern
   // for building nested JSON structures using object_t and JsonWriter.
-  // See library examples at lines 835-867 for similar patterns.
+  // See commented examples in this file (set_async function) for similar patterns.
 
-  // Ustvari objekte za ch0
+  // Create objects for ch0
   writer.create(ch0_bus, "bus_voltage_V", number_t(ch0_bus_V, 3));
   writer.create(ch0_shunt, "shunt_voltage_mV", number_t(ch0_shunt_mV, 3));
   writer.create(ch0_current, "current_mA", number_t(ch0_current_mA, 3));
   writer.create(ch0_power, "power_mW", number_t(ch0_power_mW, 3));
   writer.join(ch0_obj, 4, ch0_bus, ch0_shunt, ch0_current, ch0_power);
 
-  // Ustvari objekte za ch1
+  // Create objects for ch1
   writer.create(ch1_bus, "bus_voltage_V", number_t(ch1_bus_V, 3));
   writer.create(ch1_shunt, "shunt_voltage_mV", number_t(ch1_shunt_mV, 3));
   writer.create(ch1_current, "current_mA", number_t(ch1_current_mA, 3));
   writer.create(ch1_power, "power_mW", number_t(ch1_power_mW, 3));
   writer.join(ch1_obj, 4, ch1_bus, ch1_shunt, ch1_current, ch1_power);
 
-  // Ustvari objekte za ch2
+  // Create objects for ch2
   writer.create(ch2_bus, "bus_voltage_V", number_t(ch2_bus_V, 3));
   writer.create(ch2_shunt, "shunt_voltage_mV", number_t(ch2_shunt_mV, 3));
   writer.create(ch2_current, "current_mA", number_t(ch2_current_mA, 3));
   writer.create(ch2_power, "power_mW", number_t(ch2_power_mW, 3));
   writer.join(ch2_obj, 4, ch2_bus, ch2_shunt, ch2_current, ch2_power);
 
-  // Ustvari glavne vrednosti (alert_flags, shunt_voltage_sum_mV, total_current_mA)
+  // Create main values (alert_flags, shunt_voltage_sum_mV, total_current_mA)
   writer.create(alert_obj, "alert_flags", alert_flags);
   writer.create(shunt_sum_obj, "shunt_voltage_sum_mV", number_t(shunt_voltage_sum_mV, 3));
   writer.create(total_current_obj, "total_current_mA", number_t(total_current_mA, 3));
 
-  // Preoblikuj ch0_obj, ch1_obj, ch2_obj v object_t s ključi
+  // Wrap channel objects with keys
   object_t ch0_with_key, ch1_with_key, ch2_with_key;
   writer.create(ch0_with_key, "ch0", ch0_obj);
   writer.create(ch1_with_key, "ch1", ch1_obj);
   writer.create(ch2_with_key, "ch2", ch2_obj);
 
-  // Združi vse v končni JSON objekt
+  // Join all into final JSON object
   writer.join(json, 6, alert_obj, shunt_sum_obj, total_current_obj, 
               ch0_with_key, ch1_with_key, ch2_with_key);
 
-  // Ustvari pot v Firebase: /UserData/{uid}/sensors/{device_id}/readings/{timestamp}
+  // Create Firebase path: /UserData/{uid}/sensors/{device_id}/readings/{timestamp}
   String parentPath = databasePath + "/sensors/" + String(device_id) + "/readings/" + String(timestamp);
 
-  // Pošlji podatke v Firebase
+  // Send data to Firebase asynchronously
   Database.set<object_t>(aClient, parentPath, json, Firebase_processResponse, "updateINA3221Task");
 }
 
