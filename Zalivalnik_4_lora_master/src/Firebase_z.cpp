@@ -396,6 +396,11 @@ void Firebase_Update_INA3221_Data(const char* device_id, unsigned long timestamp
   
   JsonWriter writer;
 
+  // Note: The following code creates objects for each channel separately.
+  // While this appears repetitive, it follows the FirebaseClient library pattern
+  // for building nested JSON structures using object_t and JsonWriter.
+  // See library examples at lines 835-867 for similar patterns.
+
   // Ustvari objekte za ch0
   writer.create(ch0_bus, "bus_voltage_V", number_t(ch0_bus_V, 3));
   writer.create(ch0_shunt, "shunt_voltage_mV", number_t(ch0_shunt_mV, 3));
