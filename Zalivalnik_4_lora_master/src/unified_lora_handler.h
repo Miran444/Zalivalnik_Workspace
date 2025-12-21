@@ -6,7 +6,7 @@
 using PacketHandlerCallback = void (*)(const LoRaPacket& packet);
 
 void lora_initialize(PacketHandlerCallback callback);
-void lora_loop();
+//void lora_loop();
 bool lora_send_packet(const LoRaPacket& packet);
 // --- NOVO: Funkciji za upravljanje stanja čakanja ---
 void lora_set_waiting_for_response(bool waiting); // Nastavi stanje čakanja na odgovor

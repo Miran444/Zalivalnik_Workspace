@@ -111,6 +111,12 @@ struct RelayStateChangePayload {
   uint8_t newState;  // Novo stanje (0 za OFF, 1 za ON)
 };
 
+struct RelayStatePayload {
+  uint8_t channel; // Indeks releja (0-7)
+  bool state;  // Novo stanje (0 za OFF, 1 za ON)
+};
+
+
 // --- Glavna struktura paketa ---
 struct LoRaPacket {
     uint16_t syncWord;
@@ -131,7 +137,7 @@ struct INA3221_DataPayload {
     INA3221_ChannelData channels[3];
     uint16_t alert_flags;
     float shunt_voltage_sum_mV;
-    float total_current_mA;
+    // float total_current_mA;
 };
 
 // --- DODAJTE TO VRSTICO ---

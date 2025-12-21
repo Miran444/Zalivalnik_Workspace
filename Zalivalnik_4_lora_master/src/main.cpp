@@ -21,6 +21,25 @@
 #include "message_protocol.h"
 
 #define IS_MASTER
+#define DEFAULT_SENSOR_READ_INTERVAL_MINUTES 5 // Privzeti interval branja senzorjev v minutah
+// --- NOVO: Struktura in čakalna vrsta za Firebase naloge ---
+enum class FirebaseTaskType {
+    UPDATE_SENSORS,
+    UPDATE_INA,
+    UPDATE_RELAY_STATE,
+    READ_INTERVAL
+};
+
+struct FirebaseQueueItem {
+    FirebaseTaskType taskType;
+    union {
+        SensorDataPayload sensorData;
+        INA3221_DataPayload inaData;
+        RelayStatePayload relayState;
+    } data;
+    unsigned long timestamp;
+};
+// ---------------------------------------------------------
 
 // --- GLOBALNE SPREMENLJIVKE ---
 
@@ -51,6 +70,8 @@ uint32_t Interval_mS = 0;     // Interval v milisekundah
 enum class InitState
 {
   IDLE,                       // Ne dela ničesar
+  READ_FIREBASE_INTERVAL,     // Pošlji zahtevo za branje intervala iz Firebase
+  WAIT_FOR_INTERVAL_RESPONSE, // Čakaj na odgovor za interval
   START,                      // Začetek inicializacije
   SEND_TIME,                  // Pošlji ukaz za čas
   WAIT_FOR_TIME_RESPONSE,     // Čakaj na odgovor za čas
@@ -79,6 +100,7 @@ uint8_t currentChannelInProcess = 0;          // Kateri kanal (0-7) trenutno obd
 // --- SPREMENLJIVKE ZA TIMEOUT PRI INICIALIZACIJI ---
 unsigned long initState_timeout_start = 0;           // Časovnik za timeout pri čakanju na odgovor
 const unsigned long INIT_RESPONSE_TIMEOUT_MS = 5000; // 5 sekund za odgovor
+const unsigned long FIREBASE_RESPONSE_TIMEOUT_MS = 15000; // 15 sekund za odgovor iz Firebase
 
 // --- SPREMENLJIVKE ZA PONOVNE POSKUSE ---
 const uint8_t MAX_INIT_RETRIES = 3; // Največje število ponovnih poskusov
@@ -87,23 +109,37 @@ uint8_t init_retry_count = 0;       // Trenutni števec ponovnih poskusov
 // zastavice za spremljanje prejetih odgovorov
 bool lora_response_received = false;     // Ali je bil prejet Lora odgovor
 bool firebase_response_received = false; // Ali smo prejeli odgovor iz Firebase?
-LoRaPacket last_received_packet;         // Shranimo zadnji prejeti paket za obdelavo v avtomatu
+// LoRaPacket last_received_packet;         // Shranimo zadnji prejeti paket za obdelavo v avtomatu
 
-bool firebase_sensor_update = false; // zastavica za posodobitev senzorjev v Firebase
+// bool firebase_sensor_update = false; // zastavica za posodobitev senzorjev v Firebase
 bool reset_occured = false; // zastavica, da je prišlo do ponovnega zagona na Rele modulu
-bool system_time_set = false; // zastavica, da je bil sistemski čas nastavljen
-bool notification_awaiting_ack = false; // zastavica, da čakamo na potrditev obvestila
+// bool system_time_set = false; // zastavica, da je bil sistemski čas nastavljen
+// bool notification_awaiting_ack = false; // zastavica, da čakamo na potrditev obvestila
 
 // -- SPREMENLJIVKE IZ INA3221 SENZORJA --
-float ina3221_bus_voltage = 0.0;   // Napetost na I2C vodilu
-float ina3221_shunt_voltage = 0.0; // Napetost na shunt uporu
-float ina3221_current = 0.0;       // Tok, izmerjen z INA3221
-float ina3221_power = 0.0;         // Moč, izmerjena z INA3221
-float ina3221_total_current = 0.0;    // Tok na obremenitvi iz INA3221
-float ina3221_shunt_voltage_sum = 0.0; // Skupna napetost na shunt uporih
+// float ina3221_bus_voltage = 0.0;   // Napetost na I2C vodilu
+// float ina3221_shunt_voltage = 0.0; // Napetost na shunt uporu
+// float ina3221_current = 0.0;       // Tok, izmerjen z INA3221
+// float ina3221_power = 0.0;         // Moč, izmerjena z INA3221
+// float ina3221_total_current = 0.0;    // Tok na obremenitvi iz INA3221
+// float ina3221_shunt_voltage_sum = 0.0; // Skupna napetost na shunt uporih
 
-// NOVO: Globalna spremenljivka za shranjevanje podatkov iz INA3221
+// Globalna spremenljivka za shranjevanje podatkov iz INA3221
 INA3221_DataPayload ina_data;
+
+// Semafor za sinhronizacijo Firebase in INA
+SemaphoreHandle_t firebaseSemaphore;
+// NOVO: Semafor za zaščito Firebase klicev
+SemaphoreHandle_t firebaseMutex;
+
+// Semafor za sinhronizacijo Firebase in glavnega toka
+QueueHandle_t firebaseQueue;
+
+// Prototipi za Taske
+void ReadSensorsTask(void *pvParameters);
+void LoRaTask(void *pvParameters);
+void ReadINATask(void *pvParameters);
+void FirebaseUpdateTask(void *pvParameters);
 
 // -------------------------------------------------------------
 // Definition of the Kanal (Relay) component
@@ -137,7 +173,7 @@ Kanal firebase_kanal[8] = {
     {false, "00:00", 0, "00:00", 0},
     {false, "00:00", 0, "00:00", 0}}; // Končamo z definicijo Firebase kanalov
 
-// globalne spremenljivke za temperature in vlažnost
+// globalne spremenljivke za podatke senzorjev
 float Temperature = 0.0;        // trenutna temperatura
 float Humidity = 0.0;           // trenutna vlažnost
 float SoilMoisture = 0.0;       // trenutna vlažnost tal
@@ -146,8 +182,8 @@ float CurrentConsumption = 0.0; // trenutna poraba toka
 float WaterConsumption = 0.0;   // skupna poraba vode
 
 // globalne spremenljivke za napetost in porabo
-float voltage = 0.0; // trenutna napetost
-float current = 0.0; // trenutna poraba
+// float voltage = 0.0; // trenutna napetost
+// float current = 0.0; // trenutna poraba
 
 // spremenljivke za Firebase
 FirebaseApp app;
@@ -315,8 +351,13 @@ void Lora_prepare_and_send_packet(CommandType cmd, const void *payload_data, siz
   {
     memcpy(packet.payload, payload_data, payload_size);
   }
+    // Preveri porabo sklada
+    UBaseType_t stackLeft = uxTaskGetStackHighWaterMark(NULL);
+    Serial.printf("[Lora] Preostala velikost sklada: %d bajtov\n", stackLeft); 
+
   String logMsg = "OUT ID: " + String(packet.messageId) + ", CMD: " + String((uint8_t)packet.command);
-  displayLogOnLine(4, logMsg.c_str());
+  Serial.println(logMsg);
+  // displayLogOnLine(4, logMsg.c_str());
   packet.crc = calculate_crc((const uint8_t *)&packet, offsetof(LoRaPacket, crc));
 
   // --- SPREMENJENO: Aktiviramo splošni mehanizem za ponovne poskuse SAMO, ČE NE POTEKA INICIALIZACIJA ---
@@ -533,6 +574,46 @@ void manageReleInitialization()
   // Glavna logika avtomata
   switch (currentInitState)
   {
+
+
+  // --- NOVO STANJE: Pošlji zahtevo za branje intervala ---
+  //============================================================================
+  case InitState::READ_FIREBASE_INTERVAL:
+  //============================================================================
+    displayLogOnLine(LINE_ERROR_WARNING, "[INIT] Reading Interval...");
+    
+    // Pošlji zahtevo v čakalno vrsto
+    FirebaseQueueItem newItem;
+    newItem.taskType = FirebaseTaskType::READ_INTERVAL;
+    if (xQueueSend(firebaseQueue, &newItem, pdMS_TO_TICKS(100)) == pdPASS) {
+        firebase_response_received = false; // Ponastavimo zastavico za odgovor
+        initState_timeout_start = millis();      // Ponastavimo timer za timeout
+        currentInitState = InitState::WAIT_FOR_INTERVAL_RESPONSE;
+    } else {
+        Serial.println("[INIT] Napaka: Vrsta za Firebase je polna, branje intervala ni uspelo!");
+        currentInitState = InitState::ERROR; // Preidemo v stanje napake
+    }
+    break;
+
+
+  // --- NOVO STANJE: Čakaj na odgovor za interval ---
+  //============================================================================
+  case InitState::WAIT_FOR_INTERVAL_RESPONSE:
+  //============================================================================  
+    if (firebase_response_received)
+    {
+      Serial.println("[INIT] Uspeh pri branju intervala.");
+      currentInitState = InitState::START; // Nadaljujemo z naslednjim korakom (START)
+      initState_timeout_start = millis(); // Ponastavimo timer za naslednji korak
+    }
+    else if (millis() - initState_timeout_start > FIREBASE_RESPONSE_TIMEOUT_MS)
+    {
+      Serial.println("[INIT] Timeout pri čakanju na 'odgovor za interval'. Uporabljam privzeto vrednost.");
+      set_Interval(DEFAULT_SENSOR_READ_INTERVAL_MINUTES); // Nastavimo privzeto vrednost
+      currentInitState = InitState::START; // Vseeno nadaljujemo z inicializacijo
+    }
+    break;
+
   //============================================================================
   case InitState::START:
     //============================================================================
@@ -807,6 +888,7 @@ void manageReleInitialization()
     if (millis() - initState_timeout_start > 300000)
     { // 5 minut (300000 ms)
       Serial.println("[INIT] Ponovni poskus inicializacije po napaki...");
+
       currentInitState = InitState::START;
       init_retry_count = 0; // Ponastavimo števec poskusov
     }
@@ -825,7 +907,7 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
 //================================================================================================================
 {
 
-  // --- NOVO: Ob prejemu kateregakoli odgovora, ustavimo mehanizem za ponovne poskuse ---
+  // --- Ob prejemu kateregakoli odgovora, ustavimo mehanizem za ponovne poskuse ---
   if (is_waiting_for_critical_response)
   {
     Serial.println("[LORA RETRY] Prejet odgovor, ustavljam mehanizem za ponovne poskuse.");
@@ -835,7 +917,8 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
 
   // Prikažemo ID in ukaz prejetega paketa na zaslonu
   String logMsg = "In ID: " + String(packet.messageId) + ", CMD: " + String((uint8_t)packet.command);
-  displayLogOnLine(4, logMsg.c_str());
+  Serial.println(logMsg);
+  // displayLogOnLine(4, logMsg.c_str());
 
   // Preverimo CRC
   uint16_t received_crc = packet.crc;
@@ -935,8 +1018,18 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
       // Tukaj obdelajte podatke senzorjev, npr. posodobite Firebase
       timestamp = getTime(); // Pridobimo trenutni Unix časovni žig.
       // Posodobimo Firebase z novimi podatki senzorjev
-      firebase_response_received = false;
-      Firebase_Update_Sensor_Data(timestamp, Temperature, Humidity, SoilMoisture);
+
+      // --- SPREMENJENO: Pošlji v čakalno vrsto namesto direktnega klica ---
+      FirebaseQueueItem item;
+      item.taskType = FirebaseTaskType::UPDATE_SENSORS;
+      item.timestamp = timestamp;
+      memcpy(&item.data.sensorData, &sensors, sizeof(SensorDataPayload));
+      if (xQueueSend(firebaseQueue, &item, (TickType_t)10) != pdPASS) {
+          Serial.println("NAPAKA: Ni bilo mogoče poslati podatkov senzorjev v Firebase čakalno vrsto!");
+      }
+
+      // firebase_response_received = false;
+      // Firebase_Update_Sensor_Data(timestamp, sensors);
       // povratna informacija za update v: Firebase_processResponse
       // PrikaziStanjeSenzorjevNaSerial();
       lora_response_received = true; // nastavimo zastavico za inicializacijski avtomat
@@ -1070,7 +1163,15 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
         if (kanal[i].state != is_on)
         {
           Serial.printf("  Rele %d novo stanje: %s\n", i + 1, is_on ? "ON" : "OFF");
-          Firebase_Update_Relay_State(i + 1, is_on); // Posodobimo stanje na Firebase
+          // Firebase_Update_Relay_State(i + 1, is_on); // Posodobimo stanje na Firebase
+          // --- SPREMENJENO: Pošlji v čakalno vrsto namesto direktnega klica ---
+          FirebaseQueueItem item;
+          item.taskType = FirebaseTaskType::UPDATE_RELAY_STATE;
+          item.data.relayState.channel = i + 1;
+          item.data.relayState.state = is_on;
+          if (xQueueSend(firebaseQueue, &item, (TickType_t)10) != pdPASS) {
+              Serial.println("NAPAKA: Ni bilo mogoče poslati stanja releja v Firebase čakalno vrsto!");
+          }          
 #ifdef IS_MASTER
           kanal[i].state = is_on; // Posodobimo lokalno stanje
 #endif
@@ -1093,14 +1194,10 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
   {
       Serial.println("Prejeti podatki iz INA3221 senzorja.");
 
-      // 1. Pošlji potrditev (ACK) nazaj na Rele
-      // uint8_t message_id = packet.messageId;
-      // Lora_prepare_and_send_response(message_id, CommandType::ACK_NOTIFICATION, &message_id, sizeof(message_id));
-
-      // 2. Preberi podatke iz payloada
+      // 1. Preberi podatke iz payloada
       memcpy(&ina_data, packet.payload, sizeof(INA3221_DataPayload));
 
-      // 3. Izpiši prejete podatke za preverjanje
+      // 2. Izpiši prejete podatke za preverjanje
       String kanal_str[3] = {"Battery", "Solar", "Load"};
       for (int i = 0; i < 3; i++) {
           Serial.printf("  %s: Napetost: %.2f V, Tok: %.2f mA, Shunt napetost: %.2f mV, Moč: %.2f mW\n",
@@ -1112,11 +1209,19 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
       }
       Serial.printf("  Alert zastavice: 0x%04X\n", ina_data.alert_flags);
       Serial.printf("  Shunt voltage Sum: %.3f \n", ina_data.shunt_voltage_sum_mV);
-      Serial.printf("  Total Current: %.3f \n", ina_data.total_current_mA);
 
-      // 4. Posodobi podatke v Firebase
+      // 3. Posodobi podatke v Firebase
       timestamp = getTime(); // Pridobimo trenutni Unix časovni žig.
-      Firebase_Update_INA_Data(timestamp, ina_data);
+      // Firebase_Update_INA_Data(timestamp, ina_data);
+      // --- Pošlji v čakalno vrsto za posodobitev Firebase namesto direktnega klica ---
+      FirebaseQueueItem item;
+      item.taskType = FirebaseTaskType::UPDATE_INA;
+      item.timestamp = timestamp;
+      memcpy(&item.data.inaData, &ina_data, sizeof(INA3221_DataPayload));
+      if (xQueueSend(firebaseQueue, &item, (TickType_t)10) != pdPASS) {
+          Serial.println("NAPAKA: Ni bilo mogoče poslati INA podatkov v Firebase čakalno vrsto!");
+      }
+
 
       break;
   }
@@ -1173,7 +1278,7 @@ void manage_lora_retries()
     {
       // Presegli smo število poskusov, obupamo
       Serial.printf("[LORA RETRY] NAPAKA: Preseženo število poskusov za ukaz %d. Obupujem.\n", (int)last_sent_packet.command);
-      displayLogOnLine(LINE_LORA_STATUS, "[LoRa] Fatal Timeout!");
+      // displayLogOnLine(LINE_LORA_STATUS, "[LoRa] Fatal Timeout!");
       is_waiting_for_critical_response = false; // Prenehamo čakati
       lora_set_waiting_for_response(false);     // Sprostimo tudi splošno zastavico
     }
@@ -1219,11 +1324,9 @@ void setup()
   onboard_led.update();             // update the LED state
 
   Serial.begin(115200); // Inicializiraj serijsko komunikacijo
-
   init_display(); // Inicializiraj OLED zaslon
 
   connectToWiFi(); // Povezava z WiFi
-
   syncTimestamp(); // Sinhroniziraj čas z NTP strežnikom
 
   displayLogOnLine(LINE_TITLE, "Master LoRa");
@@ -1239,11 +1342,30 @@ void setup()
   Init_Firebase(); // Inicializiraj Firebase
   displayLogOnLine(LINE_RSSI_SNR, "Init Firebase...OK");
   delay(400);
+
+  // Inicializacija semaforjev
+  firebaseSemaphore = xSemaphoreCreateBinary();  // Inicializacija semaforja
+  firebaseMutex = xSemaphoreCreateMutex(); // NOVO: Inicializacija Mutex-a
+  if (firebaseSemaphore == NULL || firebaseMutex == NULL) {
+    Serial.println("Napaka: Semafor ni ustvarjen!");
+  }
+
+  // --- NOVO: Ustvarjanje čakalne vrste za Firebase ---
+  firebaseQueue = xQueueCreate(10, sizeof(FirebaseQueueItem));
+  if (firebaseQueue == NULL) {
+      Serial.println("Napaka: Firebase čakalna vrsta ni ustvarjena!");
+  }
+
+  // Inicializacija FreeRTOS taskov
+  xTaskCreate(ReadSensorsTask, "ReadSensorsTask", 4096, NULL, 1, NULL);       // Naloga za branje senzorjev (nižja prioriteta)
+  xTaskCreate(LoRaTask, "LoRaTask", 4096, NULL, 2, NULL);                     // Naloga za LoRa komunikacijo (višja prioriteta)
+  xTaskCreate(ReadINATask, "ReadINATask", 4096, NULL, 1, NULL);               // Naloga za branje INA3221 (nižja prioriteta)
+  xTaskCreate(FirebaseUpdateTask, "FirebaseUpdateTask", 8192, NULL, 1, NULL); // Naloga za posodabljanje Firebase (nižja prioriteta)
+
+
   displayLogOnLine(LINE_RSSI_SNR, "Init done.");
   displayLogOnLine(LINE_LORA_STATUS, "Setup board...OK");
   displayLogOnLine(LINE_PACKET_INFO, "WAITING FOR DATA");
-  // rele_setup_ciklus_done = true; // Postavimo flag, da je rele setup ciklus končan
-  // rele_setup_status = 0;         // Premaknemo se na prvi korak
 
   Serial.println("Setup končan.");
   printLocalTime();                                     // Izpiši lokalni čas
@@ -1252,28 +1374,147 @@ void setup()
   secFromMidnight = getCurrentSeconds();                // Pridobimo trenutni čas v sekundah od polnoči
 }
 
+
+
+//---------------------------------------------------------------------------------------------------------------------
+// Naloga za periodično branje senzorjev in pošiljanje podatkov INA3221
+//---------------------------------------------------------------------------------------------------------------------
+void ReadSensorsTask(void *pvParameters)
+{
+  // --- SPREMENJENO: Interval je zdaj dinamičen, prebran iz Firebase ---
+  // const uint32_t SENSORS_INTERVAL_MS = 120000; // Interval za branje senzorjev (2 minuti)
+
+  TickType_t lastWakeTime = xTaskGetTickCount(); // Shrani trenutni čas
+
+  for (;;)
+  {
+    // --- SPREMENJENO: Najprej počakaj, nato izvedi ---
+
+    // Počakamo, dokler ne preteče nastavljen interval.
+    // Uporabimo globalno spremenljivko Interval_mS, ki jo nastavi Firebase.
+    // Če Interval_mS še ni nastavljen (je 0), bomo čakali zelo kratek čas,
+    // kar je v redu, saj bo preverjanje v if stavku preprečilo izvajanje.
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(Interval_mS > 0 ? Interval_mS : 1000));
+
+    // Izvedemo branje samo, če je inicializacija končana in je interval smiseln.
+    if (init_done_flag && Interval_mS > 0)
+    {
+        // Preberi podatke senzorjev
+        Rele_readSensors();
+
+        // Preveri porabo sklada
+        UBaseType_t stackLeft = uxTaskGetStackHighWaterMark(NULL);
+        Serial.printf("[SensorsTask] Preostala velikost sklada: %d bajtov\n", stackLeft);
+    }
+  }
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+// Naloga za branje podatkov iz INA3221 senzorja
+//---------------------------------------------------------------------------------------------------------------------
+void ReadINATask(void *pvParameters)
+{
+  for (;;)
+  {
+    // Čakaj na semafor iz ReadSensorsTask
+    if (xSemaphoreTake(firebaseSemaphore, portMAX_DELAY) == pdTRUE && currentInitState == InitState::STOP)
+    {
+      // Ko semafor osvobodi ReadSensorsTask in je inicijacija končana, nadaljuj z obdelavo INA
+      Read_INA();
+    }
+  }
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+// Naloga za upravljanje LoRa komunikacije in ponovnih poskusov
+void LoRaTask(void *pvParameters)
+{
+  for (;;)
+  {
+    // Upravljaj ponovne poskuse za pomembne zahteve
+    manage_lora_retries();
+
+    // Obdelaj dohodne in izhodne LoRa pakete
+    if (lora_new_packet_available)
+    {
+
+      Lora_handle_received_packet(lora_received_packet);
+      lora_new_packet_available = false; // Ponastavi zastavico
+    }
+
+    // Uporabi FreeRTOS delay, da osveži task breme
+    vTaskDelay(pdMS_TO_TICKS(10)); // 10 ms delay
+  }
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+// --- NOVO: Task za obdelavo Firebase operacij ---
+void FirebaseUpdateTask(void *pvParameters) {
+    FirebaseQueueItem receivedItem;
+
+    for (;;) {
+        // Čakaj na element v čakalni vrsti
+        if (xQueueReceive(firebaseQueue, &receivedItem, portMAX_DELAY) == pdPASS) {
+            Serial.println("[FirebaseUpdateTask] Prejet nov zahtevek za obdelavo.");
+
+            // Zakleni dostop do Firebase
+            if (xSemaphoreTake(firebaseMutex, pdMS_TO_TICKS(1000)) == pdTRUE) {
+                switch (receivedItem.taskType) {
+                    case FirebaseTaskType::UPDATE_SENSORS:
+                        Serial.println("[FirebaseUpdateTask] Posodabljam podatke senzorjev...");
+                        Firebase_Update_Sensor_Data(receivedItem.timestamp, receivedItem.data.sensorData);
+                        break;
+
+                    case FirebaseTaskType::UPDATE_INA:
+                        Serial.println("[FirebaseUpdateTask] Posodabljam podatke INA...");
+                        Firebase_Update_INA_Data(receivedItem.timestamp, receivedItem.data.inaData);
+                        break;
+
+                    case FirebaseTaskType::UPDATE_RELAY_STATE:
+                        Serial.printf("[FirebaseUpdateTask] Posodabljam stanje releja %d...\n", receivedItem.data.relayState.channel);
+                        Firebase_Update_Relay_State(receivedItem.data.relayState.channel, receivedItem.data.relayState.state);
+                        break;
+
+                    // --- DODAJTE NOVO OBRAVNAVO ---
+                    case FirebaseTaskType::READ_INTERVAL:
+                        Serial.println("[FirebaseUpdateTask] Berem interval...");
+                        Firebase_readInterval();
+                        break;                        
+                }
+                // Sprosti dostop do Firebase
+                xSemaphoreGive(firebaseMutex);
+            } else {
+                Serial.println("[FirebaseUpdateTask] NAPAKA: Timeout pri čakanju na Firebase mutex!");
+            }
+             // Preveri porabo sklada
+            UBaseType_t stackLeft = uxTaskGetStackHighWaterMark(NULL);
+            Serial.printf("[FirebaseUpdateTask] Preostala velikost sklada: %d bajtov\n", stackLeft);
+        }
+    }
+}
+
 //---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
 
   // Glavna zanka opravila LoRa komunikacije
-  lora_loop();
+  // lora_loop();
 
   // --- SPREMENJENO: Kličemo novo funkcijo za upravljanje ponovnih poskusov ---
   // Ta se bo zdaj izvajala samo za ukaze izven inicializacije.
-  manage_lora_retries();
+  // manage_lora_retries();
 
-  // Ali je na voljo nov paket, ki ga je pripravil lora_loop?
-  if (lora_new_packet_available)
-  {
-    Serial.println("[MAIN] Obdelujem nov LoRa paket iz čakalne vrste...");
+  // // Ali je na voljo nov paket, ki ga je pripravil lora_loop?
+  // if (lora_new_packet_available)
+  // {
+  //   Serial.println("[MAIN] Obdelujem nov LoRa paket iz čakalne vrste...");
 
-    // Kličemo glavno logiko aplikacije s podatki iz nabiralnika
-    Lora_handle_received_packet(lora_received_packet);
+  //   // Kličemo glavno logiko aplikacije s podatki iz nabiralnika
+  //   Lora_handle_received_packet(lora_received_packet);
 
-    // Počistimo zastavico, da ne obdelamo istega paketa večkrat
-    lora_new_packet_available = false;
-  }
+  //   // Počistimo zastavico, da ne obdelamo istega paketa večkrat
+  //   lora_new_packet_available = false;
+  // }
 
   //-------------------------------------------------------------------------------------
   // Ali imamo čakajočo posodobitev IN ali je LoRa sedaj prosta?
@@ -1301,75 +1542,82 @@ void loop()
 
   //-------------------------------------------------------------------------------------
   // Firebase obdelava
-  app.loop(); // To maintain the authentication and async tasks
-
-  if (app.ready())
+  // --- SPREMENJENO: Zaščitimo klice Firebase z mutexom ---
+  if (xSemaphoreTake(firebaseMutex, pdMS_TO_TICKS(10)) == pdTRUE)
   {
-    if (!taskComplete)  // samo na začetku
+    app.loop(); // To maintain the authentication and async tasks
+
+    if (app.ready())
     {
-      displayLogOnLine(LINE_RSSI_SNR, "Init Firebase...OK");
-      taskComplete = true;
-      displayLogOnLine(LINE_LORA_STATUS, "Link Firebase...");
-      Firebase_Connect();
-      displayLogOnLine(LINE_LORA_STATUS, "Link Firebase...OK");
-
-      // tukaj poskušamo pridobiti Interval iz Firebase, če še ni bil pridobljen
-      firebase_response_received = false; // Ponastavimo zastavico
-      Firebase_readInterval(); // Preberemo interval branja senzorjev iz Firebase
-      // povratna informacija v: Firebase_processResponse in postavi Interval_mS
-
-      // --- ZAŽENEMO manageReleInitialization ---
-      initState_timeout_start = millis(); // Zaženemo timer za timeout
-      currentInitState = InitState::START;
-
-      firebase_init_flag = true; // Nastavimo flag, da je Firebase inicializiran
-    }
-    else
-    {
-      //---- Periodične naloge----
-      // Tukaj lahko izvajamo periodične naloge ko smo končali z inicializacijo
-      if (Interval_mS > 0)
+      if (!taskComplete) // samo na začetku
       {
-        if (currentInitState == InitState::STOP && millis() - lastSync > Interval_mS)
+        displayLogOnLine(LINE_RSSI_SNR, "Init Firebase...OK");
+        taskComplete = true;
+        displayLogOnLine(LINE_LORA_STATUS, "Link Firebase...");
+        Firebase_Connect();
+        displayLogOnLine(LINE_LORA_STATUS, "Link Firebase...OK");
+
+        // --- SPREMENJENO: Samo zaženemo avtomatiko, ne kličemo Firebase neposredno ---
+        initState_timeout_start = millis(); // Zaženemo timer za timeout
+        currentInitState = InitState::READ_FIREBASE_INTERVAL; // ZAČNEMO Z BRANJEM INTERVALA
+
+        firebase_init_flag = true; // Nastavimo flag, da je Firebase inicializiran
+      }
+      else
+      {
+        //---- Periodične naloge----
+        // Tukaj lahko izvajamo periodične naloge ko smo končali z inicializacijo
+        // if (Interval_mS > 0)
+        // {
+        //   if (currentInitState == InitState::STOP && millis() - lastSync > Interval_mS)
+        //   {
+        //     lastSync = millis();
+        //     Rele_readSensors(); // Preberi senzorje in jih posodobi v Firebase
+        //     firebase_sensor_update = false; // Ponastavimo zastavico
+        //     // Počakamo da prebrane podatke senzorjev pošljemo v Firebase in šele nato pošljemo naslednji ukaz
+        //   }
+
+        // }
+        // --- konec periodičnih nalog ---
+
+        //--------------------------------------------------------------------------------------------------
+        // Preveri, ali so na voljo novi podatki iz Firebase streama
+        if (newChannelDataAvailable)
         {
-          lastSync = millis();
-          Rele_readSensors(); // Preberi senzorje in jih posodobi v Firebase
-          firebase_sensor_update = false; // Ponastavimo zastavico
-          // Počakamo da prebrane podatke senzorjev pošljemo v Firebase in šele nato pošljemo naslednji ukaz
+          // Tukaj pokličite funkcijo za pošiljanje podatkov Rele modulu
+          Firebase_handleStreamUpdate(channelUpdate.kanalIndex, channelUpdate.start_sec, channelUpdate.end_sec);
+
+          // Počisti zastavico, da ne obdelamo istih podatkov večkrat
+          newChannelDataAvailable = false;
+        }
+        //--------------------------------------------------------------------------------------------------
+        // Preveri, ali je prišlo do ponovnega zagona Rele modula
+        if (reset_occured && !lora_is_busy())
+        {
+          // Zaženemo inicializacijski avtomat znova
+          init_done_flag = false;              // Ponastavi zastavico, da inicializacija ni končana
+          Serial.println("[INIT] Ponovna inicializacija zaradi ponastavitve Rele modula...");
+          initState_timeout_start = millis(); // Zaženemo timer za timeout
+          currentInitState = InitState::START;
+          reset_occured = false; // Ponastavi zastavico
         }
 
-      }
-      // --- konec periodičnih nalog ---
-
-      //--------------------------------------------------------------------------------------------------
-      // Preveri, ali so na voljo novi podatki iz Firebase streama
-      if (newChannelDataAvailable)
-      {
-        // Tukaj pokličite funkcijo za pošiljanje podatkov Rele modulu
-        Firebase_handleStreamUpdate(channelUpdate.kanalIndex, channelUpdate.start_sec, channelUpdate.end_sec);
-
-        // Počisti zastavico, da ne obdelamo istih podatkov večkrat
-        newChannelDataAvailable = false;
-      }
-      //--------------------------------------------------------------------------------------------------
-      // Preveri, ali je prišlo do ponovnega zagona Rele modula
-      if (reset_occured && !lora_is_busy())
-      {
-        // Zaženemo inicializacijski avtomat znova
-        initState_timeout_start = millis(); // Zaženemo timer za timeout
-        currentInitState = InitState::START;
-        reset_occured = false; // Ponastavi zastavico
-      }
-
-      //--------------------------------------------------------------------------------------------------
-      // Preveri, ali so sensorji posodobljeni v Firebase
-      if (currentInitState == InitState::STOP && firebase_sensor_update && !lora_is_busy())
-      {
-        // Pošlji ukaz za branje INA podatkov iz Rele modula
-        Read_INA();
-        firebase_sensor_update = false; // Ponastavimo zastavico
+        //--------------------------------------------------------------------------------------------------
+        // Preveri, ali so sensorji posodobljeni v Firebase
+        // if (currentInitState == InitState::STOP && firebase_sensor_update && !lora_is_busy())
+        // {
+        //   // Pošlji ukaz za branje INA podatkov iz Rele modula
+        //   Read_INA();
+        //   firebase_sensor_update = false; // Ponastavimo zastavico
+        // }
       }
     }
+    xSemaphoreGive(firebaseMutex); // Sprosti mutex
+  }
+  else
+  {
+    // Če ne moremo dobiti mutexa, preskočimo Firebase obdelavo v tem ciklu.
+    // To prepreči zrušitev in da priložnost drugemu tasku, da konča.
   }
 
   // --- KLIČEMO NAŠ SEKVENČNI AVTOMAT ZA INICIJALIZACIJO ---

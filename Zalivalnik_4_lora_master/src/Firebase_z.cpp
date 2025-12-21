@@ -321,8 +321,11 @@ void Firebase_get_Channel_End_Seconds(int kanal)
 // Funkcija ki prebere urnik iz Firebase in ga shrani v globalno spremenljivko firebase_kanal
 void Firebase_readKanalUrnik(uint8_t kanalIndex)
 {
-  Firebase_get_Channel_Start_Seconds(kanalIndex + 1); // preberemo start_sec kanala
-  Firebase_get_Channel_End_Seconds(kanalIndex + 1);   // preberemo end_sec kanala
+  // Firebase_get_Channel_Start_Seconds(kanalIndex + 1); // preberemo start_sec kanala
+  // Firebase_get_Channel_End_Seconds(kanalIndex + 1);   // preberemo end_sec kanala
+  // --- SPREMENJENO: Preberemo celotno vozlišče za kanal naenkrat ---
+  String parentPath = KanaliPath + String(kanalIndex + 1); // KanaliPath je "/UserData/.../Kanali/kanal"
+  Database.get(aClient, parentPath, Firebase_processResponse, false, "getUrnikTask");  
   // Odgovor bo obdelan v funkciji Firebase_processResponse
 }
 
@@ -352,7 +355,7 @@ void Firebase_Update_Relay_State(int kanal, bool state)
 //------------------------------------------------------------------------------------------------------------------------
 // Funkcija za posodobitev podatkov senzorjev v Firebase
 
-void Firebase_Update_Sensor_Data(unsigned long timestamp, float temp, float hum, float soil_moisture)
+void Firebase_Update_Sensor_Data(unsigned long timestamp, const SensorDataPayload &sensors)
 {
 
   object_t json, obj1, obj2, obj3, obj4;
@@ -360,9 +363,9 @@ void Firebase_Update_Sensor_Data(unsigned long timestamp, float temp, float hum,
 
   // Library does not provide JSON parser library, the following JSON writer class will be used with
   // object_t for simple demonstration.
-  writer.create(obj1, tempPath, string_t(temp));
-  writer.create(obj2, humPath, string_t(hum));
-  writer.create(obj3, soilMoisturePath, string_t(soil_moisture));
+  writer.create(obj1, tempPath, string_t(sensors.temperature));
+  writer.create(obj2, humPath, string_t(sensors.humidity));
+  writer.create(obj3, soilMoisturePath, string_t(sensors.soil_moisture));
   writer.create(obj4, timePath, String(timestamp));
   writer.join(json, 4 /* no. of object_t (s) to join */, obj1, obj2, obj3, obj4);
   //.create(json, String(timestamp), obj4); //-> {"data":{"value":x}}
@@ -389,13 +392,13 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
     return;
   }
 
-  Serial.println("Posodabljam INA3221 podatke v Firebase...");
+  // Serial.println("Posodabljam INA3221 podatke v Firebase...");
 
   object_t json, json0, json1, json2, ch0_0, ch0_1, ch0_2, ch0_3,
       ch1_0, ch1_1, ch1_2, ch1_3,
       ch2_0, ch2_1, ch2_2, ch2_3;
 
-  object_t obj_flags, obj_totalA, obj_sumV, obj_timestamp;
+  object_t obj_flags, obj_sumV, obj_timestamp;
   JsonWriter writer;
 
     // Parent path for each sensor data entry
@@ -429,7 +432,7 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
   //Ustvarimo ostale JSON objekte
   writer.create(obj_flags, "/alert_flags", number_t(data.alert_flags));
   writer.create(obj_sumV, "/shunt_voltage_sum_mV", number_t(data.shunt_voltage_sum_mV));
-  writer.create(obj_totalA, "/total_current_mA", number_t(data.total_current_mA));
+  // writer.create(obj_totalA, "/total_current_mA", number_t(data.total_current_mA));
   writer.create(obj_timestamp, "/timestamp", number_t(timestamp));
 
   // Wrap channel objects with keys
@@ -439,8 +442,8 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
   writer.create(ch2_with_key, "ch2", json2);
 
   // Join all into final JSON object
-  writer.join(json, 7 /* no. of object_t (s) to join */, ch0_with_key, ch1_with_key, ch2_with_key, obj_flags, obj_sumV, obj_totalA, obj_timestamp);
-  Serial.println(json.c_str());
+  writer.join(json, 6 /* no. of object_t (s) to join */, ch0_with_key, ch1_with_key, ch2_with_key, obj_flags, obj_sumV, obj_timestamp);
+  // Serial.println(json.c_str());
 
   // Send data to Firebase asynchronously
   Database.set<object_t>(aClient, parentPath, json, Firebase_processResponse, "updateINA3221Task");
@@ -453,9 +456,9 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
 void Firebase_processResponse(AsyncResult &aResult)
 {
 
-  static uint8_t channelBeingProcessed = 0;
-  static bool startSecReceived = false;
-  static bool endSecReceived = false;
+  // SPREMEMBA: Uporabimo statične spremenljivke za sledenje prejetim delom odgovora
+  static bool startSecReceived[8] = {false};
+  static bool endSecReceived[8] = {false};
 
   if (!aResult.isResult())
     return;
@@ -463,48 +466,149 @@ void Firebase_processResponse(AsyncResult &aResult)
   if (aResult.isError())
     Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
 
+  if (aResult.isEvent())
+    Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.eventLog().message().c_str(), aResult.eventLog().code());
+
+  if (aResult.isDebug())
+    Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
+
   // here you get the values from the database and save them in variables if you need to use them later
   if (aResult.available())
   {
     // Log the task and payload
     Firebase.printf("[FIREBASE] task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
+    String path = aResult.path().c_str();
+    Firebase.printf("[DIAGNOZA] Firebase path: %s\n", path.c_str());
+    // String path = aResult.dataPath().c_str();
+    // Serial.printf("[DIAGNOZA] Firebase path: %s\n", path.c_str());
+    int kanalIndex = -1;
+    // get_intValue = ParseToInt(aResult.payload());
+    //  get_intValue = ParseToInt(aResult.payload().indexOf("start_sec"));
+    // //     // Handle auth response
+    // // if (aResult.uid() == "🔐 authTask")
+    // // {
+    // //   Firebase_Connect();
+    // // }
 
-    // Handle int value from /Kanali/kanalX/start_sec
-    if (aResult.uid() == "getStartSecTask")
-    {
-      // Extract the value as a int
-      get_intValue = ParseToInt(aResult.payload());
-      Firebase.printf("[FIREBASE] Kanal field data (async): %d\n", get_intValue);
-      firebase_kanal[currentChannelInProcess].start_sec = get_intValue;
-      // shranimo tudi v obliki "HH:MM"
-      formatSecondsToTime(firebase_kanal[currentChannelInProcess].start, sizeof(firebase_kanal[currentChannelInProcess].start), get_intValue);
-      // channelBeingProcessed++;
-      startSecReceived = true; // označimo, da smo prejeli start_sec
-    }
-    // Handle int value from /Kanali/kanalX/end_sec
-    else if (aResult.uid() == "getEndSecTask")
-    {
-      // Extract the value as a int
-      get_intValue = ParseToInt(aResult.payload());
-      Firebase.printf("[FIREBASE] Kanal field data (async): %d\n", get_intValue);
-      firebase_kanal[currentChannelInProcess].end_sec = get_intValue;
-      // shranimo tudi v obliki "HH:MM"
-      formatSecondsToTime(firebase_kanal[currentChannelInProcess].end, sizeof(firebase_kanal[currentChannelInProcess].end), get_intValue);
-      // channelBeingProcessed++;
-      endSecReceived = true; // označimo, da smo prejeli end_sec
-    }
+    // // SPREMEMBA: Pridobimo pot za lažje razčlenjevanje
+    // // Primer poti: /Kanali/kanal3/start_sec
+    // String path = aResult.dataPath().c_str();
+    // Serial.printf("[DIAGNOZA] Firebase path: %s\n", path.c_str());
+    // int kanalIndex = -1;
 
-    // ko preberemo obe vrednosti enega kanala, lahko nadaljujemo
-    if (startSecReceived && endSecReceived)
+    // // Iz poti poskusimo izluščiti številko kanala
+    // int kanaliPos = path.indexOf("/Kanali/kanal");
+    // if (kanaliPos != -1) {
+    //     // Najdemo številko za "kanal"
+    //     kanalIndex = path.substring(kanaliPos + 13).toInt() - 1; // +13 je dolžina "/Kanali/kanal", -1 za 0-based indeks
+    // }
+
+    // // Handle int value from /Kanali/kanalX/start_sec
+    // if (aResult.uid() == "getStartSecTask" && kanalIndex != -1)
+    // {
+    //   Firebase.printf("[DIAGNOZA] Prejet start_sec. Pričakovan kanal: %d, Prejet kanal: %d\n", currentChannelInProcess, kanalIndex);
+
+    //   // Preverimo, ali je to odgovor za kanal, ki ga trenutno obdelujemo
+    //   if (kanalIndex == currentChannelInProcess) {
+    //       get_intValue = ParseToInt(aResult.payload());
+    //       Firebase.printf("[FIREBASE] Prejet start_sec %d za kanal %d\n", get_intValue, kanalIndex);
+    //       firebase_kanal[kanalIndex].start_sec = get_intValue;
+    //       formatSecondsToTime(firebase_kanal[kanalIndex].start, sizeof(firebase_kanal[kanalIndex].start), get_intValue);
+    //       startSecReceived[kanalIndex] = true;
+    //   }
+    // }
+    // // Handle int value from /Kanali/kanalX/end_sec
+    // else if (aResult.uid() == "getEndSecTask" && kanalIndex != -1)
+    // {
+    //   Firebase.printf("[DIAGNOZA] Prejet end_sec. Pričakovan kanal: %d, Prejet kanal: %d\n", currentChannelInProcess, kanalIndex);
+
+    //   // Preverimo, ali je to odgovor za kanal, ki ga trenutno obdelujemo
+    //   if (kanalIndex == currentChannelInProcess) {
+    //       get_intValue = ParseToInt(aResult.payload());
+    //       Firebase.printf("[FIREBASE] Prejet end_sec %d za kanal %d\n", get_intValue, kanalIndex);
+    //       firebase_kanal[kanalIndex].end_sec = get_intValue;
+    //       formatSecondsToTime(firebase_kanal[kanalIndex].end, sizeof(firebase_kanal[kanalIndex].end), get_intValue);
+    //       endSecReceived[kanalIndex] = true;
+    //   }
+    // }
+
+    // // SPREMEMBA: Signaliziraj uspeh šele, ko sta prejeta OBA dela za TRENUTNI kanal
+    // if (kanalIndex == currentChannelInProcess && startSecReceived[kanalIndex] && endSecReceived[kanalIndex])
+    // {
+    //     Firebase.printf("[FIREBASE] Prejeta oba dela za kanal %d. Signaliziram uspeh.\n", kanalIndex);
+    //     firebase_response_received = true; // Signaliziramo uspeh
+    //     // Ponastavimo zastavici za naslednjič
+    //     startSecReceived[kanalIndex] = false;
+    //     endSecReceived[kanalIndex] = false;
+    // }
+    // --- SPREMENJENO: Nova logika za obdelavo urnika ---
+    if (aResult.uid() == "getUrnikTask")
     {
-      Serial.printf("[FIREBASE] Prebrano iz Firebase za kanal %d: start=%d, end=%d\n",
-                    currentChannelInProcess + 1,
-                    firebase_kanal[currentChannelInProcess].start_sec,
-                    firebase_kanal[currentChannelInProcess].end_sec);
-      // channelBeingProcessed = 0; // reset za naslednji kanal
-      startSecReceived = false;
-      endSecReceived = false;
-      firebase_response_received = true;
+      // Iz poti poskusimo izluščiti številko kanala
+      int kanaliPos = path.indexOf("/Kanali/kanal");
+      if (kanaliPos != -1)
+      {
+        kanalIndex = path.substring(kanaliPos + 13).toInt() - 1; // +13 je dolžina "/Kanali/kanal", -1 za 0-based indeks
+      }
+
+      Firebase.printf("[DIAGNOZA] Prejet urnik. Pričakovan kanal: %d, Prejet kanal: %d\n", currentChannelInProcess, kanalIndex);
+
+      if (kanalIndex != -1 && kanalIndex == currentChannelInProcess)
+      {
+        String payload = aResult.c_str();
+        int start_sec = -1;
+        int end_sec = -1;
+
+        // --- Ročno razčlenjevanje za "start_sec" ---
+        String startKey = "\"start_sec\":";
+        int startIndex = payload.indexOf(startKey);
+        if (startIndex != -1)
+        {
+          int valueStartIndex = startIndex + startKey.length();
+          int valueEndIndex = payload.indexOf(',', valueStartIndex);
+          if (valueEndIndex == -1)
+          { // Če je zadnji element, iščemo '}'
+            valueEndIndex = payload.indexOf('}', valueStartIndex);
+          }
+          if (valueEndIndex != -1)
+          {
+            start_sec = payload.substring(valueStartIndex, valueEndIndex).toInt();
+          }
+        }
+
+        // --- Ročno razčlenjevanje za "end_sec" ---
+        String endKey = "\"end_sec\":";
+        startIndex = payload.indexOf(endKey);
+        if (startIndex != -1)
+        {
+          int valueStartIndex = startIndex + endKey.length();
+          int valueEndIndex = payload.indexOf(',', valueStartIndex);
+          if (valueEndIndex == -1)
+          { // Če je zadnji element, iščemo '}'
+            valueEndIndex = payload.indexOf('}', valueStartIndex);
+          }
+          if (valueEndIndex != -1)
+          {
+            end_sec = payload.substring(valueStartIndex, valueEndIndex).toInt();
+          }
+        }
+
+        // Preverimo, ali smo uspešno prebrali obe vrednosti
+        if (start_sec != -1 && end_sec != -1)
+        {
+          firebase_kanal[kanalIndex].start_sec = start_sec;
+          firebase_kanal[kanalIndex].end_sec = end_sec;
+          formatSecondsToTime(firebase_kanal[kanalIndex].start, sizeof(firebase_kanal[kanalIndex].start), start_sec);
+          formatSecondsToTime(firebase_kanal[kanalIndex].end, sizeof(firebase_kanal[kanalIndex].end), end_sec);
+
+          Firebase.printf("[FIREBASE] Prejeta oba dela za kanal %d. Signaliziram uspeh.\n", kanalIndex);
+          firebase_response_received = true; // Signaliziramo uspeh
+        }
+        else
+        {
+          Serial.println("[NAPAKA] JSON za urnik nima pričakovanih polj (start_sec, end_sec) ali pa je napaka pri razčlenjevanju.");
+        }
+      }
     }
 
     if (aResult.uid() == "updateSensorTask")
@@ -513,7 +617,9 @@ void Firebase_processResponse(AsyncResult &aResult)
       Serial.println("[FIREBASE] Sensor data uploaded");
       PrikaziStanjeSenzorjevNaSerial();  // napišemo podatke
       firebase_response_received = true; // označimo da je Firebase prejel podatke
-      firebase_sensor_update = true; // zastavica za posodobitev senzorjev v Firebase
+      // firebase_sensor_update = true; // zastavica za posodobitev senzorjev v Firebase
+      // Signaliziraj ReadINATask, da lahko nadaljuje
+      xSemaphoreGive(firebaseSemaphore);
     }
 
     if (aResult.uid() == "updateStateTask")
@@ -526,7 +632,7 @@ void Firebase_processResponse(AsyncResult &aResult)
     if (aResult.uid() == "getChartIntervalTask")
     {
       uint8_t sensorReadIntervalMinutes = aResult.payload().toInt();
-      set_Interval(sensorReadIntervalMinutes);  // Nastavimo interval branja senzorjev
+      set_Interval(sensorReadIntervalMinutes); // Nastavimo interval branja senzorjev
       Serial.printf("[FIREBASE] Sensor read interval set to: %d minutes\n", sensorReadIntervalMinutes);
       firebase_response_received = true; // označimo da je Firebase prejel podatke
     }
@@ -537,11 +643,8 @@ void Firebase_processResponse(AsyncResult &aResult)
       Serial.println("[FIREBASE] INA3221 data uploaded");
       firebase_response_received = true; // označimo da je Firebase prejel podatke
     }
-    
   }
 }
-
-
 
 //------------------------------------------------------------------------------------------------------------------------
 // Funkcija za posodobitev podatkov iz Firebase (chart interval)
@@ -1083,7 +1186,7 @@ void Firebase_processResponse(AsyncResult &aResult)
 //     show_status(status);
 // }
 
-// void get_async(int kanal)
+// void get_async()
 // {
 //     // Get the generic value (no waits)
 //     // Using Database.get with the callback function or AsyncResult object
