@@ -655,8 +655,6 @@ void initINA3221()
 // ----------------------------------------------------------------------------
 void Read_INA3221(INA3221_DataPayload* payload = nullptr)
 {
-  float sumCurrent = 0.0;
-
   // Display voltage and current (in mA) for all three channels
   Serial.println("\nCHAN\tBUS\tSHUNT\tCURRENT\tPOWER");
   Serial.println("\t   V \t   mV \t   mA \t   W");
@@ -672,8 +670,7 @@ void Read_INA3221(INA3221_DataPayload* payload = nullptr)
     Serial.print(busVoltage, 3);
     Serial.print("\t");
     Serial.print(shuntVoltage, 3);
-    Serial.print("\t");
-    sumCurrent += current;
+    Serial.print("\t");    
     Serial.print(current, 3);
     Serial.print("\t");
     Serial.print(power, 3);
@@ -687,15 +684,10 @@ void Read_INA3221(INA3221_DataPayload* payload = nullptr)
     }
   }
 
-
-  Serial.printf("Total Current: %.3f\n", sumCurrent);
-  Serial.printf("Total Shunt Voltage (mV): %.3f\n", INA.getShuntVoltageSum() / 1000.0);
-
   uint16_t flags = INA.getMaskEnable();
   if (payload) {
     payload->alert_flags = flags;
     payload->shunt_voltage_sum_mV = INA.getShuntVoltageSum();
-    payload->total_current_mA = sumCurrent;
   }
 
   if (flags & INA3221_CRITICAL_CH1) {
