@@ -50,7 +50,7 @@ extern bool firebase_response_received; // Zastavica, ki označuje, da je bil od
 // -----------------------------------------
 
 // Deklaracija globalnega semaforja
-extern SemaphoreHandle_t firebaseSemaphore;
+// extern SemaphoreHandle_t firebaseSemaphore;
 
 
 // Extern deklaracije za Firebase objekte
@@ -66,5 +66,38 @@ extern RealtimeDatabase Database;
 extern AsyncResult databaseResult;
 extern AsyncResult streamResult;               // Za Firebase streaming
 
+// --- NOVA STRUKTURA: Enostavna čakalna vrsta brez dinamične alokacije ---
+#define FIREBASE_QUEUE_SIZE 10
+
+// --- NOVO: Struktura in čakalna vrsta za Firebase naloge ---
+enum class FirebaseTaskType {
+    UPDATE_SENSORS,
+    UPDATE_INA,
+    UPDATE_RELAY_STATE
+};
+
+struct FirebaseOperation {
+    FirebaseTaskType type;
+    unsigned long timestamp;
+    union {
+        SensorDataPayload sensors;
+        INA3221_DataPayload ina;
+        struct {
+            uint8_t kanal;
+            bool state;
+        } relay;
+    } data;
+    bool pending;  // Ali je operacija aktivna?
+};
+
+// Globalna čakalna vrsta (statična alokacija)
+extern FirebaseOperation firebaseOpsQueue[FIREBASE_QUEUE_SIZE];
+extern uint8_t firebase_queue_head;
+extern uint8_t firebase_queue_tail;
+extern uint8_t firebase_queue_count;
+
+// Funkcije za upravljanje čakalne vrste
+bool Firebase_QueueOperation(const FirebaseOperation& op);
+bool Firebase_ProcessNextOperation();
 
 #endif // FIREBASE_Z_H

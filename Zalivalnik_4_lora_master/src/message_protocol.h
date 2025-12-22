@@ -40,6 +40,7 @@ enum class CommandType : uint8_t {
     NOTIFY_SENSOR_ERROR = 206,
     NOTIFY_RESET_OCCURED = 207,
     NOTIFY_INA_DATA = 208,
+    NOTIFY_INA_ALERT = 209,
 
     // Potrditev notifikacije od Master -> Rele
     ACK_NOTIFICATION = 250
@@ -138,6 +139,12 @@ struct INA3221_DataPayload {
     uint16_t alert_flags;
     float shunt_voltage_sum_mV;
     // float total_current_mA;
+};
+
+struct INA3221_AlertPayload {
+    uint16_t alert_number;
+    uint32_t timestamp;
+
 };
 
 // --- DODAJTE TO VRSTICO ---
