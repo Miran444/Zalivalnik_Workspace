@@ -32,21 +32,23 @@ uint8_t firebase_queue_head = 0;
 uint8_t firebase_queue_tail = 0;
 uint8_t firebase_queue_count = 0;
 
-// DODAJ: Globalna spremenljivka za sledenje lastnim posodobitvam
-// static bool ignoreNextStreamUpdate[8] = {false, false, false, false, false, false, false, false};
+static unsigned long lastConnectionAttempt = 0;
+static uint8_t connectionRetries = 0;
+const uint8_t MAX_CONNECTION_RETRIES = 3;
+
 //------------------------------------------------------------------------------------------------------------------------
 // Funkcija za inicializacijo Firebase
 void Init_Firebase()
 {
   // Configure SSL client
   ssl_client.setInsecure();
-  ssl_client.setTimeout(1000);
-  ssl_client.setHandshakeTimeout(5);
+  ssl_client.setTimeout(5000);
+  ssl_client.setHandshakeTimeout(10);
  
   // Configure stream SSL client
   stream_ssl_client.setInsecure();
-  stream_ssl_client.setTimeout(1000);
-  stream_ssl_client.setHandshakeTimeout(5);
+  stream_ssl_client.setTimeout(5000);
+  stream_ssl_client.setHandshakeTimeout(10);
 
   // Initialize Firebase
   initializeApp(aClient, app, getAuth(user_auth), Firebase_processResponse, "🔐 authTask");
@@ -416,7 +418,24 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
 void Firebase_processResponse(AsyncResult &aResult)
 {
   if (!aResult.isResult()) return;
-  if (aResult.isError()) Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+
+  // DODAJ: Če je timeout ali connection error, signaliziraj neuspeh
+  if (aResult.isError()) {
+    Firebase.printf("Error task: %s, msg: %s, code: %d\n", 
+                   aResult.uid().c_str(), 
+                   aResult.error().message().c_str(), 
+                   aResult.error().code());
+    
+    // Signaliziraj neuspeh za senzorske operacije
+    if (strcmp(aResult.uid().c_str(), "updateSensorTask") == 0 ||
+        strcmp(aResult.uid().c_str(), "updateINA3221Task") == 0) {
+      Sensor_OnFirebaseResponse(false);
+    }
+    
+    firebase_response_received = false;
+    return;
+  }
+
   if (aResult.isEvent()) Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.eventLog().message().c_str(), aResult.eventLog().code());
   if (aResult.isDebug()) Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
 
@@ -583,9 +602,37 @@ bool Firebase_ProcessNextOperation() {
     
     // Preveri, ali Firebase ni zaseden
     if (!app.ready()) {
+        // Če Firebase ni ready, počakaj malo in poskusi ponovno
+        if (millis() - lastConnectionAttempt > 2000) {
+            lastConnectionAttempt = millis();
+            connectionRetries++;
+            
+            if (connectionRetries > MAX_CONNECTION_RETRIES) {
+                Firebase.printf("[FB_QUEUE] NAPAKA: Firebase se ne more povezati po %d poskusih!\n", MAX_CONNECTION_RETRIES);
+                
+                // Odstrani operacijo, da se ne zatakne
+                firebase_queue_head = (firebase_queue_head + 1) % FIREBASE_QUEUE_SIZE;
+                firebase_queue_count--;
+                connectionRetries = 0;
+                
+                // DODAJ: Signaliziraj neuspeh senzorski vrsti
+                FirebaseOperation& op = firebaseOpsQueue[firebase_queue_head];
+                if (op.type == FirebaseTaskType::UPDATE_SENSORS || 
+                    op.type == FirebaseTaskType::UPDATE_INA) {
+                    Sensor_OnFirebaseResponse(false);
+                }
+                
+                return false;
+            }
+            Firebase.printf("[FB_QUEUE] Firebase ni ready. Poskus %d/%d...\n", 
+                          connectionRetries, MAX_CONNECTION_RETRIES);
+        }      
         return false;
     }
-    
+
+        // Reset števca ob uspešni povezavi
+    connectionRetries = 0;
+
     FirebaseOperation& op = firebaseOpsQueue[firebase_queue_head];
 
     Firebase.printf("[FB_QUEUE] Procesiranje operacije tipa %d, timestamp: %lu\n", 
@@ -611,4 +658,18 @@ bool Firebase_ProcessNextOperation() {
     firebase_queue_count--;
     
     return true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+void Firebase_ResetConnection() {
+    Firebase.printf("[FB_RESET] Resetiranje SSL povezave...\n");
+    
+    ssl_client.stop();
+    delay(100);
+    
+    ssl_client.setInsecure();
+    ssl_client.setTimeout(5000);
+    ssl_client.setHandshakeTimeout(10);
+    
+    Firebase.printf("[FB_RESET] SSL povezava resetirana.\n");
 }

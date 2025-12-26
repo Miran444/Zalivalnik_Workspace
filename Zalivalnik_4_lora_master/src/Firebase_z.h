@@ -99,5 +99,6 @@ extern uint8_t firebase_queue_count;
 // Funkcije za upravljanje čakalne vrste
 bool Firebase_QueueOperation(const FirebaseOperation& op);
 bool Firebase_ProcessNextOperation();
+void Firebase_ResetConnection();
 
 #endif // FIREBASE_Z_H
