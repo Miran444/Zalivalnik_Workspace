@@ -24,7 +24,8 @@ enum class LoRaContext {
     IDLE,                 // Nič ne počnemo
     INITIALIZATION,       // Sredi inicializacije (manageReleInitialization upravlja)
     WAITING_FOR_RESPONSE, // Pošiljanje ukaza in čakanje na odgovor
-    JUST_ACK              // Samo ACK
+    JUST_ACK,             // Samo ACK
+    SENSOR_QUEUE          // NOVO: Sensor queue ima svoj retry mehanizem
 
 };
 

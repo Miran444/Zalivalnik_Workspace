@@ -1,5 +1,6 @@
 #include "sensor_queue.h"
 #include "Lora_master.h"
+#include "unified_lora_handler.h"
 
 // --- Statična alokacija (brez malloc!) ---
 SensorOperation sensorOpsQueue[SENSOR_QUEUE_SIZE];
@@ -84,6 +85,9 @@ static void execute_sensor_operation(SensorOperation* op) {
     op->state = SensorTaskState::SENDING;
     op->last_attempt_time = millis();
     
+    // Nastavi kontekst na SENSOR_QUEUE (onemogočimo LoRa retry)
+    lora_set_context(LoRaContext::SENSOR_QUEUE);
+
     // Pošlji LoRa ukaz
     Lora_prepare_and_send_packet(op->lora_command, nullptr, 0);
     

@@ -364,8 +364,8 @@ void Lora_prepare_and_send_packet(CommandType cmd, const void *payload_data, siz
   // displayLogOnLine(4, logBuffer);
   packet.crc = calculate_crc((const uint8_t *)&packet, offsetof(LoRaPacket, crc));
 
-  // Če smo v načinu inicializacije preskočimo nastavitev konteksta
-  if (lora_get_context() != LoRaContext::INITIALIZATION)
+  // Če smo v načinu inicializacije ali pošiljamo iz SENSOR_QUEUE preskočimo nastavitev konteksta za ponovni poskus
+  if (lora_get_context() != LoRaContext::INITIALIZATION && lora_get_context() != LoRaContext::SENSOR_QUEUE)
   {
     // Nastavi kontekst na čakanje na odgovor
     lora_set_context(LoRaContext::WAITING_FOR_RESPONSE);

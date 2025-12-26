@@ -332,6 +332,7 @@ void lora_rx_task(void *pvParameters)
 // PREMAKNI manage_lora_retries() iz main.cpp sem
 void manage_lora_retries()
 {
+  if (currentContext == LoRaContext::SENSOR_QUEUE) return;
   if (currentContext != LoRaContext::WAITING_FOR_RESPONSE) return;
   
   if (millis() - lora_response_timeout_start > LORA_RESPONSE_TIMEOUT_MS)
