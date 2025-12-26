@@ -48,15 +48,15 @@ ChannelUpdateData pendingUpdateData; // Podatki, ki čakajo na pošiljanje
 volatile bool newChannelDataAvailable;
 ChannelUpdateData channelUpdate;
 
-// spremenljivke za LORA TIMEOUT (ko pošljemo zahtevo in čakamo na odgovor)
-unsigned long lora_response_timeout_start = 0;
-const unsigned long LORA_RESPONSE_TIMEOUT_MS = 3000; // 3 sekunde za odgovor
+// // spremenljivke za LORA TIMEOUT (ko pošljemo zahtevo in čakamo na odgovor)
+// unsigned long lora_response_timeout_start = 0;
+// const unsigned long LORA_RESPONSE_TIMEOUT_MS = 3000; // 3 sekunde za odgovor
 
-// --- NOVO: NABIRALNIK ZA ODHODNE PAKETE IN PONOVNE POSKUSE ---
-LoRaPacket last_sent_packet;                   // Hranimo zadnji paket, ki čaka na odgovor
-bool is_waiting_for_critical_response = false; // Zastavica, ki pove, da paket v nabiralniku čaka na odgovor
-uint8_t lora_retry_count = 0;                  // Števec ponovnih poskusov za splošne ukaze
-const uint8_t MAX_LORA_RETRIES = 3;            // Največje število ponovnih poskusov
+// // --- NOVO: NABIRALNIK ZA ODHODNE PAKETE IN PONOVNE POSKUSE ---
+// LoRaPacket last_sent_packet;                   // Hranimo zadnji paket, ki čaka na odgovor
+// bool is_waiting_for_critical_response = false; // Zastavica, ki pove, da paket v nabiralniku čaka na odgovor
+// uint8_t lora_retry_count = 0;                  // Števec ponovnih poskusov za splošne ukaze
+// const uint8_t MAX_LORA_RETRIES = 3;            // Največje število ponovnih poskusov
 
 // --- SPREMENLJIVKE ZA ČASOVNIK IN URNIK ---
 uint32_t timestamp;           // Trenutni timestamp (vsaj enkrat na sekundo posodobljen)
@@ -137,7 +137,7 @@ INA3221_DataPayload ina_data;
 
 // Prototipi za Taske
 // void ReadSensorsTask(void *pvParameters);
-void LoRaTask(void *pvParameters);
+// void LoRaTask(void *pvParameters);
 // void ReadINATask(void *pvParameters);
 // SPREMEMBA: Prototip za nov, dinamični task
 // void FirebaseSingleUpdateTask(void *pvParameters);
@@ -364,29 +364,18 @@ void Lora_prepare_and_send_packet(CommandType cmd, const void *payload_data, siz
   // displayLogOnLine(4, logBuffer);
   packet.crc = calculate_crc((const uint8_t *)&packet, offsetof(LoRaPacket, crc));
 
-  // --- Aktiviramo splošni mehanizem za ponovne poskuse SAMO, ČE NE POTEKA INICIALIZACIJA ---
-  if (currentInitState == InitState::IDLE || currentInitState == InitState::STOP || currentInitState == InitState::DONE)
+  // Če smo v načinu inicializacije preskočimo nastavitev konteksta
+  if (lora_get_context() != LoRaContext::INITIALIZATION)
   {
-    // Nismo v inicializaciji, uporabimo splošni mehanizem
-    memcpy(&last_sent_packet, &packet, sizeof(LoRaPacket));
-    lora_retry_count = 0;
-    is_waiting_for_critical_response = true; // Aktiviramo splošni mehanizem
-    lora_response_timeout_start = millis();
-  }
-  else
-  {
-    // Smo sredi inicializacije. Ne aktiviramo splošnega mehanizma.
-    // Za ponovne poskuse bo poskrbel izključno `manageReleInitialization`.
-    is_waiting_for_critical_response = false;
+    // Nastavi kontekst na čakanje na odgovor
+    lora_set_context(LoRaContext::WAITING_FOR_RESPONSE);
   }
 
-  // paket je priravljen, pošljemo ga in preverimo ali je bilo pošiljanje uspešno
+  // ENOSTAVNO: Samo pošlji - vsa logika je v lora_send_packet!
   if (!lora_send_packet(packet))
   {
-    // Napaka pri pošiljanju
-    Serial.println("[MAIN] Napaka pri pošiljanju paketa! (lora_send_packet ni uspel)");
-    // Če je prišlo do napake, takoj sprostimo zastavico, da ne čakamo na odgovor, ki ni bil nikoli poslan
-    is_waiting_for_critical_response = false;
+    Serial.println("[MAIN] Napaka pri pošiljanju paketa!");
+    lora_set_context(LoRaContext::IDLE); // Reset konteksta
   }
 }
 
@@ -408,8 +397,14 @@ void Lora_prepare_and_send_response(uint16_t request_id, CommandType cmd, const 
   packet.crc = calculate_crc((const uint8_t *)&packet, offsetof(LoRaPacket, crc));
 
   // Odgovor ni kritičen, ne čakamo na potrditev
-  lora_set_waiting_for_response(false);
-  lora_send_packet(packet);
+  // lora_set_waiting_for_response(false);
+  lora_set_context(LoRaContext::JUST_ACK);
+
+    if (!lora_send_packet(packet))
+  {
+    Serial.println("[MAIN] Napaka pri pošiljanju paketa!");
+    lora_set_context(LoRaContext::IDLE); // Reset konteksta
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -533,6 +528,7 @@ bool check_init_wait_state(bool response_flag, InitState success_state, InitStat
       Serial.println("[INIT] NAPAKA: Preseženo število poskusov. Prekinjam inicializacijo.");
       displayLogOnLine(LINE_ERROR_WARNING, "[INIT] Fatal Timeout!");
       currentInitState = InitState::ERROR;
+      lora_set_context(LoRaContext::IDLE);   // VRNI na normalno delovanje
       initState_timeout_start = millis(); // Ponastavimo časovnik za čakanje v ERROR stanju
     }
     else
@@ -558,28 +554,9 @@ void manageReleInitialization()
     return;
   }
 
-  // // Preverjanje timeout-a za vsa "WAIT" stanja
-  // if (currentInitState == InitState::WAIT_FOR_TIME_RESPONSE ||
-  //     currentInitState == InitState::WAIT_FOR_STATUS_RESPONSE ||
-  //     currentInitState == InitState::WAIT_FOR_SENSORS_RESPONSE ||
-  //     currentInitState == InitState::WAIT_FOR_URNIK_RESPONSE ||
-  //     currentInitState == InitState::WAIT_FOR_FIREBASE_RESPONSE ||
-  //     currentInitState == InitState::WAIT_FOR_UPDATE_URNIK)
-
-  // {
-  //   if (millis() - initState_timeout_start > INIT_RESPONSE_TIMEOUT_MS) {
-  //     Serial.println("[INIT] NAPAKA: Timeout med inicializacijo! Ni odgovora od Rele modula.");
-  //     displayLogOnLine(LINE_ERROR_WARNING, "[INIT] Timeout!");
-  //     currentInitState = InitState::ERROR;
-  //     return;
-  //   }
-  // }
-
   // Glavna logika avtomata
   switch (currentInitState)
   {
-
-
   // --- NOVO STANJE: Pošlji zahtevo za branje intervala ---
   //============================================================================
   case InitState::READ_FIREBASE_INTERVAL:
@@ -617,6 +594,7 @@ void manageReleInitialization()
   case InitState::START:
     //============================================================================
     Serial.println("--- ZACENJAM INICIALIZACIJO RELE MODULA ---");
+    lora_set_context(LoRaContext::INITIALIZATION); // NASTAVI kontekst inicializacije
     displayLogOnLine(LINE_ERROR_WARNING, "[INIT] Starting...");
     currentInitState = InitState::SEND_TIME;
     break;
@@ -891,6 +869,7 @@ void manageReleInitialization()
     //============================================================================
     Serial.println("[INIT] Inicializacija uspesno zakljucena.");
     displayLogOnLine(LINE_ERROR_WARNING, "[INIT] Done");
+    lora_set_context(LoRaContext::IDLE); // Vrni na IDLE stanje
     init_done_flag = true;              // Nastavi zastavico, da je inicializacija zaključena
     currentInitState = InitState::STOP; // Postavi avtomat v stanje mirovanja
     lastSync = millis();                // Zapomni si čas zadnje sinhronizacije
@@ -918,19 +897,10 @@ void manageReleInitialization()
 }
 
 //================================================================================================================
-// --- Glavna funkcija za obdelavo prejetih paketov (Callback) ---
+// --- Glavna funkcija za obdelavo prejetih paketov (Callback) iz lora_rx_task ---
 void Lora_handle_received_packet(const LoRaPacket &packet)
 //================================================================================================================
 {
-
-  // --- Ob prejemu kateregakoli odgovora, ustavimo mehanizem za ponovne poskuse ---
-  if (is_waiting_for_critical_response)
-  {
-    Serial.println("[LORA RETRY] Prejet odgovor, ustavljam mehanizem za ponovne poskuse.");
-    is_waiting_for_critical_response = false;
-    lora_retry_count = 0;
-  }
-
   // Prikažemo ID in ukaz prejetega paketa na zaslonu
   char logBuffer[32];
   snprintf(logBuffer, sizeof(logBuffer), "In ID: %d, CMD: %d", packet.messageId, (uint8_t)packet.command);
@@ -1161,7 +1131,9 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
     {
       Serial.println("!!! OPOZORILO: Nizka napetost baterije na Rele enoti !!!");
       // Pošljemo potrditev (ACK) nazaj na Rele
-      Lora_prepare_and_send_packet(CommandType::ACK_NOTIFICATION, nullptr, 0);
+      // pridobimo ID sporočila iz prejete notifikacije
+      uint8_t message_id = packet.messageId;
+      Lora_prepare_and_send_response(message_id, CommandType::ACK_NOTIFICATION, &message_id, sizeof(message_id));
       break;
     }
 
@@ -1182,7 +1154,9 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
         if (kanal[i].state != is_on)
         {
           Serial.printf("  Rele %d novo stanje: %s\n", i + 1, is_on ? "ON" : "OFF");
-          // Firebase_Update_Relay_State(i + 1, is_on); // Posodobimo stanje na Firebase
+
+          // POSODOBI LOKALNO STANJE PRED POŠILJANJEM V FIREBASE!
+          kanal[i].state = is_on;          
 
           FirebaseOperation op;
           op.type = FirebaseTaskType::UPDATE_RELAY_STATE;
@@ -1194,10 +1168,6 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
           if (!Firebase_QueueOperation(op)) { // Dodamo operacijo v čakalno vrsto
               Serial.println("[LORA] OPOZORILO: Firebase queue full, relay state update dropped!");
           }
-
-#ifdef IS_MASTER
-          kanal[i].state = is_on; // Posodobimo lokalno stanje
-#endif
         }
       }
       // Pošljemo potrditev (ACK) nazaj na Rele
@@ -1285,51 +1255,6 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-// --- NOVA FUNKCIJA ZA UPRAVLJANJE PONOVNIH POSKUSOV ---
-void manage_lora_retries()
-{
-  // Ta funkcija se izvaja samo, če čakamo na odgovor na pomemben ukaz
-  if (!is_waiting_for_critical_response)
-  {
-    return;
-  }
-
-  // Preverimo, ali je potekel čas za odgovor
-  if (millis() - lora_response_timeout_start > LORA_RESPONSE_TIMEOUT_MS)
-  {
-    lora_retry_count++; // Povečamo števec poskusov
-
-    if (lora_retry_count >= MAX_LORA_RETRIES)
-    {
-      // Presegli smo število poskusov, obupamo
-      Serial.printf("[LORA RETRY] NAPAKA: Preseženo število poskusov za ukaz %d. Obupujem.\n", (int)last_sent_packet.command);
-      // displayLogOnLine(LINE_LORA_STATUS, "[LoRa] Fatal Timeout!");
-      is_waiting_for_critical_response = false; // Prenehamo čakati
-      lora_set_waiting_for_response(false);     // Sprostimo tudi splošno zastavico
-    }
-    else
-    {
-      // Nismo še obupali, poskusimo ponovno poslati
-      Serial.printf("[LORA RETRY] Timeout! Ponovno pošiljam ukaz %d (Poskus %d/%d)\n", (int)last_sent_packet.command, lora_retry_count, MAX_LORA_RETRIES - 1);
-
-      // Ponovno pošljemo TOČNO ISTI paket iz nabiralnika
-      if (lora_send_packet(last_sent_packet))
-      {
-        // Pošiljanje se je začelo, ponastavimo časovnik
-        lora_response_timeout_start = millis();
-      }
-      else
-      {
-        Serial.println("[LORA RETRY] Napaka pri ponovnem pošiljanju!");
-        // V tem primeru ne ponastavimo časovnika, da bo kmalu poskusil znova
-      }
-    }
-  }
-}
-
-
-
-//---------------------------------------------------------------------------------------------------------------------
 void setup()
 {
   pinMode(onboard_led.pin, OUTPUT); // onboard LED is output
@@ -1348,7 +1273,8 @@ void setup()
   displayLogOnLine(LINE_RSSI_SNR, "WiFi: " + String(WiFi.localIP()));
   delay(400);
   displayLogOnLine(LINE_RSSI_SNR, "Init Lora...");
-  // Inicializacija LoRa z našo callback funkcijo
+    // Registriraj callback funkcijo za obdelavo LoRa paketov
+  // Ta funkcija bo poklicana iz lora_process_received_packets() v loop()
   lora_initialize(Lora_handle_received_packet);
   delay(400);
   displayLogOnLine(LINE_RSSI_SNR, "Init Firebase...");
@@ -1359,7 +1285,7 @@ void setup()
   Sensor_InitQueue(); // DODAJ: Inicializacija senzorske čakalne vrste
 
   // Ustvari FreeRTOS naloge
-  xTaskCreate(LoRaTask, "LoRaTask", 4096, NULL, 1, NULL);  // Naloga za LoRa komunikacijo (višja prioriteta)
+  // xTaskCreate(LoRaTask, "LoRaTask", 8192, NULL, 3, NULL);  // Naloga za LoRa komunikacijo (višja prioriteta)
 
   displayLogOnLine(LINE_RSSI_SNR, "Init done.");
   displayLogOnLine(LINE_LORA_STATUS, "Setup board...OK");
@@ -1425,25 +1351,25 @@ void setup()
 
 //---------------------------------------------------------------------------------------------------------------------
 // Naloga za upravljanje LoRa komunikacije in ponovnih poskusov
-void LoRaTask(void *pvParameters)
-{
-  for (;;)
-  {
-    // Upravljaj ponovne poskuse za pomembne zahteve
-    manage_lora_retries();
+// void LoRaTask(void *pvParameters)
+// {
+//   for (;;)
+//   {
+//     // Upravljaj ponovne poskuse za pomembne zahteve
+//     manage_lora_retries();
 
-    // Obdelaj dohodne in izhodne LoRa pakete
-    if (lora_new_packet_available)
-    {
+//     // Obdelaj dohodne in izhodne LoRa pakete
+//     if (lora_new_packet_available)
+//     {
 
-      Lora_handle_received_packet(lora_received_packet);
-      lora_new_packet_available = false; // Ponastavi zastavico
-    }
+//       Lora_handle_received_packet(lora_received_packet);
+//       lora_new_packet_available = false; // Ponastavi zastavico
+//     }
 
-    // Uporabi FreeRTOS delay, da osveži task breme
-    vTaskDelay(pdMS_TO_TICKS(10)); // 10 ms delay
-  }
-}
+//     // Uporabi FreeRTOS delay, da osveži task breme
+//     vTaskDelay(pdMS_TO_TICKS(20)); // 20 ms delay
+//   }
+// }
 
 //---------------------------------------------------------------------------------------------------------------------
 // --- NOVO: Task za obdelavo Firebase operacij ---
@@ -1642,6 +1568,9 @@ void loop()
 
   // --- KLIČEMO NAŠ SEKVENČNI AVTOMAT ZA INICIJALIZACIJO ---
   manageReleInitialization();
+
+  // ZAMENJAJ LoRa obdelavo z enim klicem:
+  lora_process_received_packets(); // Namesto vsega v LoRaTask
 
   // --- ONBOARD LED BLINK ---
   if (currentInitState == InitState::ERROR)

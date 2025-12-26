@@ -45,6 +45,19 @@ void lora_dispatch_task(void *pvParameters);
 void lora_rx_task(void *pvParameters);
 void lora_tx_task(void *pvParameters);
 
+// Potek prejetega Lora paketa:
+// ISR (setFlag_unified) 
+//   ↓
+// lora_dispatch_task (notify)
+//   ↓
+// lora_rx_task (dekriptira, napolni nabiralnik)
+//   ↓
+// lora_new_packet_available = true  ← nastavljena zastavica
+//   ↓
+// loop() → lora_process_received_packets()  ← NOVA funkcija
+//   ↓
+// Lora_handle_received_packet()  ← VAŠ callback (registriran pri setup)
+
 // --- ISR ---
 #if defined(ESP32)
 void IRAM_ATTR setFlag_unified() {
@@ -66,27 +79,58 @@ volatile bool lora_new_packet_available = false;
 LoRaPacket lora_received_packet;
 
 
+// spremenljivke za LORA TIMEOUT (ko pošljemo zahtevo in čakamo na odgovor)
+unsigned long lora_response_timeout_start = 0;
+const unsigned long LORA_RESPONSE_TIMEOUT_MS = 3000; // 3 sekunde za odgovor
+
+// --- NOVO: NABIRALNIK ZA ODHODNE PAKETE IN PONOVNE POSKUSE ---
+LoRaPacket last_sent_packet;                   // Hranimo zadnji paket, ki čaka na odgovor
+// bool is_waiting_for_critical_response = false; // Zastavica, ki pove, da paket v nabiralniku čaka na odgovor
+uint8_t lora_retry_count = 0;                  // Števec ponovnih poskusov za splošne ukaze
+const uint8_t MAX_LORA_RETRIES = 3;            // Največje število ponovnih poskusov
+
 //-----------------------------------------------------------------------------------------
 // --- Implementacija javnih funkcij za stanje ---
 
-void lora_set_waiting_for_response(bool waiting) {
-  loraIsWaitingResponse = waiting;
-}
+// void lora_set_waiting_for_response(bool waiting) {
+//   loraIsWaitingResponse = waiting;
+// }
 
 // Preveri, ali je LoRa zasedena (pošilja ali čaka na odgovor)
 bool lora_is_busy() {
   return loraIsTransmitting || loraIsWaitingResponse;
 }
 
-bool lora_is_waiting_for_response() {
-  return loraIsWaitingResponse;
-}
+// bool lora_is_waiting_for_response() {
+//   return loraIsWaitingResponse;
+// }
 
 // Pomožna funkcija za preverjanje, ali je ukaz odgovor
-bool is_response_command(CommandType cmd) {
-    // Predpostavimo, da se vsi odgovori začnejo z RESPONSE_
-    // To je odvisno od vaše definicije v message_protocol.h
-    return (uint8_t)cmd >= (uint8_t)CommandType::RESPONSE_ACK;
+// bool is_response_command(CommandType cmd) {
+//     // Predpostavimo, da se vsi odgovori začnejo z RESPONSE_
+//     // To je odvisno od vaše definicije v message_protocol.h
+//     return (uint8_t)cmd >= (uint8_t)CommandType::RESPONSE_ACK;
+// }
+
+// // DODAJ: Nova struktura za kontekst
+// enum class LoRaContext {
+//     IDLE,                 // Nič ne počnemo
+//     INITIALIZATION,       // Sredi inicializacije (manageReleInitialization upravlja)
+//     WAITING_FOR_RESPONSE, // Normalno delovanje (splošni mehanizem)
+//     JUST_ACK              // Samo ACK
+
+// };
+
+static LoRaContext currentContext = LoRaContext::IDLE;
+
+// DODAJ: Funkcija za nastavitev konteksta
+void lora_set_context(LoRaContext context) {
+  currentContext = context;
+}
+
+// Funkcija za pridobitev trenutnega konteksta
+LoRaContext lora_get_context() {
+  return currentContext;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -104,9 +148,9 @@ void lora_initialize(PacketHandlerCallback callback)
   }
 
   // Kreiranje taskov za obdelavo LoRa dogodkov
-  xTaskCreate(lora_dispatch_task, "LoRaDispatch", 2048, NULL, 10, &loraDispatchTaskHandle); // Visoka prioriteta
-  xTaskCreate(lora_rx_task, "LoRaRX", 4096, NULL, 5, &loraRxTaskHandle);
-  xTaskCreate(lora_tx_task, "LoRaTX", 2048, NULL, 5, &loraTxTaskHandle);
+  xTaskCreate(lora_dispatch_task, "LoRaDispatch", 8192, NULL, 2, &loraDispatchTaskHandle); // Visoka prioriteta
+  xTaskCreate(lora_rx_task, "LoRaRX", 6144, NULL, 1, &loraRxTaskHandle);
+  xTaskCreate(lora_tx_task, "LoRaTX", 6144, NULL, 1, &loraTxTaskHandle);
   // --- KONEC NOVO ---
 
   // int state = radio.begin();
@@ -137,122 +181,62 @@ void lora_initialize(PacketHandlerCallback callback)
 // Pošlji paket prek LoRa
 bool lora_send_packet(const LoRaPacket &packet)
 {
-
-    // Preverimo, ali je LoRa modul pripravljen za pošiljanje nove zahteve
-  if (lora_is_busy()) {
-    Serial.println("[LORA] LoRa je zasedena zaradi: " + String(loraIsTransmitting ? "TX" : "RX") + ". Ne morem poslati paketa.");
+  // Preverimo, ali je LoRa modul pripravljen za pošiljanje nove zahteve
+  if (loraIsTransmitting || loraIsWaitingResponse)
+  {
+    Serial.println("[LORA] Busy, ne morem poslati!");
     return false; // Vrnemo neuspeh
   }
 
-  // Šifriramo in pošljemo paket
-  uint8_t txBuffer[sizeof(LoRaPacket) + 16]; // Prostor za paket + GCM tag
-  if (!encrypt_packet(packet, txBuffer, sizeof(txBuffer)))
+  // --- NOVO: Aktiviramo mehanizem za ponovne poskuse SAMO če pri čakanju na odgovor ---
+  if (currentContext == LoRaContext::WAITING_FOR_RESPONSE)
   {
-    Serial.println("[LORA] Napaka pri sifriranju!");
-    return false;
+    memcpy(&last_sent_packet, &packet, sizeof(LoRaPacket));
+    lora_retry_count = 0;
+    // is_waiting_for_critical_response = true;
+    lora_response_timeout_start = millis();
+    Serial.println("[LORA] Aktiviran mehanizem za ponovne poskuse.");
   }
-  Serial.println("[LORA] Paket uspesno sifriran. Zacenjam posiljanje...");
-  operationDone = false; // Počistimo zastavico pred pošiljanjem
-  int state = radio.startTransmit(txBuffer, sizeof(txBuffer));
-
-  if (state == RADIOLIB_ERR_NONE)
+  else if (currentContext == LoRaContext::INITIALIZATION)
   {
-    displayLogOnLine(LINE_LORA_STATUS, "[LORA] TX Start...");
-    // Pošiljanje se je uspešno začelo. Funkcija se lahko vrne.
-    loraIsTransmitting = true;  // Nastavimo zastavico oddajanja
-    // Glavna zanka lora_loop() bo poskrbela za zaključek.
-    return true;
+    // Sredi inicializacije - ne aktiviramo splošnega mehanizma
+    // is_waiting_for_critical_response = false;
+    Serial.println("[LORA] Način inicializacije - brez splošnih poskusov.");
   }
   else
   {
-    Serial.print(F("[LORA] Napaka pri zacetku posiljanja, koda: "));
-    Serial.println(state);
-    displayLogOnLine(LINE_LORA_STATUS, "[LORA] TX napaka!");
+    // Samo ACK - ne aktiviramo splošnega mehanizma
+    // is_waiting_for_critical_response = false;
+    Serial.println("[LORA] Način samo ACK - brez poskusov.");
+  }
+
+  // Priprava šifriranega paketa
+  uint8_t encrypted[sizeof(LoRaPacket) + 16];
+  size_t enc_len = sizeof(encrypted);
+
+  if (!encrypt_packet(packet, encrypted, enc_len))
+  {
+    Serial.println("[LORA] Napaka pri šifriranju!");
+    // is_waiting_for_critical_response = false; // Sprostimo
+    currentContext = LoRaContext::IDLE; // Reset konteksta
     return false;
   }
+
+  // Pošiljanje
+  loraIsTransmitting = true;
+  int state = radio.startTransmit(encrypted, enc_len);
+
+  if (state != RADIOLIB_ERR_NONE)
+  {
+    Serial.printf("[LORA] Napaka pri pošiljanju: %d\n", state);
+    loraIsTransmitting = false;
+    // is_waiting_for_critical_response = false; // Sprostimo
+    currentContext = LoRaContext::IDLE; // Reset konteksta
+    return false;
+  }
+
+  return true;
 }
-
-// -----------------------------------------------------------------------------------------
-// Glavna zanka za obdelavo LoRa dogodkov
-// void lora_loop()
-// {
-//   if (!operationDone) // Ni bilo dogodka, Lora ni oddala ali prejela ničesar
-//   {
-//     return;
-//   }
-
-//   // Zgodil se je dogodek, počistimo zastavico
-//   operationDone = false;
-
-//   // Preverimo, ali je bila prekinitev od pošiljanja ali prejema
-//   uint16_t irqFlags = radio.getIRQFlags();
-
-//   if (irqFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_TX_DONE)
-//   {
-//     radio.finishTransmit(); // Zaključimo oddajanje
-//     loraIsTransmitting = false; // Ni več v načinu oddajanja
-//     Serial.println("[LORA] Paket uspesno poslan.");
-//     displayLogOnLine(LINE_LORA_STATUS,"[LORA] TX done.");
-//   }
-//   else if (irqFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_DONE)
-//   {
-//     uint8_t rxBuffer[sizeof(LoRaPacket) + 16];
-//     int len = radio.getPacketLength();
-
-//     loraIsWaitingResponse = false; // Prejeli smo nekaj, ne čakamo več na odgovor
-
-//     // Preberemo podatke
-//     if (len != sizeof(rxBuffer))
-//     {
-//       Serial.println("[LORA] Napaka: Prejet paket napacne dolzine!");
-//     }
-//     else
-//     {
-//       radio.readData(rxBuffer, len);
-
-//       // Prikaz RSSI in SNR na zaslonu in serijskem monitorju
-//       String debugLine = "RSSI " + String(radio.getRSSI()) + " SNR " + String(radio.getSNR());
-//       displayLogOnLine(LINE_RSSI_SNR, debugLine);
-
-//       LoRaPacket tempPacket;
-//       if (decrypt_packet(rxBuffer, len, tempPacket))
-//       {
-//         Serial.println("[LORA] Prejet paket uspesno desifriran. Postavljam v čakalno vrsto.");
-//         // Prikažemo prejeti paket
-//         String logMsg = "Out ID: " + String(tempPacket.messageId) + ", CMD: " + String((uint8_t)tempPacket.command);
-//         displayLogOnLine(LINE_PACKET_INFO, logMsg.c_str());
-//         // Ne kličemo več dolgotrajne funkcije.
-//         // Samo skopiramo podatke v nabiralnik in postavimo zastavico.
-//         memcpy(&lora_received_packet, &tempPacket, sizeof(LoRaPacket));
-//         lora_new_packet_available = true;
-//       }
-//       else
-//       {
-//         Serial.println("[LORA] Napaka: Desifriranje neuspesno (napacen kljuc ali poskodovani podatki).");
-//         // Prikažemo poslan paket
-//         // Serial.println("[LORA] Prejeti podatki (heks):");
-//         // for (int i = 0; i < len; i++)
-//         // {
-//         //   if (rxBuffer[i] < 0x10)
-//         //     Serial.print("0");
-//         //   Serial.print(rxBuffer[i], HEX);
-//         //   Serial.print(" ");
-//         // }
-//       }
-//     }
-//   }
-//   // Ponovno zaženemo sprejem
-//   int state = radio.startReceive();
-//   if (state != RADIOLIB_ERR_NONE)
-//   {
-//     Serial.print(F("[LORA] Napaka pri inicializaciji sprejema, koda: "));
-//     Serial.println(state);
-//     displayLogOnLine(LINE_LORA_STATUS, "[LORA] RX ERR");
-//   }
-//   displayLogOnLine(LINE_LORA_STATUS, "[LORA] RX READY");
-//   Serial.println("-------------------------");
-//   Serial.println("");
-// }
 
 // -----------------------------------------------------------------------------------------
 // --- NOVO: Implementacija FreeRTOS taskov ---
@@ -302,51 +286,95 @@ void lora_tx_task(void *pvParameters) {
     }
 }
 
-// Task za obdelavo prejetega paketa
-void lora_rx_task(void *pvParameters) {
-    for (;;) {
-        // Čakaj na obvestilo iz dispatch taska
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        uint8_t rxBuffer[sizeof(LoRaPacket) + 16];
-        int len = radio.getPacketLength();
+// Task za obdelavo prejetega paketa - POENOSTAVLJEN
+void lora_rx_task(void *pvParameters)
+{
+  for (;;)
+  {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Čakaj na obvestilo
 
-        loraIsWaitingResponse = false; // Prejeli smo nekaj, ne čakamo več na odgovor
+    uint8_t rxBuffer[sizeof(LoRaPacket) + 16];
+    int len = radio.getPacketLength();
 
-        // Preberemo podatke
-        if (len != sizeof(rxBuffer)) {
-            Serial.println("[LORA] Napaka: Prejet paket napacne dolzine!");
-        } else {
-            radio.readData(rxBuffer, len);
+    loraIsWaitingResponse = false;
 
-            // Prikaz RSSI in SNR na zaslonu in serijskem monitorju
-            String debugLine = "RSSI " + String(radio.getRSSI()) + " SNR " + String(radio.getSNR());
-            // displayLogOnLine(LINE_RSSI_SNR, debugLine);
+    if (len == sizeof(rxBuffer))
+    {
+      radio.readData(rxBuffer, len);
 
-            LoRaPacket tempPacket;
-            if (decrypt_packet(rxBuffer, len, tempPacket)) {
-                Serial.println("[LORA] Prejet paket uspesno desifriran. Postavljam v čakalno vrsto.");
-                // Prikažemo prejeti paket
-                String logMsg = "Out ID: " + String(tempPacket.messageId) + ", CMD: " + String((uint8_t)tempPacket.command);
-                // displayLogOnLine(LINE_PACKET_INFO, logMsg.c_str());
-                // Ne kličemo več dolgotrajne funkcije.
-                // Samo skopiramo podatke v nabiralnik in postavimo zastavico.
-                memcpy(&lora_received_packet, &tempPacket, sizeof(LoRaPacket));
-                lora_new_packet_available = true;
-            } else {
-                Serial.println("[LORA] Napaka: Desifriranje neuspesno (napacen kljuc ali poskodovani podatki).");
-            }
+      LoRaPacket tempPacket;
+      if (decrypt_packet(rxBuffer, len, tempPacket))
+      {
+        Serial.printf("[LORA RX] ID:%d CMD:%d RSSI:%d SNR:%.1f\n",
+                      tempPacket.messageId, (uint8_t)tempPacket.command,
+                      radio.getRSSI(), radio.getSNR());
+
+        // --- POSODOBLJENO: Ob prejemu odgovora, ustavimo mehanizem ---
+        if (currentContext == LoRaContext::WAITING_FOR_RESPONSE)  // Če čakamo na odgovor
+        {
+          Serial.println("[LORA RETRY] Prejet odgovor, ustavljam ponovne poskuse.");
+          // is_waiting_for_critical_response = false;
+          currentContext = LoRaContext::IDLE; // Reset konteksta
+          lora_retry_count = 0;
         }
-        // Ponovno zaženemo sprejem
-        int state = radio.startReceive();
-        if (state != RADIOLIB_ERR_NONE) {
-            Serial.print(F("[LORA] Napaka pri inicializaciji sprejema, koda: "));
-            Serial.println(state);
-            // displayLogOnLine(LINE_LORA_STATUS, "[LORA] RX ERR");
-        }
-        Serial.println("[LORA] Preklop v RX.");
-        // displayLogOnLine(LINE_LORA_STATUS, "[LORA] RX READY");
-        Serial.println("-------------------------");
-        Serial.println("");
+        memcpy(&lora_received_packet, &tempPacket, sizeof(LoRaPacket));
+        lora_new_packet_available = true;
+      }
     }
-}        
+
+    radio.startReceive();
+  }
+}
+
+
+// -----------------------------------------------------------------------------------------
+// PREMAKNI manage_lora_retries() iz main.cpp sem
+void manage_lora_retries()
+{
+  if (currentContext != LoRaContext::WAITING_FOR_RESPONSE) return;
+  
+  if (millis() - lora_response_timeout_start > LORA_RESPONSE_TIMEOUT_MS)
+  {
+    lora_retry_count++;
+    
+    if (lora_retry_count >= MAX_LORA_RETRIES)
+    {
+      Serial.printf("[LORA RETRY] NAPAKA: Preseženo število poskusov za ukaz %d.\n", (int)last_sent_packet.command);
+      currentContext = LoRaContext::IDLE; // Reset konteksta
+      // lora_set_waiting_for_response(false);
+    }
+    else
+    {
+      Serial.printf("[LORA RETRY] Timeout! Poskus %d/%d\n", lora_retry_count, MAX_LORA_RETRIES);
+      if (lora_send_packet(last_sent_packet))
+      {
+        lora_response_timeout_start = millis();
+      }
+      else
+      {
+        currentContext = LoRaContext::IDLE; // Reset če pošiljanje ne uspe
+      }      
+    }
+  }
+}
+
+//------------------------------------------------------------------------------------------
+// NOVA funkcija, ki nadomesti LoRaTask iz main.cpp
+void lora_process_received_packets()
+{
+  // 1. Upravljaj ponovne poskuse
+  manage_lora_retries();
+  
+  // 2. Obdelaj prejete pakete
+  if (lora_new_packet_available)
+  {
+    // Kliči callback, ki je registriran pri inicializaciji (Lora_handle_received_packet)
+    if (packetCallback != nullptr)
+    {
+      packetCallback(lora_received_packet);
+    }
+    lora_new_packet_available = false;
+  }
+}
+

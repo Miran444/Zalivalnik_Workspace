@@ -40,7 +40,5 @@ void PrikaziStanjeRelejevNaSerial();
 // Funkcija za update urnikov relejev v Rele modulu
 void Rele_updateRelayUrnik(uint8_t index, uint32_t startSec, uint32_t endSec);
 
-// Funkcija za pošiljanje paketa preko LoRa
-// void Lora_prepare_and_send_packet(CommandType cmd, const void *payload_data, size_t payload_size);
 
 

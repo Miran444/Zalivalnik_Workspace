@@ -43,7 +43,9 @@ enum class CommandType : uint8_t {
     NOTIFY_INA_ALERT = 209,
 
     // Potrditev notifikacije od Master -> Rele
-    ACK_NOTIFICATION = 250
+    ACK_NOTIFICATION = 250,
+    ACK_RESET_OCCURED = 251,
+    ACK_TIME_REQUEST = 252
 };
 
 // --- Statusi odgovora ---

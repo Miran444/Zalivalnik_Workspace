@@ -32,6 +32,8 @@ uint8_t firebase_queue_head = 0;
 uint8_t firebase_queue_tail = 0;
 uint8_t firebase_queue_count = 0;
 
+// DODAJ: Globalna spremenljivka za sledenje lastnim posodobitvam
+// static bool ignoreNextStreamUpdate[8] = {false, false, false, false, false, false, false, false};
 //------------------------------------------------------------------------------------------------------------------------
 // Funkcija za inicializacijo Firebase
 void Init_Firebase()
@@ -65,7 +67,7 @@ void Firebase_Connect()
   snprintf(kanaliPath, sizeof(kanaliPath), "%s/Kanali/kanal", databasePath);
   snprintf(chartIntervalPath, sizeof(chartIntervalPath), "%s/charts/Interval", databasePath);
 
-  Firebase.printf("Free Heap: %d\n", ESP.getFreeHeap());
+  Firebase.printf("[F_CONNECT] Free Heap: %d\n", ESP.getFreeHeap());
 
   streamClient.setSSEFilters("put,patch,cancel");
   Database.get(streamClient, databasePath, streamCallback, true /* SSE mode (HTTP Streaming) */, "mainStreamTask");
@@ -88,23 +90,21 @@ void streamCallback(AsyncResult &aResult)
     if (stream.isStream())
     {
       Serial.println("----------------------------");
-      Firebase.printf("event: %s\n", stream.event().c_str());
+      Firebase.printf("[STREAM] event: %s\n", stream.event().c_str());
 
-      // const char* path = stream.dataPath().c_str();
-      // Firebase.printf("String path: %s\n", path);
-
-      // --- SPREMEMBA 3: Preverite pot (path), da ugotovite, kaj se je spremenilo ---
+      // PRAVILNO: Najprej shrani v String objekt
       String path_str = stream.dataPath();
-      // Takoj dobimo kazalec in v nadaljevanju delamo samo z njim.
-      const char* path = path_str.c_str();
+      const char* path = path_str.c_str();  // Zdaj je kazalec veljaven
+      Firebase.printf("[STREAM] String path: %s\n", path);
 
-      Firebase.printf("String path: %s\n", path);
-
+      //-----------------------------------------------------------------------------------------
       // Ali je sprememba znotraj /Kanali?
       if (strncmp(path, "/Kanali", 7) == 0)
       {
-        const char* payload = stream.data().c_str();
-        Firebase.printf("Payload: %s\n", payload);
+        // PRAV TAKO shranimo payload v String
+        String payload_str = stream.data();
+        const char* payload = payload_str.c_str();  // Kazalec na veljavno pomnilniško lokacijo
+        Firebase.printf("[STREAM] Payload: %s\n", payload);
 
         int kanalIndex = -1;
         const char* kanalStr = strstr(payload, "kanal");
@@ -115,7 +115,22 @@ void streamCallback(AsyncResult &aResult)
 
         if (kanalIndex != -1)
         {
-          // POPRAVEK: Inicializiramo vrednosti na obstoječe stanje, ne na -1.
+          // DODAJ: Preveri, ali je to naša lastna posodobitev
+          // if (ignoreNextStreamUpdate[kanalIndex - 1]) {
+          //   Serial.printf("[STREAM] Ignoriram lastno posodobitev za kanal %d\n", kanalIndex);
+          //   ignoreNextStreamUpdate[kanalIndex - 1] = false;
+          //   return; // Ne procesiramo naprej!
+          // }
+
+          // Preveri, ali je sprememba v 'state' polju
+          const char* stateKey = "\"state\":";
+          const char* statePtr = strstr(payload, stateKey);
+          if (statePtr != NULL) {
+            Serial.printf("[STREAM] Zaznana sprememba stanja, ne urnika. Ignoriram.\n");
+            return; // NE pošiljamo nazaj na Rele!
+          }
+
+          // Samo urnik (start_sec/end_sec) procesiramo naprej
           int startSec = firebase_kanal[kanalIndex - 1].start_sec;
           int endSec = firebase_kanal[kanalIndex - 1].end_sec;
           bool dataChanged = false; // Zastavica, ki pove, ali je prišlo do spremembe
@@ -127,7 +142,7 @@ void streamCallback(AsyncResult &aResult)
           {
             // Premaknemo kazalec za dolžino ključa, da pridemo do vrednosti
             startSec = atoi(startSecPtr + strlen(startSecKey));
-            Firebase.printf("Kanal %d je spremenjen, nov začetni čas: %d\n", kanalIndex, startSec);
+            Firebase.printf("[STREAM] Kanal %d je spremenjen, nov začetni čas: %d\n", kanalIndex, startSec);
             firebase_kanal[kanalIndex - 1].start_sec = startSec;
             dataChanged = true;
           }
@@ -139,7 +154,7 @@ void streamCallback(AsyncResult &aResult)
           {
             // Premaknemo kazalec za dolžino ključa, da pridemo do vrednosti
             endSec = atoi(endSecPtr + strlen(endSecKey));
-            Firebase.printf("Kanal %d je spremenjen, nov končni čas: %d\n", kanalIndex, endSec);
+            Firebase.printf("[STREAM] Kanal %d je spremenjen, nov končni čas: %d\n", kanalIndex, endSec);
             firebase_kanal[kanalIndex - 1].end_sec = endSec;
             dataChanged = true;
           }
@@ -154,18 +169,19 @@ void streamCallback(AsyncResult &aResult)
           }
         }
       }
-
+      //-----------------------------------------------------------------------------------------
+      // Ali je sprememba poti /charts/Interval?
       else if (strcmp(path, "/charts/Interval") == 0)
       {
         uint8_t chartInterval = stream.to<uint8_t>();
         set_Interval(chartInterval);
-        Firebase.printf("Nastavljen interval branja senzorjev: %d minut\n", chartInterval);
+        Firebase.printf("[STREAM] Nastavljen interval branja senzorjev: %d minut\n", chartInterval);
       }
     }
     else
     {
       Serial.println("----------------------------");
-      Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
+      Firebase.printf("[STREAM] task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
     }
   }
 }
@@ -190,7 +206,7 @@ void Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec)
 
     if (lora_is_busy())
     {
-      Serial.println("[STREAM] LoRa zasedena. Shranjujem posodobitev za kasneje.");
+      Firebase.printf("[STREAM] LoRa zasedena. Shranjujem posodobitev za kasneje.\n");
       pendingUpdateData.kanalIndex = index;
       pendingUpdateData.start_sec = firebase_kanal[index].start_sec;
       pendingUpdateData.end_sec = firebase_kanal[index].end_sec;
@@ -198,7 +214,7 @@ void Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec)
     }
     else
     {
-      Serial.println("[STREAM] LoRa prosta. Pošiljam posodobitev takoj.");
+      Firebase.printf("[STREAM] LoRa prosta. Pošiljam posodobitev takoj.\n");
       Rele_updateRelayUrnik(index, firebase_kanal[index].start_sec, firebase_kanal[index].end_sec);
     }
   }
@@ -208,7 +224,7 @@ void Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec)
 // Funkcija za posodobitev podatkov iz Firebase (chart interval)
 void Firebase_readInterval()
 {
-  Serial.printf("[FIREBASE] Branje intervala iz Firebase...\n");
+  Firebase.printf("[FIREBASE] Branje intervala iz Firebase...\n");
   Database.get(aClient, chartIntervalPath, Firebase_processResponse, false, "getChartIntervalTask");
 }
 
@@ -228,14 +244,14 @@ void Firebase_Update_Relay_State(int kanal, bool state)
     // DODAJ PREVERJANJE PROSTEGA HEAP-a PRED OPERACIJO
   size_t freeHeap = ESP.getFreeHeap();
   if (freeHeap < 30000) { // Potrebuješ vsaj ~30KB za SSL
-    Serial.printf("[FIREBASE] OPOZORILO: Premalo prostega heap-a: %d bajtov. Preskakujem posodobitev.\n", freeHeap);
+    Firebase.printf("[F_UPDATE_RELAY] OPOZORILO: Premalo prostega heap-a: %d bajtov. Preskakujem posodobitev.\n", freeHeap);
     firebase_response_received = false; // Obravnavaj kot neuspešno
     return;
   }
 
   if (!app.ready())
   {
-    Serial.println("Firebase ni pripravljen za pošiljanje stanja releja.");
+    Firebase.printf("[F_UPDATE_RELAY] Firebase ni pripravljen za pošiljanje stanja releja.\n");
     return;
   }
 
@@ -246,7 +262,10 @@ void Firebase_Update_Relay_State(int kanal, bool state)
   // Pripravimo vrednost, ki jo želimo nastaviti (ne več kot JSON objekt)
   const char* state_payload = state ? "ON" : "OFF";
 
-  Firebase.printf("[FIREBASE] Sending set to: %s, payload: %s\n", path_buffer, state_payload);
+  // DODAJ PRED POŠILJANJEM: Označi, da ignoriramo naslednji stream update za ta kanal
+  // ignoreNextStreamUpdate[kanal - 1] = true;
+
+  Firebase.printf("[F_UPDATE_RELAY] Sending set to: %s, payload: %s\n", path_buffer, state_payload);
 
   // Uporabimo metodo 'set' za nastavitev vrednosti specifičnega polja.
   // To je bolj robustno kot 'update' za posamezna polja.
@@ -260,13 +279,13 @@ void Firebase_Update_Sensor_Data(unsigned long timestamp, const SensorDataPayloa
     // DODAJ PREVERJANJE PROSTEGA HEAP-a PRED OPERACIJO
   size_t freeHeap = ESP.getFreeHeap();
   if (freeHeap < 30000) { // Potrebuješ vsaj ~30KB za SSL
-    Serial.printf("[FIREBASE] OPOZORILO: Premalo prostega heap-a: %d bajtov. Preskakujem posodobitev.\n", freeHeap);
+    Firebase.printf("[F_UPDATE_SENSOR] OPOZORILO: Premalo prostega heap-a: %d bajtov. Preskakujem posodobitev.\n", freeHeap);
     firebase_response_received = false; // Obravnavaj kot neuspešno
     return;
   }
   if (!app.ready())
   {
-    Serial.println("Firebase ni pripravljen za pošiljanje senzornih podatkov.");
+    Firebase.printf("[F_UPDATE_SENSOR] Firebase ni pripravljen za pošiljanje senzornih podatkov.\n");
     return;
   }
 
@@ -296,7 +315,7 @@ void Firebase_Update_Sensor_Data(unsigned long timestamp, const SensorDataPayloa
   char path_buffer[96];
   snprintf(path_buffer, sizeof(path_buffer), "%s/%lu", sensorPath, timestamp);
 
-  Firebase.printf("[FIREBASE] Sending sensor data to: %s\n", path_buffer);
+  Firebase.printf("[F_UPDATE_SENSOR] Sending sensor data to: %s\n", path_buffer);
 
   // Pošljemo podatke z asinhronim klicem
   Database.set<object_t>(aClient, path_buffer, json, Firebase_processResponse, "updateSensorTask");
@@ -309,14 +328,14 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
     // DODAJ PREVERJANJE PROSTEGA HEAP-a PRED OPERACIJO
   size_t freeHeap = ESP.getFreeHeap();
   if (freeHeap < 30000) { // Potrebuješ vsaj ~30KB za SSL
-    Serial.printf("[FIREBASE] OPOZORILO: Premalo prostega heap-a: %d bajtov. Preskakujem posodobitev.\n", freeHeap);
+    Firebase.printf("[F_UPDATE_INA] OPOZORILO: Premalo prostega heap-a: %d bajtov. Preskakujem posodobitev.\n", freeHeap);
     firebase_response_received = false; // Obravnavaj kot neuspešno
     return;
   }
 
   if (!app.ready())
   {
-    Serial.println("Firebase ni pripravljen za pošiljanje INA podatkov.");
+    Firebase.printf("[F_UPDATE_INA] Firebase ni pripravljen za pošiljanje INA podatkov.\n");
     return;
   }
 
@@ -385,7 +404,7 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
   char path_buffer[96];
   snprintf(path_buffer, sizeof(path_buffer), "%s/%lu", inaPath, timestamp);
 
-  Firebase.printf("[FIREBASE] Sending INA data to: %s\n", path_buffer);
+  Firebase.printf("[F_UPDATE_INA] Sending INA data to: %s\n", path_buffer);
 
   // Pošljemo podatke
   Database.set<object_t>(aClient, path_buffer, final_json, Firebase_processResponse, "updateINA3221Task");
@@ -403,20 +422,34 @@ void Firebase_processResponse(AsyncResult &aResult)
 
   if (aResult.available())
   {
-    Firebase.printf("[FIREBASE] task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
-    String path = aResult.path().c_str();
-    Firebase.printf("[DIAGNOZA] Firebase path: %s\n", path);
+    Firebase.printf("[F_RESPONSE] task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
+    // String path = aResult.path().c_str();
+    // Firebase.printf("[DIAGNOZA] Firebase path: %s\n", path.c_str());
 
+    const char* path = aResult.path().c_str();
+    Firebase.printf("[F_RESPONSE] String path: %s\n", path);
+
+    // Obdelava različnih nalog glede na UID
+
+    //-----------------------------------------------------------------------------------------
+    // Preberi urnik kanala
     if (strcmp(aResult.uid().c_str(), "getUrnikTask") == 0)
     {
+      // Pridobimo indeks kanala iz poti
       int kanalIndex = -1;
-      int kanaliPos = path.indexOf("/Kanali/kanal");
-      if (kanaliPos != -1)
-      {
-        kanalIndex = path.substring(kanaliPos + 13).toInt() - 1; // +13 je dolžina "/Kanali/kanal", -1 za 0-based indeks
+      const char* kanalStr = strstr(path, "kanal");
+      if (kanalStr != NULL) {
+          // Preskočimo "kanal" in pretvorimo številko v int
+          kanalIndex = atoi(kanalStr + 5) - 1; // -1 za 0-based indeks
       }
 
-      Firebase.printf("[DIAGNOZA] Prejet urnik. Pričakovan kanal: %d, Prejet kanal: %d\n", currentChannelInProcess, kanalIndex);
+      // int kanaliPos = path.indexOf("/Kanali/kanal");
+      // if (kanaliPos != -1)
+      // {
+      //   kanalIndex = path.substring(kanaliPos + 13).toInt() - 1; // +13 je dolžina "/Kanali/kanal", -1 za 0-based indeks
+      // }
+
+      Firebase.printf("[F_RESPONSE] Prejet urnik. Pričakovan kanal: %d, Prejet kanal: %d\n", currentChannelInProcess, kanalIndex);
 
       if (kanalIndex != -1 && kanalIndex == currentChannelInProcess)
       {
@@ -465,42 +498,50 @@ void Firebase_processResponse(AsyncResult &aResult)
           formatSecondsToTime(firebase_kanal[kanalIndex].start, sizeof(firebase_kanal[kanalIndex].start), start_sec);
           formatSecondsToTime(firebase_kanal[kanalIndex].end, sizeof(firebase_kanal[kanalIndex].end), end_sec);
 
-          Firebase.printf("[FIREBASE] Prejeta oba dela za kanal %d. Signaliziram uspeh.\n", kanalIndex);
+          Firebase.printf("[F_RESPONSE] Prejeta oba dela za kanal %d. Signaliziram uspeh.\n", kanalIndex);
           firebase_response_received = true; // Signaliziramo uspeh
         }
         else
         {
-          Serial.println("[NAPAKA] JSON za urnik nima pričakovanih polj (start_sec, end_sec) ali pa je napaka pri razčlenjevanju.");
+          Firebase.printf("[F_RESPONSE] JSON za urnik nima pričakovanih polj (start_sec, end_sec) ali pa je napaka pri razčlenjevanju.\n");
         }
       }
     }
 
+    //-----------------------------------------------------------------------------------------
+    // Posodobi podatke senzorjev
     if (strcmp(aResult.uid().c_str(), "updateSensorTask") == 0)
     {
-      Serial.println("[FIREBASE] Sensor data uploaded");
+      Firebase.printf("[F_RESPONSE] Sensor data uploaded\n");
       PrikaziStanjeSenzorjevNaSerial();
       firebase_response_received = true;
       // DODAJ: Signaliziraj senzorski čakalni vrsti
       Sensor_OnFirebaseResponse(true);
     }
 
+    //-----------------------------------------------------------------------------------------
+    // Posodobi stanje releja
     if (strcmp(aResult.uid().c_str(), "updateStateTask") == 0)
     {
-      Serial.println("[FIREBASE] State data uploaded");
+      Firebase.printf("[F_RESPONSE] State data uploaded\n");
       firebase_response_received = true;
     }
 
+    //-----------------------------------------------------------------------------------------
+    // Preberi interval za grafe
     if (strcmp(aResult.uid().c_str(), "getChartIntervalTask") == 0)
     {
       uint8_t sensorReadIntervalMinutes = aResult.payload().toInt();
       set_Interval(sensorReadIntervalMinutes);
-      Serial.printf("[FIREBASE] Sensor read interval set to: %d minutes\n", sensorReadIntervalMinutes);
+      Firebase.printf("[F_RESPONSE] Sensor read interval set to: %d minutes\n", sensorReadIntervalMinutes);
       firebase_response_received = true;
     }
 
+    //-----------------------------------------------------------------------------------------
+    // Posodobi INA3221 podatke
     if (strcmp(aResult.uid().c_str(), "updateINA3221Task") == 0)
     {
-      Serial.println("[FIREBASE] INA3221 data uploaded");
+      Firebase.printf("[F_RESPONSE] INA3221 data uploaded\n");
       firebase_response_received = true;
       // DODAJ: Signaliziraj senzorski čakalni vrsti
       Sensor_OnFirebaseResponse(true);
@@ -513,15 +554,15 @@ void Firebase_processResponse(AsyncResult &aResult)
 // Dodaj operacijo v čakalno vrsto
 bool Firebase_QueueOperation(const FirebaseOperation& op) {
     if (firebase_queue_count >= FIREBASE_QUEUE_SIZE) {
-        Serial.println("[FB_QUEUE] POLNA! Preskakujem operacijo.");
+        Firebase.printf("[FB_QUEUE] POLNA! Preskakujem operacijo.\n");
         return false;
     }
     
     firebaseOpsQueue[firebase_queue_tail] = op;
     firebase_queue_tail = (firebase_queue_tail + 1) % FIREBASE_QUEUE_SIZE;
     firebase_queue_count++;
-    
-    Serial.printf("[FB_QUEUE] Dodana operacija. V vrsti: %d/%d\n", 
+
+    Firebase.printf("[FB_QUEUE] Dodana operacija. V vrsti: %d/%d\n", 
                   firebase_queue_count, FIREBASE_QUEUE_SIZE);
     return true;
 }
@@ -536,7 +577,7 @@ bool Firebase_ProcessNextOperation() {
     // Preveri heap pred operacijo
     size_t freeHeap = ESP.getFreeHeap();
     if (freeHeap < 30000) {
-        Serial.printf("[FB_QUEUE] Premalo heap-a: %d B. Čakam...\n", freeHeap);
+        Firebase.printf("[FB_QUEUE] Premalo heap-a: %d B. Čakam...\n", freeHeap);
         return false;
     }
     
@@ -546,8 +587,8 @@ bool Firebase_ProcessNextOperation() {
     }
     
     FirebaseOperation& op = firebaseOpsQueue[firebase_queue_head];
-    
-    Serial.printf("[FB_QUEUE] Procesiranje operacije tipa %d, timestamp: %lu\n", 
+
+    Firebase.printf("[FB_QUEUE] Procesiranje operacije tipa %d, timestamp: %lu\n", 
                   (int)op.type, op.timestamp);
     
     // Izvedi operacijo
