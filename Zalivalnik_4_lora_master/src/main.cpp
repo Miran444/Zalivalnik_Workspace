@@ -127,21 +127,6 @@ bool reset_occured = false; // zastavica, da je prišlo do ponovnega zagona na R
 // Globalna spremenljivka za shranjevanje podatkov iz INA3221
 INA3221_DataPayload ina_data;
 
-// Semafor za sinhronizacijo Firebase in INA
-// SemaphoreHandle_t firebaseSemaphore;
-// NOVO: Semafor za zaščito Firebase klicev
-// SemaphoreHandle_t firebaseMutex;
-
-// Semafor za sinhronizacijo Firebase in glavnega toka
-// QueueHandle_t firebaseQueue;
-
-// Prototipi za Taske
-// void ReadSensorsTask(void *pvParameters);
-// void LoRaTask(void *pvParameters);
-// void ReadINATask(void *pvParameters);
-// SPREMEMBA: Prototip za nov, dinamični task
-// void FirebaseSingleUpdateTask(void *pvParameters);
-
 // -------------------------------------------------------------
 // Definition of the Kanal (Relay) component
 // // Struktura za shranjevanje podatkov o relejih
@@ -182,10 +167,6 @@ float BatteryVoltage = 0.0;     // trenutna napetost baterije
 float CurrentConsumption = 0.0; // trenutna poraba toka
 float WaterConsumption = 0.0;   // skupna poraba vode
 
-// globalne spremenljivke za napetost in porabo
-// float voltage = 0.0; // trenutna napetost
-// float current = 0.0; // trenutna poraba
-
 // spremenljivke za Firebase
 FirebaseApp app;
 WiFiClientSecure ssl_client;
@@ -200,8 +181,6 @@ AsyncResult streamResult; // Za Firebase streaming
 bool firebase_init_flag = false; // Ali je Firebase inicializiran?
 bool taskComplete = false;
 unsigned long lastSync = 0; // Čas zadnje sinhronizacije s Firebase
-
-// String logMsg = ""; // Sporočilo za prikaz na zaslonu
 
 int get_intValue = 0;        // Variables get from the database
 uint16_t messageCounter = 0; // Števec poslanih sporočil
@@ -1007,18 +986,18 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
 
       // Tukaj obdelajte podatke senzorjev, npr. posodobite Firebase
       timestamp = getTime(); // Pridobimo trenutni Unix časovni žig.
-      FirebaseOperation op;
-      op.type = FirebaseTaskType::UPDATE_SENSORS;
-      op.timestamp = timestamp;
-      op.data.sensors = sensors;
-      op.pending = true;
+      // FirebaseOperation op;
+      // op.type = FirebaseTaskType::UPDATE_SENSORS;
+      // op.timestamp = timestamp;
+      // op.data.sensors = sensors;
+      // op.pending = true;
 
-      if (!Firebase_QueueOperation(op)) { // Dodamo operacijo v čakalno vrsto
-          Serial.println("[LORA] OPOZORILO: Firebase queue full, sensor data dropped!");
-      }
+      // if (!Firebase_QueueOperation(op)) { // Dodamo operacijo v čakalno vrsto
+      //     Serial.println("[LORA] OPOZORILO: Firebase queue full, sensor data dropped!");
+      // }
 
       // firebase_response_received = false;
-      // Firebase_Update_Sensor_Data(timestamp, sensors);
+      Firebase_Update_Sensor_Data(timestamp, sensors);
       // povratna informacija za update v: Firebase_processResponse
       // PrikaziStanjeSenzorjevNaSerial();
       lora_response_received = true; // nastavimo zastavico za inicializacijski avtomat
@@ -1158,18 +1137,24 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
           // POSODOBI LOKALNO STANJE PRED POŠILJANJEM V FIREBASE!
           kanal[i].state = is_on;          
 
-          FirebaseOperation op;
-          op.type = FirebaseTaskType::UPDATE_RELAY_STATE;
-          op.timestamp = getTime();
-          op.data.relay.kanal = i + 1;
-          op.data.relay.state = is_on;
-          op.pending = true;
+          // FirebaseOperation op;
+          // op.type = FirebaseTaskType::UPDATE_RELAY_STATE;
+          // op.timestamp = getTime();
+          // op.data.relay.kanal = i + 1;
+          // op.data.relay.state = is_on;
+          // op.pending = true;
 
-          if (!Firebase_QueueOperation(op)) { // Dodamo operacijo v čakalno vrsto
-              Serial.println("[LORA] OPOZORILO: Firebase queue full, relay state update dropped!");
-          }
+          // if (!Firebase_QueueOperation(op)) { // Dodamo operacijo v čakalno vrsto
+          //     Serial.println("[LORA] OPOZORILO: Firebase queue full, relay state update dropped!");
+          // }
+
+          // Pošlji v Firebase
+          Firebase_Update_Relay_State(i + 1, is_on);
+
         }
       }
+
+
       // Pošljemo potrditev (ACK) nazaj na Rele
       // pridobimo ID sporočila iz prejete notifikacije
       uint8_t message_id = packet.messageId;
@@ -1191,33 +1176,35 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
       memcpy(&ina_data, packet.payload, sizeof(INA3221_DataPayload));
 
       // 2. Izpiši prejete podatke za preverjanje
-      const char* kanal_str[3] = {"Battery", "Solar", "Load"};
-      for (int i = 0; i < 3; i++) {
-          Serial.printf("  %s: Napetost: %.2f V, Tok: %.2f mA, Shunt napetost: %.2f mV, Moč: %.2f mW\n",
-                        kanal_str[i],
-                        ina_data.channels[i].bus_voltage,
-                        ina_data.channels[i].current_mA,
-                        ina_data.channels[i].shunt_voltage_mV,
-                        ina_data.channels[i].power_mW);
-      }
-      Serial.printf("  Alert zastavice: 0x%04X\n", ina_data.alert_flags);
-      Serial.printf("  Shunt voltage Sum: %.3f \n", ina_data.shunt_voltage_sum_mV);
+      // const char* kanal_str[3] = {"Battery", "Solar", "Load"};
+      // for (int i = 0; i < 3; i++) {
+      //     Serial.printf("  %s: Napetost: %.2f V, Tok: %.2f mA, Shunt napetost: %.2f mV, Moč: %.2f mW\n",
+      //                   kanal_str[i],
+      //                   ina_data.channels[i].bus_voltage,
+      //                   ina_data.channels[i].current_mA,
+      //                   ina_data.channels[i].shunt_voltage_mV,
+      //                   ina_data.channels[i].power_mW);
+      // }
+      // Serial.printf("  Alert zastavice: 0x%04X\n", ina_data.alert_flags);
+      // Serial.printf("  Shunt voltage Sum: %.3f \n", ina_data.shunt_voltage_sum_mV);
 
       // DODAJ: Signaliziraj čakalni vrsti, da so podatki uspešno prejeti
       Sensor_OnLoRaResponse(true);
 
       // 3. Posodobi podatke v Firebase
       timestamp = getTime(); // Pridobimo trenutni Unix časovni žig.
-      FirebaseOperation op;
-      op.type = FirebaseTaskType::UPDATE_INA;
-      op.timestamp = timestamp;
-      memcpy(&op.data.ina, &ina_data, sizeof(INA3221_DataPayload));
-      op.pending = true;
+      // FirebaseOperation op;
+      // op.type = FirebaseTaskType::UPDATE_INA;
+      // op.timestamp = timestamp;
+      // memcpy(&op.data.ina, &ina_data, sizeof(INA3221_DataPayload));
+      // op.pending = true;
 
-      if (!Firebase_QueueOperation(op)) { // Dodamo operacijo v čakalno vrsto 
-          Serial.println("[LORA] OPOZORILO: Firebase queue full, INA data update dropped!");
-      }
+      // if (!Firebase_QueueOperation(op)) { // Dodamo operacijo v čakalno vrsto 
+      //     Serial.println("[LORA] OPOZORILO: Firebase queue full, INA data update dropped!");
+      // }
 
+      // Pošlji v Firebase
+      Firebase_Update_INA_Data(timestamp, ina_data);
       break;
   }
 
@@ -1534,12 +1521,12 @@ void loop()
 
       // NOVO: Procesiranje Firebase čakalne vrste v glavnem loop-u
       // To pokličite periodično (na primer vsakih 100-500ms)
-      static unsigned long lastFirebaseCheck = 0;
-      if (millis() - lastFirebaseCheck > 200)
-      { // 5x na sekundo
-        lastFirebaseCheck = millis();
-        Firebase_ProcessNextOperation();
-      }
+      // static unsigned long lastFirebaseCheck = 0;
+      // if (millis() - lastFirebaseCheck > 200)
+      // { // 5x na sekundo
+      //   lastFirebaseCheck = millis();
+      //   Firebase_ProcessNextOperation();
+      // }
       // --- konec periodičnih nalog ---
 
       //--------------------------------------------------------------------------------------------------

@@ -23,6 +23,7 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
 void Firebase_processResponse(AsyncResult &aResult);
 void streamCallback(AsyncResult &aResult);
 
+#define FIREBASE_OPERATION_TIMEOUT 20000 // 20 seconds timeout
 
 // --- DEKLARACIJA GLOBALNIH SPREMENLJIVK IZ main.cpp ---
 // S tem povemo, da te spremenljivke obstajajo in so definirane drugje.
@@ -91,14 +92,16 @@ struct FirebaseOperation {
 };
 
 // Globalna čakalna vrsta (statična alokacija)
-extern FirebaseOperation firebaseOpsQueue[FIREBASE_QUEUE_SIZE];
-extern uint8_t firebase_queue_head;
-extern uint8_t firebase_queue_tail;
-extern uint8_t firebase_queue_count;
+// extern FirebaseOperation firebaseOpsQueue[FIREBASE_QUEUE_SIZE];
+// extern uint8_t firebase_queue_head;
+// extern uint8_t firebase_queue_tail;
+// extern uint8_t firebase_queue_count;
 
 // Funkcije za upravljanje čakalne vrste
-bool Firebase_QueueOperation(const FirebaseOperation& op);
-bool Firebase_ProcessNextOperation();
-void Firebase_ResetConnection();
+// bool Firebase_QueueOperation(const FirebaseOperation& op);
+// bool Firebase_ProcessNextOperation();
+// void Firebase_ResetConnection();
+// void Firebase_OpenSSLConnection();
+// void Firebase_CloseSSLConnection();
 
 #endif // FIREBASE_Z_H

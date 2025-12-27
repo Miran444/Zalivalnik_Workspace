@@ -198,3 +198,9 @@ void Sensor_OnFirebaseResponse(bool success) {
         current_sensor_op->state = SensorTaskState::RETRY;
     }
 }
+
+//------------------------------------------------------------------------------------------------------------------------
+// Vrne število aktivnih operacij (v vrsti + trenutna)
+uint8_t Sensor_GetActiveOperationCount() {
+    return sensor_queue_count + (current_sensor_op != nullptr ? 1 : 0);
+}

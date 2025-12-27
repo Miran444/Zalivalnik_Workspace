@@ -1,4 +1,5 @@
 #include "Firebase_z.h"
+#include "wifi_manager.h"
 #include "sensor_queue.h"
 //------------------------------------------------------------------------------------------------------------------------
 
@@ -26,25 +27,15 @@ bool relayState[8]; // Stanja relejev (za 8 relejev)
                     // false = OFF, true = ON
 bool status;        // Spremenljivka za shranjevanje statusa operacij
 
-// --- STATIČNA ČAKALNA VRSTA (brez malloc!) ---
-FirebaseOperation firebaseOpsQueue[FIREBASE_QUEUE_SIZE];
-uint8_t firebase_queue_head = 0;
-uint8_t firebase_queue_tail = 0;
-uint8_t firebase_queue_count = 0;
-
-static unsigned long lastConnectionAttempt = 0;
-static uint8_t connectionRetries = 0;
-const uint8_t MAX_CONNECTION_RETRIES = 3;
-
 //------------------------------------------------------------------------------------------------------------------------
 // Funkcija za inicializacijo Firebase
 void Init_Firebase()
 {
   // Configure SSL client
   ssl_client.setInsecure();
-  ssl_client.setTimeout(5000);
-  ssl_client.setHandshakeTimeout(10);
- 
+  ssl_client.setTimeout(10000);
+  ssl_client.setHandshakeTimeout(15);
+
   // Configure stream SSL client
   stream_ssl_client.setInsecure();
   stream_ssl_client.setTimeout(5000);
@@ -54,6 +45,7 @@ void Init_Firebase()
   initializeApp(aClient, app, getAuth(user_auth), Firebase_processResponse, "🔐 authTask");
   app.getApp<RealtimeDatabase>(Database);
   Database.url(FIREBASE_DATABASE_URL);
+
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -73,8 +65,18 @@ void Firebase_Connect()
 
   streamClient.setSSEFilters("put,patch,cancel");
   Database.get(streamClient, databasePath, streamCallback, true /* SSE mode (HTTP Streaming) */, "mainStreamTask");
-}
 
+
+    // Preveri, ali so še aktivne naloge
+    // if (aClient.taskCount() == 0) {
+    //   Serial.println("Vse naloge so končane.");
+    // }
+    // else
+    // {
+    //   Serial.printf("Še %d nalog aktivnih.\n", aClient.taskCount());
+    // }
+
+}
 //------------------------------------------------------------------------------------------------------------------------
 // Callback funkcija za obdelavo sprememb iz Firebase stream-a
 void streamCallback(AsyncResult &aResult)
@@ -117,13 +119,6 @@ void streamCallback(AsyncResult &aResult)
 
         if (kanalIndex != -1)
         {
-          // DODAJ: Preveri, ali je to naša lastna posodobitev
-          // if (ignoreNextStreamUpdate[kanalIndex - 1]) {
-          //   Serial.printf("[STREAM] Ignoriram lastno posodobitev za kanal %d\n", kanalIndex);
-          //   ignoreNextStreamUpdate[kanalIndex - 1] = false;
-          //   return; // Ne procesiramo naprej!
-          // }
-
           // Preveri, ali je sprememba v 'state' polju
           const char* stateKey = "\"state\":";
           const char* statePtr = strstr(payload, stateKey);
@@ -263,9 +258,6 @@ void Firebase_Update_Relay_State(int kanal, bool state)
 
   // Pripravimo vrednost, ki jo želimo nastaviti (ne več kot JSON objekt)
   const char* state_payload = state ? "ON" : "OFF";
-
-  // DODAJ PRED POŠILJANJEM: Označi, da ignoriramo naslednji stream update za ta kanal
-  // ignoreNextStreamUpdate[kanal - 1] = true;
 
   Firebase.printf("[F_UPDATE_RELAY] Sending set to: %s, payload: %s\n", path_buffer, state_payload);
 
@@ -417,56 +409,69 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
 // Funkcija za obdelavo odgovora iz Firebase
 void Firebase_processResponse(AsyncResult &aResult)
 {
-  if (!aResult.isResult()) return;
+  if (!aResult.isResult())
+    return;
 
   // DODAJ: Če je timeout ali connection error, signaliziraj neuspeh
-  if (aResult.isError()) {
-    Firebase.printf("Error task: %s, msg: %s, code: %d\n", 
-                   aResult.uid().c_str(), 
-                   aResult.error().message().c_str(), 
-                   aResult.error().code());
-    
+  if (aResult.isError())
+  {
+    Firebase.printf("Error task: %s, msg: %s, code: %d\n",
+                    aResult.uid().c_str(),
+                    aResult.error().message().c_str(),
+                    aResult.error().code());
+
     // Signaliziraj neuspeh za senzorske operacije
     if (strcmp(aResult.uid().c_str(), "updateSensorTask") == 0 ||
-        strcmp(aResult.uid().c_str(), "updateINA3221Task") == 0) {
+        strcmp(aResult.uid().c_str(), "updateINA3221Task") == 0)
+    {
       Sensor_OnFirebaseResponse(false);
     }
-    
+
     firebase_response_received = false;
     return;
   }
 
-  if (aResult.isEvent()) Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.eventLog().message().c_str(), aResult.eventLog().code());
-  if (aResult.isDebug()) Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
+  if (aResult.isEvent())
+  {
+    Firebase.printf("Event task: %s, msg: %s, code: %d\n",
+                    aResult.uid().c_str(),
+                    aResult.appEvent().message().c_str(),
+                    aResult.appEvent().code());
+
+    // ODSTRANI: Ne zapri več po avtentikaciji
+    // Avtentikacijska povezava je ločena od operacijske
+  }
+
+  if (aResult.isDebug())
+  {
+    // pripišemo trenutni čas
+    printLocalTime();
+    Firebase.printf("Debug task: %s, msg: %s\n",
+                    aResult.uid().c_str(),
+                    aResult.debug().c_str());
+  }
 
   if (aResult.available())
   {
-    Firebase.printf("[F_RESPONSE] task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
-    // String path = aResult.path().c_str();
-    // Firebase.printf("[DIAGNOZA] Firebase path: %s\n", path.c_str());
+    // Firebase.printf("[F_RESPONSE] task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
 
-    const char* path = aResult.path().c_str();
+    const char *path = aResult.path().c_str();
     Firebase.printf("[F_RESPONSE] String path: %s\n", path);
 
     // Obdelava različnih nalog glede na UID
-
+    // --- Branje iz Firebase ---
     //-----------------------------------------------------------------------------------------
     // Preberi urnik kanala
     if (strcmp(aResult.uid().c_str(), "getUrnikTask") == 0)
     {
       // Pridobimo indeks kanala iz poti
       int kanalIndex = -1;
-      const char* kanalStr = strstr(path, "kanal");
-      if (kanalStr != NULL) {
-          // Preskočimo "kanal" in pretvorimo številko v int
-          kanalIndex = atoi(kanalStr + 5) - 1; // -1 za 0-based indeks
+      const char *kanalStr = strstr(path, "kanal");
+      if (kanalStr != NULL)
+      {
+        // Preskočimo "kanal" in pretvorimo številko v int
+        kanalIndex = atoi(kanalStr + 5) - 1; // -1 za 0-based indeks
       }
-
-      // int kanaliPos = path.indexOf("/Kanali/kanal");
-      // if (kanaliPos != -1)
-      // {
-      //   kanalIndex = path.substring(kanaliPos + 13).toInt() - 1; // +13 je dolžina "/Kanali/kanal", -1 za 0-based indeks
-      // }
 
       Firebase.printf("[F_RESPONSE] Prejet urnik. Pričakovan kanal: %d, Prejet kanal: %d\n", currentChannelInProcess, kanalIndex);
 
@@ -528,25 +533,6 @@ void Firebase_processResponse(AsyncResult &aResult)
     }
 
     //-----------------------------------------------------------------------------------------
-    // Posodobi podatke senzorjev
-    if (strcmp(aResult.uid().c_str(), "updateSensorTask") == 0)
-    {
-      Firebase.printf("[F_RESPONSE] Sensor data uploaded\n");
-      PrikaziStanjeSenzorjevNaSerial();
-      firebase_response_received = true;
-      // DODAJ: Signaliziraj senzorski čakalni vrsti
-      Sensor_OnFirebaseResponse(true);
-    }
-
-    //-----------------------------------------------------------------------------------------
-    // Posodobi stanje releja
-    if (strcmp(aResult.uid().c_str(), "updateStateTask") == 0)
-    {
-      Firebase.printf("[F_RESPONSE] State data uploaded\n");
-      firebase_response_received = true;
-    }
-
-    //-----------------------------------------------------------------------------------------
     // Preberi interval za grafe
     if (strcmp(aResult.uid().c_str(), "getChartIntervalTask") == 0)
     {
@@ -554,6 +540,19 @@ void Firebase_processResponse(AsyncResult &aResult)
       set_Interval(sensorReadIntervalMinutes);
       Firebase.printf("[F_RESPONSE] Sensor read interval set to: %d minutes\n", sensorReadIntervalMinutes);
       firebase_response_received = true;
+    }
+
+    // --- Pisanje v Firebase ---
+    //-----------------------------------------------------------------------------------------
+    // Posodobi podatke senzorjev
+    if (strcmp(aResult.uid().c_str(), "updateSensorTask") == 0)
+    {
+      Firebase.printf("[F_RESPONSE] Sensor data uploaded\n");
+      // PrikaziStanjeSenzorjevNaSerial();
+      firebase_response_received = true;
+      // DODAJ: Signaliziraj senzorski čakalni vrsti
+      Sensor_OnFirebaseResponse(true);
+
     }
 
     //-----------------------------------------------------------------------------------------
@@ -566,110 +565,14 @@ void Firebase_processResponse(AsyncResult &aResult)
       Sensor_OnFirebaseResponse(true);
 
     }
+    //-----------------------------------------------------------------------------------------
+    // Posodobi stanje releja
+    if (strcmp(aResult.uid().c_str(), "updateStateTask") == 0)
+    {
+      Firebase.printf("[F_RESPONSE] State data uploaded\n");
+      firebase_response_received = true;
+
+    }
+
   }
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-// Dodaj operacijo v čakalno vrsto
-bool Firebase_QueueOperation(const FirebaseOperation& op) {
-    if (firebase_queue_count >= FIREBASE_QUEUE_SIZE) {
-        Firebase.printf("[FB_QUEUE] POLNA! Preskakujem operacijo.\n");
-        return false;
-    }
-    
-    firebaseOpsQueue[firebase_queue_tail] = op;
-    firebase_queue_tail = (firebase_queue_tail + 1) % FIREBASE_QUEUE_SIZE;
-    firebase_queue_count++;
-
-    Firebase.printf("[FB_QUEUE] Dodana operacija. V vrsti: %d/%d\n", 
-                  firebase_queue_count, FIREBASE_QUEUE_SIZE);
-    return true;
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-// Procesira naslednjo operacijo iz čakalne vrste
-bool Firebase_ProcessNextOperation() {
-    if (firebase_queue_count == 0) {
-        return false;  // Ni operacij
-    }
-    
-    // Preveri heap pred operacijo
-    size_t freeHeap = ESP.getFreeHeap();
-    if (freeHeap < 30000) {
-        Firebase.printf("[FB_QUEUE] Premalo heap-a: %d B. Čakam...\n", freeHeap);
-        return false;
-    }
-    
-    // Preveri, ali Firebase ni zaseden
-    if (!app.ready()) {
-        // Če Firebase ni ready, počakaj malo in poskusi ponovno
-        if (millis() - lastConnectionAttempt > 2000) {
-            lastConnectionAttempt = millis();
-            connectionRetries++;
-            
-            if (connectionRetries > MAX_CONNECTION_RETRIES) {
-                Firebase.printf("[FB_QUEUE] NAPAKA: Firebase se ne more povezati po %d poskusih!\n", MAX_CONNECTION_RETRIES);
-                
-                // Odstrani operacijo, da se ne zatakne
-                firebase_queue_head = (firebase_queue_head + 1) % FIREBASE_QUEUE_SIZE;
-                firebase_queue_count--;
-                connectionRetries = 0;
-                
-                // DODAJ: Signaliziraj neuspeh senzorski vrsti
-                FirebaseOperation& op = firebaseOpsQueue[firebase_queue_head];
-                if (op.type == FirebaseTaskType::UPDATE_SENSORS || 
-                    op.type == FirebaseTaskType::UPDATE_INA) {
-                    Sensor_OnFirebaseResponse(false);
-                }
-                
-                return false;
-            }
-            Firebase.printf("[FB_QUEUE] Firebase ni ready. Poskus %d/%d...\n", 
-                          connectionRetries, MAX_CONNECTION_RETRIES);
-        }      
-        return false;
-    }
-
-        // Reset števca ob uspešni povezavi
-    connectionRetries = 0;
-
-    FirebaseOperation& op = firebaseOpsQueue[firebase_queue_head];
-
-    Firebase.printf("[FB_QUEUE] Procesiranje operacije tipa %d, timestamp: %lu\n", 
-                  (int)op.type, op.timestamp);
-    
-    // Izvedi operacijo
-    switch (op.type) {
-        case FirebaseTaskType::UPDATE_SENSORS:
-            Firebase_Update_Sensor_Data(op.timestamp, op.data.sensors);
-            break;
-            
-        case FirebaseTaskType::UPDATE_INA:
-            Firebase_Update_INA_Data(op.timestamp, op.data.ina);
-            break;
-            
-        case FirebaseTaskType::UPDATE_RELAY_STATE:
-            Firebase_Update_Relay_State(op.data.relay.kanal, op.data.relay.state);
-            break;
-    }
-    
-    // Odstrani iz čakalne vrste
-    firebase_queue_head = (firebase_queue_head + 1) % FIREBASE_QUEUE_SIZE;
-    firebase_queue_count--;
-    
-    return true;
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-void Firebase_ResetConnection() {
-    Firebase.printf("[FB_RESET] Resetiranje SSL povezave...\n");
-    
-    ssl_client.stop();
-    delay(100);
-    
-    ssl_client.setInsecure();
-    ssl_client.setTimeout(5000);
-    ssl_client.setHandshakeTimeout(10);
-    
-    Firebase.printf("[FB_RESET] SSL povezava resetirana.\n");
 }

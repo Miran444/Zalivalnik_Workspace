@@ -53,6 +53,7 @@ bool Sensor_QueueOperation(SensorTaskType type);
 void Sensor_ProcessQueue();  // Kliči v loop()
 void Sensor_OnLoRaResponse(bool success);
 void Sensor_OnFirebaseResponse(bool success);
+uint8_t Sensor_GetActiveOperationCount();  // Vrne število aktivnih operacij (v vrsti + trenutna)
 
 extern void Lora_prepare_and_send_packet(CommandType cmd, const void *payload_data, size_t payload_size);
 
