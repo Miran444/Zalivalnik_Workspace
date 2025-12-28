@@ -23,9 +23,39 @@ char kanaliPath[64];
 char chartIntervalPath[72];
 char uid[32];
 
-bool relayState[8]; // Stanja relejev (za 8 relejev)
-                    // false = OFF, true = ON
+bool relayState[8]; // Stanja relejev (za 8 relejev) false = OFF, true = ON
 bool status;        // Spremenljivka za shranjevanje statusa operacij
+bool ssl_avtentikacija = false; // Spremenljivka za shranjevanje stanja SSL avtentikacije
+
+// DODAJ retry mehanizem:
+static unsigned long lastFirebaseOperationTime = 0;
+static uint8_t firebaseRetryCount = 0;
+const uint8_t MAX_FIREBASE_RETRIES = 3;
+const unsigned long FIREBASE_RESPONSE_TIMEOUT = 10000; // 10 sekund
+
+// Struktura za shranjevanje zadnje operacije (za retry)
+struct LastFirebaseOperation {
+    enum class Type { NONE, UPDATE_SENSOR, UPDATE_INA, UPDATE_RELAY, GET_URNIK, GET_INTERVAL } type;
+    union {
+        struct {
+            unsigned long timestamp;
+            SensorDataPayload data;
+        } sensor;
+        struct {
+            unsigned long timestamp;
+            INA3221_DataPayload data;
+        } ina;
+        struct {
+            int kanal;
+            bool state;
+        } relay;
+        struct {
+            uint8_t kanalIndex;
+        } urnik;
+    } data;
+    bool waiting_for_response;
+} lastOperation = {LastFirebaseOperation::Type::NONE, {}, false};
+
 
 //------------------------------------------------------------------------------------------------------------------------
 // Funkcija za inicializacijo Firebase
@@ -66,17 +96,34 @@ void Firebase_Connect()
   streamClient.setSSEFilters("put,patch,cancel");
   Database.get(streamClient, databasePath, streamCallback, true /* SSE mode (HTTP Streaming) */, "mainStreamTask");
 
-
-    // Preveri, ali so še aktivne naloge
-    // if (aClient.taskCount() == 0) {
-    //   Serial.println("Vse naloge so končane.");
-    // }
-    // else
-    // {
-    //   Serial.printf("Še %d nalog aktivnih.\n", aClient.taskCount());
-    // }
-
 }
+
+//------------------------------------------------------------------------------------------------------------------------
+// Funkcija za preverjanje če je Firebase pripravljen
+bool Firebase_IsReady()
+{
+  // DODAJ PREVERJANJE PROSTEGA HEAP-a PRED OPERACIJO
+  size_t freeHeap = ESP.getFreeHeap();
+  if (freeHeap < 30000) { // Potrebuješ vsaj ~30KB za SSL
+    Firebase.printf("[F_READY] OPOZORILO: Premalo prostega heap-a: %d bajtov. Preskakujem posodobitev.\n", freeHeap);
+    return false;
+  }
+
+  if (!app.ready())
+  {
+    Firebase.printf("[F_READY] Firebase ni pripravljen za pošiljanje INA podatkov.\n");
+    return false;
+  }
+
+  // NOVO: Počakaj na avtentikacijo
+  if (!ssl_avtentikacija) {
+    Firebase.printf("[F_READY] Avtentikacija v teku, čakam...\n");
+    return false;
+  }
+
+  return true;
+}
+
 //------------------------------------------------------------------------------------------------------------------------
 // Callback funkcija za obdelavo sprememb iz Firebase stream-a
 void streamCallback(AsyncResult &aResult)
@@ -221,7 +268,20 @@ void Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec)
 // Funkcija za posodobitev podatkov iz Firebase (chart interval)
 void Firebase_readInterval()
 {
-  Firebase.printf("[FIREBASE] Branje intervala iz Firebase...\n");
+  if (!ssl_avtentikacija || !app.ready())
+  {
+    Firebase.printf("[F_GET_INTERVAL] Firebase ni pripravljen.\n");
+    return;
+  }
+
+  Firebase.printf("[F_GET_INTERVAL] Reading interval (poskus %d/%d)...\n",
+                  firebaseRetryCount + 1, MAX_FIREBASE_RETRIES);
+
+  lastOperation.type = LastFirebaseOperation::Type::GET_INTERVAL;
+  lastOperation.waiting_for_response = true;
+  lastFirebaseOperationTime = millis();
+  firebase_response_received = false;
+
   Database.get(aClient, chartIntervalPath, Firebase_processResponse, false, "getChartIntervalTask");
 }
 
@@ -229,8 +289,25 @@ void Firebase_readInterval()
 // Funkcija ki prebere urnik iz Firebase in ga shrani v globalno spremenljivko firebase_kanal
 void Firebase_readKanalUrnik(uint8_t kanalIndex)
 {
+  if (!ssl_avtentikacija || !app.ready())
+  {
+    Firebase.printf("[F_GET_URNIK] Firebase ni pripravljen.\n");
+    return;
+  }
+
   char path_buffer[96];
   snprintf(path_buffer, sizeof(path_buffer), "%s%d", kanaliPath, kanalIndex + 1);
+
+  Firebase.printf("[F_GET_URNIK] Reading schedule (poskus %d/%d)...\n",
+                  firebaseRetryCount + 1, MAX_FIREBASE_RETRIES);
+
+  // NOVO: Shrani operacijo
+  lastOperation.type = LastFirebaseOperation::Type::GET_URNIK;
+  lastOperation.data.urnik.kanalIndex = kanalIndex;
+  lastOperation.waiting_for_response = true;
+  lastFirebaseOperationTime = millis();
+  firebase_response_received = false;
+
   Database.get(aClient, path_buffer, Firebase_processResponse, false, "getUrnikTask");
 }
 
@@ -238,51 +315,34 @@ void Firebase_readKanalUrnik(uint8_t kanalIndex)
 // Funkcija za posodobitev podatkov v Firebase (eno polje kanala)
 void Firebase_Update_Relay_State(int kanal, bool state)
 {
-    // DODAJ PREVERJANJE PROSTEGA HEAP-a PRED OPERACIJO
-  size_t freeHeap = ESP.getFreeHeap();
-  if (freeHeap < 30000) { // Potrebuješ vsaj ~30KB za SSL
-    Firebase.printf("[F_UPDATE_RELAY] OPOZORILO: Premalo prostega heap-a: %d bajtov. Preskakujem posodobitev.\n", freeHeap);
-    firebase_response_received = false; // Obravnavaj kot neuspešno
-    return;
-  }
-
-  if (!app.ready())
+  if (!ssl_avtentikacija || !app.ready())
   {
-    Firebase.printf("[F_UPDATE_RELAY] Firebase ni pripravljen za pošiljanje stanja releja.\n");
+    Firebase.printf("[F_UPDATE_RELAY] Firebase ni pripravljen.\n");
     return;
   }
 
-  // Sestavimo pot direktno do polja 'state'
   char path_buffer[100];
   snprintf(path_buffer, sizeof(path_buffer), "%s%d/state", kanaliPath, kanal);
+  const char *state_payload = state ? "ON" : "OFF";
 
-  // Pripravimo vrednost, ki jo želimo nastaviti (ne več kot JSON objekt)
-  const char* state_payload = state ? "ON" : "OFF";
+  Firebase.printf("[F_UPDATE_RELAY] Sending relay state (poskus %d/%d)...\n",
+                  firebaseRetryCount + 1, MAX_FIREBASE_RETRIES);
 
-  Firebase.printf("[F_UPDATE_RELAY] Sending set to: %s, payload: %s\n", path_buffer, state_payload);
+  // NOVO: Shrani operacijo
+  lastOperation.type = LastFirebaseOperation::Type::UPDATE_RELAY;
+  lastOperation.data.relay.kanal = kanal;
+  lastOperation.data.relay.state = state;
+  lastOperation.waiting_for_response = true;
+  lastFirebaseOperationTime = millis();
+  firebase_response_received = false;
 
-  // Uporabimo metodo 'set' za nastavitev vrednosti specifičnega polja.
-  // To je bolj robustno kot 'update' za posamezna polja.
   Database.set(aClient, path_buffer, state_payload, Firebase_processResponse, "updateStateTask");
 }
 
 //------------------------------------------------------------------------------------------------------------------------
-// Funkcija za posodobitev podatkov senzorjev v Firebase (PREDELANO z ArduinoJson)
+// Funkcija za posodobitev podatkov senzorjev v Firebase
 void Firebase_Update_Sensor_Data(unsigned long timestamp, const SensorDataPayload &sensors)
 {
-    // DODAJ PREVERJANJE PROSTEGA HEAP-a PRED OPERACIJO
-  size_t freeHeap = ESP.getFreeHeap();
-  if (freeHeap < 30000) { // Potrebuješ vsaj ~30KB za SSL
-    Firebase.printf("[F_UPDATE_SENSOR] OPOZORILO: Premalo prostega heap-a: %d bajtov. Preskakujem posodobitev.\n", freeHeap);
-    firebase_response_received = false; // Obravnavaj kot neuspešno
-    return;
-  }
-  if (!app.ready())
-  {
-    Firebase.printf("[F_UPDATE_SENSOR] Firebase ni pripravljen za pošiljanje senzornih podatkov.\n");
-    return;
-  }
-
   // Pripravimo bufferje za pretvorbo float vrednosti v nize
   char temp_str[8];
   char hum_str[8];
@@ -309,30 +369,32 @@ void Firebase_Update_Sensor_Data(unsigned long timestamp, const SensorDataPayloa
   char path_buffer[96];
   snprintf(path_buffer, sizeof(path_buffer), "%s/%lu", sensorPath, timestamp);
 
-  Firebase.printf("[F_UPDATE_SENSOR] Sending sensor data to: %s\n", path_buffer);
+  Firebase.printf("[F_UPDATE_SENSOR] Sending sensor data (poskus %d/%d)...\n",
+                  firebaseRetryCount + 1, MAX_FIREBASE_RETRIES);
 
-  // Pošljemo podatke z asinhronim klicem
+  // NOVO: Shrani operacijo za morebitni retry
+  lastOperation.type = LastFirebaseOperation::Type::UPDATE_SENSOR;
+  lastOperation.data.sensor.timestamp = timestamp;
+  lastOperation.data.sensor.data = sensors;
+  lastOperation.waiting_for_response = true;
+  lastFirebaseOperationTime = millis();
+  firebase_response_received = false;
+
+  if (!Firebase_IsReady())
+  {
+    Firebase.printf("[F_UPDATE_SENSOR] Firebase ni pripravljen za posodobitev podatkov senzorjev.\n");
+    Sensor_OnFirebaseResponse(false);
+    return;
+  }
+  // Pošljemo podatke
   Database.set<object_t>(aClient, path_buffer, json, Firebase_processResponse, "updateSensorTask");
+  
 }
 
-// NOVO: Funkcija za pošiljanje INA podatkov v Firebase (PREDELANO z ArduinoJson)
+// Funkcija za pošiljanje INA podatkov v Firebase (PREDELANO z ArduinoJson)
 //----------------------------------------------------------------------------------------------------------------------
 void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload &data)
 {
-    // DODAJ PREVERJANJE PROSTEGA HEAP-a PRED OPERACIJO
-  size_t freeHeap = ESP.getFreeHeap();
-  if (freeHeap < 30000) { // Potrebuješ vsaj ~30KB za SSL
-    Firebase.printf("[F_UPDATE_INA] OPOZORILO: Premalo prostega heap-a: %d bajtov. Preskakujem posodobitev.\n", freeHeap);
-    firebase_response_received = false; // Obravnavaj kot neuspešno
-    return;
-  }
-
-  if (!app.ready())
-  {
-    Firebase.printf("[F_UPDATE_INA] Firebase ni pripravljen za pošiljanje INA podatkov.\n");
-    return;
-  }
-
   JsonWriter writer;
   object_t final_json;
 
@@ -398,10 +460,27 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
   char path_buffer[96];
   snprintf(path_buffer, sizeof(path_buffer), "%s/%lu", inaPath, timestamp);
 
-  Firebase.printf("[F_UPDATE_INA] Sending INA data to: %s\n", path_buffer);
+  Firebase.printf("[F_UPDATE_INA] Sending INA data (poskus %d/%d)...\n",
+                  firebaseRetryCount + 1, MAX_FIREBASE_RETRIES);
+
+  // NOVO: Shrani operacijo za retry
+  lastOperation.type = LastFirebaseOperation::Type::UPDATE_INA;
+  lastOperation.data.ina.timestamp = timestamp;
+  lastOperation.data.ina.data = data;
+  lastOperation.waiting_for_response = true;
+  lastFirebaseOperationTime = millis();
+  firebase_response_received = false;
+
+  if (!Firebase_IsReady())
+  {
+    Firebase.printf("[F_UPDATE_INA] Firebase ni pripravljen za posodobitev INA podatkov.\n");
+    Sensor_OnFirebaseResponse(false);
+    return;
+  }
 
   // Pošljemo podatke
   Database.set<object_t>(aClient, path_buffer, final_json, Firebase_processResponse, "updateINA3221Task");
+  
 
 }
 
@@ -420,12 +499,13 @@ void Firebase_processResponse(AsyncResult &aResult)
                     aResult.error().message().c_str(),
                     aResult.error().code());
 
-    // Signaliziraj neuspeh za senzorske operacije
-    if (strcmp(aResult.uid().c_str(), "updateSensorTask") == 0 ||
-        strcmp(aResult.uid().c_str(), "updateINA3221Task") == 0)
-    {
-      Sensor_OnFirebaseResponse(false);
-    }
+    // // Signaliziraj neuspeh za senzorske operacije
+    // if (strcmp(aResult.uid().c_str(), "updateSensorTask") == 0 ||
+    //     strcmp(aResult.uid().c_str(), "updateINA3221Task") == 0)
+    // {
+    //   Sensor_OnFirebaseResponse(false);
+    // }
+      // NE signaliziraj neuspeha takoj - naj retry mehanizem poskrbi
 
     firebase_response_received = false;
     return;
@@ -438,8 +518,20 @@ void Firebase_processResponse(AsyncResult &aResult)
                     aResult.appEvent().message().c_str(),
                     aResult.appEvent().code());
 
-    // ODSTRANI: Ne zapri več po avtentikaciji
-    // Avtentikacijska povezava je ločena od operacijske
+    // Preverimo za avtentikacijo
+    if (strcmp(aResult.uid().c_str(), "🔐 authTask") == 0)
+    {
+      if (aResult.appEvent().code() == 7) // začetek avtentikacije
+      {
+        ssl_avtentikacija = false; // Med avtentikacijo onemogočimo operacije
+      }
+      else if (aResult.appEvent().code() == 10) // konec avtentikacije
+      {
+        ssl_avtentikacija = true; // Ko se zaključi avtentikacija, omogočimo operacije
+        Firebase.printf("[F_AUTH] Avtentikacija uspešna ob:\n");
+        printLocalTime();
+      }
+    }
   }
 
   if (aResult.isDebug())
@@ -522,8 +614,10 @@ void Firebase_processResponse(AsyncResult &aResult)
           formatSecondsToTime(firebase_kanal[kanalIndex].start, sizeof(firebase_kanal[kanalIndex].start), start_sec);
           formatSecondsToTime(firebase_kanal[kanalIndex].end, sizeof(firebase_kanal[kanalIndex].end), end_sec);
 
-          Firebase.printf("[F_RESPONSE] Prejeta oba dela za kanal %d. Signaliziram uspeh.\n", kanalIndex);
+          Firebase.printf("[F_RESPONSE] Prejeta oba dela za kanal %d. Signaliziram uspeh ✅\n", kanalIndex);
           firebase_response_received = true; // Signaliziramo uspeh
+          firebaseRetryCount = 0;
+          lastOperation.waiting_for_response = false;          
         }
         else
         {
@@ -538,41 +632,137 @@ void Firebase_processResponse(AsyncResult &aResult)
     {
       uint8_t sensorReadIntervalMinutes = aResult.payload().toInt();
       set_Interval(sensorReadIntervalMinutes);
-      Firebase.printf("[F_RESPONSE] Sensor read interval set to: %d minutes\n", sensorReadIntervalMinutes);
+      Firebase.printf("[F_RESPONSE] Sensor read interval set to: %d minutes ✅\n", sensorReadIntervalMinutes);
       firebase_response_received = true;
+      firebaseRetryCount = 0;
+      lastOperation.waiting_for_response = false;
     }
 
-    // --- Pisanje v Firebase ---
+    // --- Odgovor na pisanje v Firebase ---
     //-----------------------------------------------------------------------------------------
-    // Posodobi podatke senzorjev
+    // Posodobljeni podatki senzorjev
     if (strcmp(aResult.uid().c_str(), "updateSensorTask") == 0)
     {
-      Firebase.printf("[F_RESPONSE] Sensor data uploaded\n");
+      Firebase.printf("[F_RESPONSE] Sensor data uploaded ✅\n");
       // PrikaziStanjeSenzorjevNaSerial();
       firebase_response_received = true;
-      // DODAJ: Signaliziraj senzorski čakalni vrsti
-      Sensor_OnFirebaseResponse(true);
-
+      firebaseRetryCount = 0;
+      lastOperation.waiting_for_response = false;      
+      Sensor_OnFirebaseResponse(true);  // Signaliziraj senzorski čakalni vrsti
+      
     }
 
     //-----------------------------------------------------------------------------------------
-    // Posodobi INA3221 podatke
+    // Posodobljeni INA3221 podatki
     if (strcmp(aResult.uid().c_str(), "updateINA3221Task") == 0)
     {
-      Firebase.printf("[F_RESPONSE] INA3221 data uploaded\n");
+      Firebase.printf("[F_RESPONSE] INA3221 data uploaded ✅\n");
       firebase_response_received = true;
-      // DODAJ: Signaliziraj senzorski čakalni vrsti
-      Sensor_OnFirebaseResponse(true);
+      firebaseRetryCount = 0;
+      lastOperation.waiting_for_response = false;      
+      Sensor_OnFirebaseResponse(true);  // Signaliziraj senzorski čakalni vrsti
 
     }
     //-----------------------------------------------------------------------------------------
-    // Posodobi stanje releja
+    // Posodobljeno stanje releja
     if (strcmp(aResult.uid().c_str(), "updateStateTask") == 0)
     {
-      Firebase.printf("[F_RESPONSE] State data uploaded\n");
+      Firebase.printf("[F_RESPONSE] State data uploaded ✅\n");
       firebase_response_received = true;
+      firebaseRetryCount = 0;
+      lastOperation.waiting_for_response = false;
 
     }
 
   }
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+// Funkcija za preverjanje timeoutov in retry Firebase
+void Firebase_CheckAndRetry()
+{
+  // Če ni aktivne operacije, nič ne počnemo
+  if (!lastOperation.waiting_for_response)
+  {
+    return;
+  }
+
+  // Če smo prejeli odgovor, resetiramo
+  if (firebase_response_received)
+  {
+    lastOperation.waiting_for_response = false;
+    firebaseRetryCount = 0;
+    Firebase.printf("[FB_RETRY] Odgovor prejet, reset retry števca.\n");
+    return;
+  }
+
+  // Preveri timeout
+  if (millis() - lastFirebaseOperationTime < FIREBASE_RESPONSE_TIMEOUT)
+  {
+    return; // Še čakamo
+  }
+
+  // Timeout!
+  firebaseRetryCount++;
+  Firebase.printf("[FB_RETRY] TIMEOUT! Poskus %d/%d\n",
+                  firebaseRetryCount, MAX_FIREBASE_RETRIES);
+
+  // Če smo dosegli max retry, signaliziraj neuspeh
+  if (firebaseRetryCount >= MAX_FIREBASE_RETRIES)
+  {
+    Firebase.printf("[FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!\n");
+
+    // Signaliziraj neuspeh glede na tip operacije
+    if (lastOperation.type == LastFirebaseOperation::Type::UPDATE_SENSOR ||
+        lastOperation.type == LastFirebaseOperation::Type::UPDATE_INA)
+    {
+      Sensor_OnFirebaseResponse(false);
+    }
+
+    // Reset
+    lastOperation.waiting_for_response = false;
+    firebaseRetryCount = 0;
+    return;
+  }
+
+  // Ponovni poskus - pokliči ustrezno funkcijo
+  Firebase.printf("[FB_RETRY] Ponovni poskus...\n");
+
+  switch (lastOperation.type)
+  {
+  case LastFirebaseOperation::Type::UPDATE_SENSOR:
+    Firebase_Update_Sensor_Data(lastOperation.data.sensor.timestamp,
+                                lastOperation.data.sensor.data);
+    break;
+
+  case LastFirebaseOperation::Type::UPDATE_INA:
+    Firebase_Update_INA_Data(lastOperation.data.ina.timestamp,
+                             lastOperation.data.ina.data);
+    break;
+
+  case LastFirebaseOperation::Type::UPDATE_RELAY:
+    Firebase_Update_Relay_State(lastOperation.data.relay.kanal,
+                                lastOperation.data.relay.state);
+    break;
+
+  case LastFirebaseOperation::Type::GET_URNIK:
+    Firebase_readKanalUrnik(lastOperation.data.urnik.kanalIndex);
+    break;
+
+  case LastFirebaseOperation::Type::GET_INTERVAL:
+    Firebase_readInterval();
+    break;
+
+  default:
+    break;
+  }
+}
+
+    // Preveri, ali so še aktivne naloge
+    // if (aClient.taskCount() == 0) {
+    //   Serial.println("Vse naloge so končane.");
+    // }
+    // else
+    // {
+    //   Serial.printf("Še %d nalog aktivnih.\n", aClient.taskCount());
+    // }

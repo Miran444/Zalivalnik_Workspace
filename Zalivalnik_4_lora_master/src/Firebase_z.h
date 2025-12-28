@@ -91,17 +91,6 @@ struct FirebaseOperation {
     bool pending;  // Ali je operacija aktivna?
 };
 
-// Globalna čakalna vrsta (statična alokacija)
-// extern FirebaseOperation firebaseOpsQueue[FIREBASE_QUEUE_SIZE];
-// extern uint8_t firebase_queue_head;
-// extern uint8_t firebase_queue_tail;
-// extern uint8_t firebase_queue_count;
-
-// Funkcije za upravljanje čakalne vrste
-// bool Firebase_QueueOperation(const FirebaseOperation& op);
-// bool Firebase_ProcessNextOperation();
-// void Firebase_ResetConnection();
-// void Firebase_OpenSSLConnection();
-// void Firebase_CloseSSLConnection();
+void Firebase_CheckAndRetry();
 
 #endif // FIREBASE_Z_H

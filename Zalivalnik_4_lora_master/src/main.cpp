@@ -1137,23 +1137,11 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
           // POSODOBI LOKALNO STANJE PRED POŠILJANJEM V FIREBASE!
           kanal[i].state = is_on;          
 
-          // FirebaseOperation op;
-          // op.type = FirebaseTaskType::UPDATE_RELAY_STATE;
-          // op.timestamp = getTime();
-          // op.data.relay.kanal = i + 1;
-          // op.data.relay.state = is_on;
-          // op.pending = true;
-
-          // if (!Firebase_QueueOperation(op)) { // Dodamo operacijo v čakalno vrsto
-          //     Serial.println("[LORA] OPOZORILO: Firebase queue full, relay state update dropped!");
-          // }
-
           // Pošlji v Firebase
           Firebase_Update_Relay_State(i + 1, is_on);
 
         }
       }
-
 
       // Pošljemo potrditev (ACK) nazaj na Rele
       // pridobimo ID sporočila iz prejete notifikacije
@@ -1188,20 +1176,11 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
       // Serial.printf("  Alert zastavice: 0x%04X\n", ina_data.alert_flags);
       // Serial.printf("  Shunt voltage Sum: %.3f \n", ina_data.shunt_voltage_sum_mV);
 
-      // DODAJ: Signaliziraj čakalni vrsti, da so podatki uspešno prejeti
+      // Signaliziraj čakalni vrsti, da so podatki uspešno prejeti
       Sensor_OnLoRaResponse(true);
 
       // 3. Posodobi podatke v Firebase
       timestamp = getTime(); // Pridobimo trenutni Unix časovni žig.
-      // FirebaseOperation op;
-      // op.type = FirebaseTaskType::UPDATE_INA;
-      // op.timestamp = timestamp;
-      // memcpy(&op.data.ina, &ina_data, sizeof(INA3221_DataPayload));
-      // op.pending = true;
-
-      // if (!Firebase_QueueOperation(op)) { // Dodamo operacijo v čakalno vrsto 
-      //     Serial.println("[LORA] OPOZORILO: Firebase queue full, INA data update dropped!");
-      // }
 
       // Pošlji v Firebase
       Firebase_Update_INA_Data(timestamp, ina_data);
@@ -1286,171 +1265,6 @@ void setup()
 }
 
 
-
-//---------------------------------------------------------------------------------------------------------------------
-// Naloga za periodično branje senzorjev in pošiljanje podatkov INA3221
-//---------------------------------------------------------------------------------------------------------------------
-// void ReadSensorsTask(void *pvParameters)
-// {
-//   // --- SPREMENJENO: Interval je zdaj dinamičen, prebran iz Firebase ---
-//   // const uint32_t SENSORS_INTERVAL_MS = 120000; // Interval za branje senzorjev (2 minuti)
-
-//   TickType_t lastWakeTime = xTaskGetTickCount(); // Shrani trenutni čas
-
-//   for (;;)
-//   {
-//     // --- SPREMENJENO: Najprej počakaj, nato izvedi ---
-
-//     // Počakamo, dokler ne preteče nastavljen interval.
-//     // Uporabimo globalno spremenljivko Interval_mS, ki jo nastavi Firebase.
-//     // Če Interval_mS še ni nastavljen (je 0), bomo čakali zelo kratek čas,
-//     // kar je v redu, saj bo preverjanje v if stavku preprečilo izvajanje.
-//     vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(Interval_mS > 0 ? Interval_mS : 1000));
-
-//     // Izvedemo branje samo, če je inicializacija končana in je interval smiseln.
-//     if (init_done_flag && Interval_mS > 0)
-//     {
-//         // Preberi podatke senzorjev
-//         Rele_readSensors();
-
-//         // Preveri porabo sklada
-//         UBaseType_t stackLeft = uxTaskGetStackHighWaterMark(NULL);
-//         Serial.printf("[SensorsTask] Preostala velikost sklada: %d bajtov\n", stackLeft);
-//     }
-//   }
-// }
-
-//---------------------------------------------------------------------------------------------------------------------
-// Naloga za branje podatkov iz INA3221 senzorja
-//---------------------------------------------------------------------------------------------------------------------
-// void ReadINATask(void *pvParameters)
-// {
-//   for (;;)
-//   {
-//     // Čakaj na semafor iz ReadSensorsTask
-//     if (xSemaphoreTake(firebaseSemaphore, portMAX_DELAY) == pdTRUE && currentInitState == InitState::STOP)
-//     {
-//       // Ko semafor osvobodi ReadSensorsTask in je inicijacija končana, nadaljuj z obdelavo INA
-//       Read_INA();
-//     }
-//   }
-// }
-
-//---------------------------------------------------------------------------------------------------------------------
-// Naloga za upravljanje LoRa komunikacije in ponovnih poskusov
-// void LoRaTask(void *pvParameters)
-// {
-//   for (;;)
-//   {
-//     // Upravljaj ponovne poskuse za pomembne zahteve
-//     manage_lora_retries();
-
-//     // Obdelaj dohodne in izhodne LoRa pakete
-//     if (lora_new_packet_available)
-//     {
-
-//       Lora_handle_received_packet(lora_received_packet);
-//       lora_new_packet_available = false; // Ponastavi zastavico
-//     }
-
-//     // Uporabi FreeRTOS delay, da osveži task breme
-//     vTaskDelay(pdMS_TO_TICKS(20)); // 20 ms delay
-//   }
-// }
-
-//---------------------------------------------------------------------------------------------------------------------
-// --- NOVO: Task za obdelavo Firebase operacij ---
-// void FirebaseUpdateTask(void *pvParameters) {
-//     FirebaseQueueItem receivedItem;
-
-//     for (;;) {
-//         // Čakaj na element v čakalni vrsti
-//         if (xQueueReceive(firebaseQueue, &receivedItem, portMAX_DELAY) == pdPASS) {
-//             Serial.println("[FirebaseUpdateTask] Prejet nov zahtevek za obdelavo.");
-
-//             // Zakleni dostop do Firebase
-//             if (xSemaphoreTake(firebaseMutex, pdMS_TO_TICKS(1000)) == pdTRUE) {
-//                 switch (receivedItem.taskType) {
-//                     case FirebaseTaskType::UPDATE_SENSORS:
-//                         Serial.println("[FirebaseUpdateTask] Posodabljam podatke senzorjev...");
-//                         Firebase_Update_Sensor_Data(receivedItem.timestamp, receivedItem.data.sensorData);
-//                         break;
-
-//                     case FirebaseTaskType::UPDATE_INA:
-//                         Serial.println("[FirebaseUpdateTask] Posodabljam podatke INA...");
-//                         Firebase_Update_INA_Data(receivedItem.timestamp, receivedItem.data.inaData);
-//                         break;
-
-//                     case FirebaseTaskType::UPDATE_RELAY_STATE:
-//                         Serial.printf("[FirebaseUpdateTask] Posodabljam stanje releja %d...\n", receivedItem.data.relayState.channel);
-//                         Firebase_Update_Relay_State(receivedItem.data.relayState.channel, receivedItem.data.relayState.state);
-//                         break;
-
-//                     // --- DODAJTE NOVO OBRAVNAVO ---
-//                     case FirebaseTaskType::READ_INTERVAL:
-//                         Serial.println("[FirebaseUpdateTask] Berem interval...");
-//                         Firebase_readInterval();
-//                         break;                        
-//                 }
-//                 // Sprosti dostop do Firebase
-//                 xSemaphoreGive(firebaseMutex);
-//             } else {
-//                 Serial.println("[FirebaseUpdateTask] NAPAKA: Timeout pri čakanju na Firebase mutex!");
-//             }
-//              // Preveri porabo sklada
-//             UBaseType_t stackLeft = uxTaskGetStackHighWaterMark(NULL);
-//             Serial.printf("[FirebaseUpdateTask] Preostala velikost sklada: %d bajtov\n", stackLeft);
-//         }
-//     }
-// }
-
-//---------------------------------------------------------------------------------------------------------------------
-// --- NOVO: Task, ki se zažene za vsako posodobitev in se nato sam uniči ---
-// void FirebaseSingleUpdateTask(void *pvParameters) {
-//     // Prejmemo podatke za nalogo
-//     FirebaseQueueItem *item = (FirebaseQueueItem *)pvParameters;
-
-//     Serial.println("[FB_SingleTask] Začenjam z obdelavo.");
-
-//     // Zakleni dostop do Firebase, da se izognemo sočasnim klicem
-//     if (xSemaphoreTake(firebaseMutex, pdMS_TO_TICKS(5000)) == pdTRUE) {
-//         switch (item->taskType) {
-//             case FirebaseTaskType::UPDATE_SENSORS:
-//                 Serial.println("[FB_SingleTask] Posodabljam podatke senzorjev...");
-//                 Firebase_Update_Sensor_Data(item->timestamp, item->data.sensorData);
-//                 break;
-
-//             case FirebaseTaskType::UPDATE_INA:
-//                 Serial.println("[FB_SingleTask] Posodabljam podatke INA...");
-//                 Firebase_Update_INA_Data(item->timestamp, item->data.inaData);
-//                 break;
-
-//             case FirebaseTaskType::UPDATE_RELAY_STATE:
-//                 Serial.printf("[FB_SingleTask] Posodabljam stanje releja %d...\n", item->data.relayState.channel);
-//                 Firebase_Update_Relay_State(item->data.relayState.channel, item->data.relayState.state);
-//                 break;
-            
-//             // Opomba: Branje intervala še vedno poteka v glavnem loop-u, ker je del inicializacije.
-//             // Če bi ga želeli premakniti sem, bi potrebovali drugačen mehanizem za signaliziranje konca.
-//         }
-//         // Sprosti dostop do Firebase
-//         xSemaphoreGive(firebaseMutex);
-//     } else {
-//         Serial.println("[FB_SingleTask] NAPAKA: Timeout pri čakanju na Firebase mutex!");
-//     }
-
-//     // Počistimo pomnilnik, ki smo ga alocirali za parameter
-//     delete item;
-
-//     // Preveri porabo sklada pred uničenjem
-//     UBaseType_t stackLeft = uxTaskGetStackHighWaterMark(NULL);
-//     Serial.printf("[FB_SingleTask] Preostala velikost sklada: %d bajtov. Uničujem task.\n", stackLeft);
-
-//     // Uniči task in sprosti ves njegov pomnilnik
-//     vTaskDelete(NULL);
-// }
-
-
 //---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
@@ -1491,7 +1305,7 @@ void loop()
       Firebase_Connect();
       displayLogOnLine(LINE_LORA_STATUS, "Link Firebase...OK");
 
-      // --- SPREMENJENO: Samo zaženemo avtomatiko, ne kličemo Firebase neposredno ---
+      // --- Zaženemo avtomatiko za inicializacijo ---
       initState_timeout_start = millis();                   // Zaženemo timer za timeout
       currentInitState = InitState::READ_FIREBASE_INTERVAL; // ZAČNEMO Z BRANJEM INTERVALA
 
@@ -1502,31 +1316,57 @@ void loop()
       //---- Periodične naloge----
       // Tukaj lahko izvajamo periodične naloge ko smo končali z inicializacijo
 
-      // DODAJ: Procesiranje senzorske čakalne vrste
+      // Procesiranje senzorske čakalne vrste
       static unsigned long lastSensorCheck = 0;
       if (millis() - lastSensorCheck > 100) { // 10x na sekundo
           lastSensorCheck = millis();
           Sensor_ProcessQueue();
       }
 
-      // SPREMENI: Namesto direktnega klica Rele_readSensors()
-      if (init_done_flag && Interval_mS > 0 && (millis() - lastSensorRead >= Interval_mS)) {
-          lastSensorRead = millis();
+
+      // NOVO: Sinhronizacija na cele minute
+      static bool firstReadDone = false;
+      
+      if (!firstReadDone) {
+          // PRVI KLIC: Počakaj na prehod minute (sekunda == 0)
+          time_t now;
+          struct tm timeinfo;
+          time(&now);
+          localtime_r(&now, &timeinfo);
           
-          // NOVO: Dodaj operacije v čakalno vrsto namesto direktnih klicev
-          Sensor_QueueOperation(SensorTaskType::READ_SENSORS);
-          Sensor_QueueOperation(SensorTaskType::READ_INA);
-          // Sensor_QueueOperation(SensorTaskType::READ_POWER); // Po potrebi
+          if (timeinfo.tm_sec == 0 && init_done_flag && Interval_mS > 0) {
+              // Točno ob prehodu minute (XX:XX:00)
+              Serial.println("[SENSORS] Prvi sinhroniziran klic ob prehodu minute.");
+              
+              lastSensorRead = millis();
+              firstReadDone = true;
+              
+              // Dodaj operacije v čakalno vrsto
+              Sensor_QueueOperation(SensorTaskType::READ_SENSORS);
+              Sensor_QueueOperation(SensorTaskType::READ_INA);
+          }
+      } else {
+          // NASLEDNJI KLICI: Normalen interval
+          if (init_done_flag && Interval_mS > 0 && (millis() - lastSensorRead >= Interval_mS)) {
+              lastSensorRead = millis();
+              
+              Serial.println("[SENSORS] Periodično branje senzorjev.");
+              
+              // Dodaj operacije v čakalno vrsto
+              Sensor_QueueOperation(SensorTaskType::READ_SENSORS);
+              Sensor_QueueOperation(SensorTaskType::READ_INA);
+          }
       }
 
       // NOVO: Procesiranje Firebase čakalne vrste v glavnem loop-u
       // To pokličite periodično (na primer vsakih 100-500ms)
-      // static unsigned long lastFirebaseCheck = 0;
-      // if (millis() - lastFirebaseCheck > 200)
-      // { // 5x na sekundo
-      //   lastFirebaseCheck = millis();
-      //   Firebase_ProcessNextOperation();
-      // }
+      // NOVO: Preverjanje Firebase retry
+      static unsigned long lastFirebaseCheck = 0;
+      if (millis() - lastFirebaseCheck > 500) // 2x na sekundo
+      {
+        lastFirebaseCheck = millis();
+        Firebase_CheckAndRetry();
+      }
       // --- konec periodičnih nalog ---
 
       //--------------------------------------------------------------------------------------------------
