@@ -335,46 +335,46 @@ void PrikaziStanjeRelejevNaSerial()
 // Funkcija za pripravo in pošiljanje LoRa paketa
 void Lora_prepare_and_send_packet(CommandType cmd, const void *payload_data, size_t payload_size)
 {
-  // LoRaPacket packet;
-    // NAMESTO: LoRaPacket packet;
-  LoRaPacket* packet = (LoRaPacket*)malloc(sizeof(LoRaPacket));
-  if (!packet) {
-    Serial.println("[LORA] Ni spomina za paket!");
+  // NAMESTO malloc, uporabi stack:
+  LoRaPacket packet;  // Stack allocation!
+  packet.syncWord = LORA_SYNC_WORD;
+  packet.messageId = messageCounter++;
+  packet.command = cmd;
+  memset(packet.payload, 0, sizeof(packet.payload));
+  
+  if (payload_data != nullptr && payload_size > 0) {
+    memcpy(packet.payload, payload_data, payload_size);
+  }
+
+  UBaseType_t stackLeft = uxTaskGetStackHighWaterMark(NULL);
+  Serial.printf("[Lora] Stack left: %d\n", stackLeft);
+
+  // POMEMBNO: Preveri če je stack kritičen
+  if (stackLeft < 2048) {
+    Serial.println("[LORA] ⚠️ STACK CRITICAL! Prekinjam pošiljanje.");
+    lora_set_context(LoRaContext::IDLE);
     return;
   }
-  packet->syncWord = LORA_SYNC_WORD;
-  packet->messageId = messageCounter++;
-  packet->command = cmd;
-  memset(packet->payload, 0, sizeof(packet->payload));
-  if (payload_data != nullptr && payload_size > 0)
-  {
-    memcpy(packet->payload, payload_data, payload_size);
-  }
-
-  // Preveri porabo sklada
-  UBaseType_t stackLeft = uxTaskGetStackHighWaterMark(NULL);
-  Serial.printf("[Lora] Preostala velikost sklada: %d bajtov\n", stackLeft); 
 
   char logBuffer[32];
-  snprintf(logBuffer, sizeof(logBuffer), "OUT ID: %d, CMD: %d", packet->messageId, (uint8_t)packet->command);
+  snprintf(logBuffer, sizeof(logBuffer), "OUT ID: %d, CMD: %d", packet.messageId, (uint8_t)packet.command);
   Serial.println(logBuffer);
-  // displayLogOnLine(4, logBuffer);
-  packet->crc = calculate_crc((const uint8_t *)packet, offsetof(LoRaPacket, crc));
 
-  // Če smo v načinu inicializacije ali pošiljamo iz SENSOR_QUEUE preskočimo nastavitev konteksta za ponovni poskus
-  if (lora_get_context() != LoRaContext::INITIALIZATION && lora_get_context() != LoRaContext::SENSOR_QUEUE)
-  {
-    // Nastavi kontekst na čakanje na odgovor
+  packet.crc = calculate_crc((const uint8_t *)&packet, offsetof(LoRaPacket, crc));
+
+  // Nastavi kontekst...
+  if (lora_get_context() != LoRaContext::INITIALIZATION && 
+      lora_get_context() != LoRaContext::SENSOR_QUEUE) {
     lora_set_context(LoRaContext::WAITING_FOR_RESPONSE);
   }
 
-  // ENOSTAVNO: Samo pošlji - vsa logika je v lora_send_packet!
-  // pri napaki pošiljanja resetiraj kontekst
-  if (!lora_send_packet(*packet))
-  {
-    Serial.println("[MAIN] Napaka pri pošiljanju paketa!");
-    lora_set_context(LoRaContext::IDLE); // Reset konteksta
+  // Pošlji
+  if (!lora_send_packet(packet)) {  // Zdaj pošiljamo referenco na stack
+    Serial.println("[MAIN] Napaka pri pošiljanju!");
+    lora_set_context(LoRaContext::IDLE);
   }
+  
+  // packet se avtomatsko sprosti ko funkcija returna
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -1242,6 +1242,9 @@ void Lora_handle_received_packet(const LoRaPacket &packet)
 //---------------------------------------------------------------------------------------------------------------------
 void setup()
 {
+
+  configASSERT(uxTaskGetStackHighWaterMark(NULL) > 2048); // povečamo stack size (v platformio.ini)
+
   pinMode(onboard_led.pin, OUTPUT); // onboard LED is output
   onboard_led.on = false;           // turn off the LED
   onboard_led.update();             // update the LED state

@@ -119,93 +119,29 @@ void Firebase_Connect()
 
 }
 
-//------------------------------------------------------------------------------------------------------------------------
-// Firebase task - prenesene ponavljajoče se naloge iz main loop-a
-// void Firebase_Task(void *pvParameters)
-// {
-//   for (;;)
-//   {
-//     // 1. Preverjanje heap-a PRED app.loop()
-//     size_t freeHeap = ESP.getFreeHeap();
-//     if (freeHeap < 40000) // Manj kot 40KB = KRITIČNO!
-//     {
-//       Serial.printf("[FB_TASK] ⚠️ HEAP KRITIČEN: %d bajtov!\n", freeHeap);
-      
-//       // FirebaseNeedsReconnect = true;
-//       // POČISTI stare slote
-//       // Database.resetApp();
-//       // delay(1000); // Počakaj na cleanup
-//     }
-
-//     // 2. Procesiranje Firebase dogodkov (TO JE PRIORITETA!)
-//     app.loop();
-
-//     //--------------------------------------------------------------------------------------------------
-//     // 3. Dodaj diagnostiko za task
-//     static unsigned long lastStackCheck = 0;
-//     if (millis() - lastStackCheck > 30000) { // Vsakih 30 sekund
-//       lastStackCheck = millis();
-
-//       UBaseType_t firebaseStackLeft = uxTaskGetStackHighWaterMark(firebaseTaskHandle);
-//       Serial.printf("[FIREBASE TASK] Stack left: %d\n", firebaseStackLeft);
-
-//       if (firebaseStackLeft < 512) { // OPOZORILO!
-//           Serial.println("[FIREBASE TASK] ⚠️ STACK CRITICAL!");
-//       }
-//     }
-
-//     //--------------------------------------------------------------------------------------------------
-//     // 4. UPORABI Firebase_CheckAndRetry() - ne dupliraj logike!
-//     Firebase_CheckAndRetry(); // ← TA FUNKCIJA ŽE VSE NAREDI!
-
-//     //--------------------------------------------------------------------------------------------------
-//     // 5. Stream monitoring
-//     Firebase_CheckStreamHealth();
-
-//     //--------------------------------------------------------------------------------------------------
-//     // 6. Stream update logika
-//     if (app.ready())
-//     {
-//       // Firebase_CheckAndRetry();
-//       // Sensor_ProcessQueue();
-//       static bool firebaseUpdatePending = false;
-      
-//       if (newChannelDataAvailable)  // Preveri, ali so na voljo novi podatki iz Firebase streama
-//       {
-//         // Tukaj pokličite funkcijo za pripravo podatkov za posodobitev
-//         if (Firebase_handleStreamUpdate(channelUpdate.kanalIndex, channelUpdate.start_sec, channelUpdate.end_sec))
-//         {
-//           if (lora_is_busy())
-//           {
-//             Firebase.printf("[STREAM] LoRa zasedena. Shranjujem posodobitev za kasneje.\n");
-//             firebaseUpdatePending = true; // čakamo na prosto LoRa
-//           }        
-//           else
-//           {
-//             Firebase.printf("[STREAM] LoRa prosta. Pošiljam posodobitev takoj.\n");
-//             firebaseUpdatePending_OK = true; // pošljemo posodobitev takoj v main loop-u
-//           }                  
-//         }
-//         else
-//         {
-//           Firebase.printf("[STREAM] Ni sprememb urnika, samo stanje. Ne pošiljam posodobitve.\n");
-//         }
-//         newChannelDataAvailable = false;  // Počisti zastavico, da ne obdelamo istih podatkov večkrat  
-//       }
-
-//       // Lora je prosta, pošlji posodobitev prek LoRa v main loop-u 
-//       if (firebaseUpdatePending && !lora_is_busy())
-//       {
-//         Firebase.printf("[STREAM] LoRa prosta. Pošiljam posodobitev.\n");
-//         firebaseUpdatePending = false;
-//         firebaseUpdatePending_OK = true;
-//       }
-//     }
-
-//     vTaskDelay(100 / portTICK_PERIOD_MS); // 10x na sekundo
-
-//   }
-// }
+//-------------------------------------------------------------------------------------------------------
+// Pomožna funkcija za ekstrakcijo številke za ključem
+int extractIntValue(const char* json, const char* key) {
+  if (!json || !key) return -1;  // Preveri NULL kazalce
+  
+  const char* keyPos = strstr(json, key);
+  if (!keyPos) return -1;
+  
+  keyPos += strlen(key);
+  
+  // Preskočimo ': ' ali '":"' in whitespace
+  while (*keyPos && (*keyPos == ':' || *keyPos == ' ' || 
+                     *keyPos == '"' || *keyPos == '\t')) {
+    keyPos++;
+  }
+  
+  // Preveri, ali je naslednji znak številka
+  if (!isdigit(*keyPos) && *keyPos != '-') {
+    return -1;
+  }
+  
+  return atoi(keyPos);
+}
 
 //------------------------------------------------------------------------------------------------------------------------
 // Funkcija za preverjanje če je Firebase pripravljen
@@ -735,176 +671,143 @@ void Firebase_processResponse(AsyncResult &aResult)
 
   // ----------------------------------------------------------------------------------------
   // 4. CHECK
-  if (!hasData)
-  {
+
+  if (!hasData) {
     Serial.println("[F_RESPONSE] ⚠️ No available result!");
     return;
   }
 
-  // 5. KOPIRAJ path TAKOJ (ne shrani kazalca!)
-  String pathStr = aResult.path();     // ← KOPIRAJ v String!
-  String payloadStr = aResult.c_str(); // ← KOPIRAJ payload!
-  String uidStr = aResult.uid();       // ← KOPIRAJ UID!
+  // // DODAJ pred primerjavami:
+  // String uidDebug = aResult.uid();
+  // Serial.printf("[F_RESPONSE] UID length: %d, first char: 0x%02X\n", 
+  //               uidDebug.length(), 
+  //               uidDebug.length() > 0 ? (uint8_t)uidDebug[0] : 0);
+  // Serial.printf("[F_RESPONSE] UID bytes: ");
+  // for (size_t i = 0; i < min(uidDebug.length(), 20); i++) {
+  //   Serial.printf("%02X ", (uint8_t)uidDebug[i]);
+  // }
+  // Serial.println();
 
-  // 6. ZDAJ je varno - delamo s kopijami!
-  const char *path = pathStr.c_str();
-  const char *payload = payloadStr.c_str();
-  const char *uid = uidStr.c_str();
-
-  if (!path || strlen(path) == 0) {
-    Serial.println("[F_RESPONSE] ⚠️ Path is NULL!");
+  // DIREKTNE PRIMERJAVE - brez vmesnih spremenljivk:
+  if (aResult.path().length() == 0) {
+    Serial.println("[F_RESPONSE] ⚠️ Path is empty!");
     return;
   }
 
-  Firebase.printf("[F_RESPONSE] Path: %s\n", path);
+  // Debugging - uporabi String objekte
+  Serial.printf("[F_RESPONSE] Task: %s\n", aResult.uid().c_str());
+  Serial.printf("[F_RESPONSE] Path: %s\n", aResult.path().c_str());
+
+  // Payload shranimo v static buffer (kot prej)
+  static char payloadBuf[512];
+  strncpy(payloadBuf, aResult.c_str(), sizeof(payloadBuf) - 1);
+  payloadBuf[sizeof(payloadBuf) - 1] = '\0';
+
+  Serial.printf("[F_RESPONSE] RAW Payload: [%s]\n", payloadBuf);
+  Serial.printf("[F_RESPONSE] Payload length: %d\n", strlen(payloadBuf));
+
   lastFirebaseActivityTime = millis();
 
-  // Obdelava različnih nalog glede na UID
-  // --- Branje iz Firebase ---
+  // PRIMERJAVE: Uporabi .equals() namesto strcmp():
+  
   //-----------------------------------------------------------------------------------------
   // Preberi urnik kanala
-  if (strcmp(uid, "getUrnikTask") == 0)
+  if (aResult.uid().equals("getUrnikTask"))  // ✅ SAFE primerjava
   {
-    // Pridobimo indeks kanala iz poti path
+    const char* path = aResult.path().c_str();  // Uporabi takoj, ne shrani
+    
     int kanalIndex = -1;
     const char *kanalStr = strstr(path, "kanal");
-    if (kanalStr != NULL)
-    {
-      // Preskočimo "kanal" in pretvorimo številko v int
-      kanalIndex = atoi(kanalStr + 5) - 1; // -1 za 0-based indeks
+    
+    if (kanalStr != NULL) {
+      kanalIndex = atoi(kanalStr + 5) - 1;
     }
 
-    Firebase.printf("[F_RESPONSE] Prejet urnik. Pričakovan kanal: %d, Prejet kanal: %d\n", currentChannelInProcess, kanalIndex);
+    Firebase.printf("[F_RESPONSE] Prejet urnik za kanal: %d (pričakovan: %d)\n", 
+                    kanalIndex, currentChannelInProcess);
 
     if (kanalIndex != -1 && kanalIndex == currentChannelInProcess)
     {
-      // String payload = aResult.c_str();
-      int start_sec = -1;
-      int end_sec = -1;
+      int start_sec = extractIntValue(payloadBuf, "\"start_sec\"");
+      int end_sec = extractIntValue(payloadBuf, "\"end_sec\"");
 
-      // --- Ročno razčlenjevanje za "start_sec" ---
-      // String startKey = "start_sec\":";
-      int startIndex = payloadStr.indexOf("start_sec\":");
-      if (startIndex != -1)
-      {
-        int valueStartIndex = startIndex + 11; // dolžina "start_sec\":"
-        int valueEndIndex = payloadStr.indexOf(',', valueStartIndex);
-        if (valueEndIndex == -1)
-        { // Če je zadnji element, iščemo '}'
-          valueEndIndex = payloadStr.indexOf('}', valueStartIndex);
-        }
-        if (valueEndIndex != -1)
-        {
-          start_sec = payloadStr.substring(valueStartIndex, valueEndIndex).toInt();
-        }
-      }
-
-      // --- Ročno razčlenjevanje za "end_sec" ---
-      startIndex = payloadStr.indexOf("end_sec\":");
-      if (startIndex != -1)
-      {
-        int valueStartIndex = startIndex + 9; // dolžina "end_sec\":"
-        int valueEndIndex = payloadStr.indexOf(',', valueStartIndex);
-        if (valueEndIndex == -1)
-        { // Če je zadnji element, iščemo '}'
-          valueEndIndex = payloadStr.indexOf('}', valueStartIndex);
-        }
-        if (valueEndIndex != -1)
-        {
-          end_sec = payloadStr.substring(valueStartIndex, valueEndIndex).toInt();
-        }
-      }
-
-      // Preverimo, ali smo uspešno prebrali obe vrednosti
       if (start_sec != -1 && end_sec != -1)
       {
         firebase_kanal[kanalIndex].start_sec = start_sec;
         firebase_kanal[kanalIndex].end_sec = end_sec;
-        formatSecondsToTime(firebase_kanal[kanalIndex].start, sizeof(firebase_kanal[kanalIndex].start), start_sec);
-        formatSecondsToTime(firebase_kanal[kanalIndex].end, sizeof(firebase_kanal[kanalIndex].end), end_sec);
+        formatSecondsToTime(firebase_kanal[kanalIndex].start, 
+                          sizeof(firebase_kanal[kanalIndex].start), start_sec);
+        formatSecondsToTime(firebase_kanal[kanalIndex].end, 
+                          sizeof(firebase_kanal[kanalIndex].end), end_sec);
 
-        Firebase.printf("[F_RESPONSE] Prejeta oba dela za kanal %d. Signaliziram uspeh ✅\n", kanalIndex);
-        firebase_response_received = true; // Signaliziramo uspeh
+        Firebase.printf("[F_RESPONSE] ✅ Urnik shranjen: %d - %d\n", 
+                        start_sec, end_sec);
+        
+        firebase_response_received = true;
         firebaseRetryCount = 0;
         lastOperation.waiting_for_response = false;
       }
       else
       {
-        Firebase.printf("[F_RESPONSE] JSON za urnik nima pričakovanih polj (start_sec, end_sec) ali pa je napaka pri razčlenjevanju.\n");
+        Firebase.printf("[F_RESPONSE] ⚠️ Parsing failed: start=%d, end=%d\n", 
+                        start_sec, end_sec);
       }
     }
   }
 
   //-----------------------------------------------------------------------------------------
-  // Preberi interval za grafe
-  if (strcmp(uid, "getChartIntervalTask") == 0)
+  // Preberi interval
+  else if (aResult.uid().equals("getChartIntervalTask"))  // ✅
   {
-    uint8_t interval = payloadStr.toInt();
-    if (interval > 0) { // Preveri veljavnost
+    uint8_t interval = atoi(payloadBuf);
+    if (interval > 0) {
       set_Interval(interval);
       Firebase.printf("[F_RESPONSE] Interval nastavljen: %d minut ✅\n", interval);
       firebase_response_received = true;
       firebaseRetryCount = 0;
       lastOperation.waiting_for_response = false;
-    } else {
-      Firebase.printf("[F_RESPONSE] ⚠️ Neveljaven interval: %s\n", payload);
     }
   }
 
-  // --- Odgovor na pisanje v Firebase ---
   //-----------------------------------------------------------------------------------------
-  // Posodobljeni podatki senzorjev
-  if (strcmp(uid, "updateSensorTask") == 0)
+  // Senzorji
+  else if (aResult.uid().equals("updateSensorTask"))  // ✅
   {
     Firebase.printf("[F_RESPONSE] Sensor data uploaded ✅\n");
-    // PrikaziStanjeSenzorjevNaSerial();
     firebase_response_received = true;
     firebaseRetryCount = 0;
     lastOperation.waiting_for_response = false;
-    Sensor_OnFirebaseResponse(true); // Signaliziraj senzorski čakalni vrsti
-
-    // // SAMO TUKAJ preveri heap
-    // static size_t lastHeap = ESP.getFreeHeap();
-    // size_t currentHeap = ESP.getFreeHeap();
-    // int diff = lastHeap - currentHeap;
-    // if (abs(diff) > 1000) {
-    //   Serial.printf("[F_RESPONSE] HEAP sprememba: %d\n", diff);
-    // }
-    // lastHeap = currentHeap;
-
+    Sensor_OnFirebaseResponse(true);
   }
 
   //-----------------------------------------------------------------------------------------
-  // Posodobljeni INA3221 podatki
-  if (strcmp(uid, "updateINA3221Task") == 0)
+  // INA3221
+  else if (aResult.uid().equals("updateINA3221Task"))  // ✅
   {
     Firebase.printf("[F_RESPONSE] INA3221 data uploaded ✅\n");
     firebase_response_received = true;
     firebaseRetryCount = 0;
     lastOperation.waiting_for_response = false;
-    Sensor_OnFirebaseResponse(true); // Signaliziraj senzorski čakalni vrsti
-
-    // SAMO TUKAJ preveri heap
-    static size_t lastHeap = ESP.getFreeHeap();
-    size_t currentHeap = ESP.getFreeHeap();
-    int diff = lastHeap - currentHeap;
-    if (abs(diff) > 1000) {
-      Serial.printf("[F_RESPONSE] HEAP sprememba: %d\n", diff);
-    }
-    lastHeap = currentHeap; 
-
+    Sensor_OnFirebaseResponse(true);
   }
+
   //-----------------------------------------------------------------------------------------
-  // Posodobljeno stanje releja
-  if (strcmp(uid, "updateStateTask") == 0)
+  // Relay state
+  else if (aResult.uid().equals("updateStateTask"))  // ✅
   {
     Firebase.printf("[F_RESPONSE] State data uploaded ✅\n");
     firebase_response_received = true;
     firebaseRetryCount = 0;
     lastOperation.waiting_for_response = false;
   }
-
+  
+  else
+  {
+    Firebase.printf("[F_RESPONSE] ⚠️ Neznan task: %s\n", aResult.uid().c_str());
+  }
 }
+
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Funkcija za preverjanje timeoutov in retry Firebase

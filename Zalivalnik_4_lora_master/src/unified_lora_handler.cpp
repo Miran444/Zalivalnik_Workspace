@@ -1,6 +1,8 @@
 #include "unified_lora_handler.h"
 #include "crypto_manager.h"
 #include <RadioLib.h>
+#include "diagnostics.h"
+#include <stdlib.h> // for rand
 
 // --- Definicije pinov za LORA (kot prej) ---
 #define LORA_SCK 5
@@ -34,7 +36,7 @@ volatile bool loraIsTransmitting = false;       // Ali je LoRa v načinu oddajan
 volatile bool loraIsWaitingResponse = false;    // Ali LoRa čaka na odgovor
 PacketHandlerCallback packetCallback = nullptr;
 
-// --- NOVO: FreeRTOS objekti ---
+// --- FreeRTOS objekti ---
 SemaphoreHandle_t loraInterruptSemaphore = NULL;
 TaskHandle_t loraRxTaskHandle = NULL;
 TaskHandle_t loraTxTaskHandle = NULL;
@@ -45,18 +47,20 @@ void lora_dispatch_task(void *pvParameters);
 void lora_rx_task(void *pvParameters);
 void lora_tx_task(void *pvParameters);
 
-// Potek prejetega Lora paketa:
-// ISR (setFlag_unified) 
-//   ↓
-// lora_dispatch_task (notify)
-//   ↓
-// lora_rx_task (dekriptira, napolni nabiralnik)
-//   ↓
-// lora_new_packet_available = true  ← nastavljena zastavica
-//   ↓
-// loop() → lora_process_received_packets()  ← NOVA funkcija
-//   ↓
-// Lora_handle_received_packet()  ← VAŠ callback (registriran pri setup)
+// Definicije za nabiralnik prejetih paketov ---
+volatile bool lora_new_packet_available = false;
+LoRaPacket lora_received_packet;
+
+// Lora timeout / retry
+unsigned long lora_response_timeout_start = 0;
+unsigned long lora_next_retry_time = 0; // NEW: next allowed retry time
+const unsigned long LORA_RESPONSE_TIMEOUT_MS = 3000; // baseline timeout
+
+// --- NABIRALNIK ZA ODHODNE PAKETE IN PONOVNE POSKUSE ---
+LoRaPacket last_sent_packet;                   // Hranimo zadnji paket, ki čaka na odgovor
+uint8_t lora_retry_count = 0;                  // Števec ponovnih poskusov za splošne ukaze
+const uint8_t MAX_LORA_RETRIES = 3;            // Največje število ponovnih poskusov
+
 
 // --- ISR ---
 #if defined(ESP32)
@@ -74,53 +78,19 @@ void setFlag_unified() { operationDone = true; }
 #endif
 
 
-// Definicije za nabiralnik prejetih paketov ---
-volatile bool lora_new_packet_available = false;
-LoRaPacket lora_received_packet;
 
 
-// spremenljivke za LORA TIMEOUT (ko pošljemo zahtevo in čakamo na odgovor)
-unsigned long lora_response_timeout_start = 0;
-const unsigned long LORA_RESPONSE_TIMEOUT_MS = 3000; // 3 sekunde za odgovor
 
-// --- NOVO: NABIRALNIK ZA ODHODNE PAKETE IN PONOVNE POSKUSE ---
-LoRaPacket last_sent_packet;                   // Hranimo zadnji paket, ki čaka na odgovor
-// bool is_waiting_for_critical_response = false; // Zastavica, ki pove, da paket v nabiralniku čaka na odgovor
-uint8_t lora_retry_count = 0;                  // Števec ponovnih poskusov za splošne ukaze
-const uint8_t MAX_LORA_RETRIES = 3;            // Največje število ponovnih poskusov
 
 //-----------------------------------------------------------------------------------------
 // --- Implementacija javnih funkcij za stanje ---
-
-// void lora_set_waiting_for_response(bool waiting) {
-//   loraIsWaitingResponse = waiting;
-// }
 
 // Preveri, ali je LoRa zasedena (pošilja ali čaka na odgovor)
 bool lora_is_busy() {
   return loraIsTransmitting || loraIsWaitingResponse;
 }
 
-// bool lora_is_waiting_for_response() {
-//   return loraIsWaitingResponse;
-// }
-
-// Pomožna funkcija za preverjanje, ali je ukaz odgovor
-// bool is_response_command(CommandType cmd) {
-//     // Predpostavimo, da se vsi odgovori začnejo z RESPONSE_
-//     // To je odvisno od vaše definicije v message_protocol.h
-//     return (uint8_t)cmd >= (uint8_t)CommandType::RESPONSE_ACK;
-// }
-
-// // DODAJ: Nova struktura za kontekst
-// enum class LoRaContext {
-//     IDLE,                 // Nič ne počnemo
-//     INITIALIZATION,       // Sredi inicializacije (manageReleInitialization upravlja)
-//     WAITING_FOR_RESPONSE, // Normalno delovanje (splošni mehanizem)
-//     JUST_ACK              // Samo ACK
-
-// };
-
+//-----------------------------------------------------------------------------------------
 static LoRaContext currentContext = LoRaContext::IDLE;
 
 // DODAJ: Funkcija za nastavitev konteksta
