@@ -1,0 +1,3210 @@
+18:08:13.388 > ets Jun  8 2016 00:22:57
+18:08:13.388 > 
+18:08:13.388 > rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:13.393 > configsip: 188777542, SPIWP:0xee
+18:08:13.393 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:13.404 > mode:DIO, clock div:2
+18:08:13.404 > load:0x3fff0030,len:1184
+18:08:13.404 > load:0x40078000,len:13232
+18:08:13.504 > load:0x40080400,len:3028
+18:08:13.504 > entry 0x400805e4
+18:08:14.261 > Vrstica 2: Povezujem WiFi...
+18:08:14.859 > .Vrstica 2: WiFi povezan!
+18:08:14.897 > 
+18:08:14.897 > WiFi povezan
+18:08:14.897 > IP naslov: 192.168.64.105
+18:08:14.928 > Vrstica 3: Sync cas...
+18:08:14.929 > Cakam na NTP sinhronizacijo... 
+18:08:18.748 > NTP sinhronizacija uspesna!
+18:08:18.782 > Vrstica 3: NTP OK
+18:08:18.783 > Monday, December 29 2025 18:08:19
+18:08:18.783 > Trenutni čas: 1767028099
+18:08:18.812 > Vrstica 1: Master LoRa
+18:08:18.845 > Vrstica 2: Setup board...
+18:08:19.379 > Vrstica 3: WiFi: 1765845184
+18:08:19.811 > Vrstica 3: Init Lora...
+18:08:19.865 > Vrstica 2: [LORA] Ready.
+18:08:19.865 > [LORA] Init uspesen. Cakam na sporocila...
+18:08:20.298 > Vrstica 3: Init Firebase...
+18:08:20.298 > [F_RESPONSE]Event task: 🔐 authTask, msg: authenticating, code: 7
+18:08:20.304 > Monday, December 29 2025 18:08:21
+18:08:20.309 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Connecting to server...
+18:08:20.315 > [F_RESPONSE]Event task: 🔐 authTask, msg: auth request sent, code: 8
+18:08:20.343 > Vrstica 3: Init Firebase...OK
+18:08:20.744 > [SENSOR_QUEUE] Inicializirana.
+18:08:20.775 > Vrstica 3: Init done.
+18:08:20.809 > Vrstica 2: Setup board...OK
+18:08:20.844 > Vrstica 4: WAITING FOR DATA
+18:08:20.844 > Setup končan.
+18:08:20.844 > Monday, December 29 2025 18:08:21
+18:08:20.848 > Trenutni čas: 1767028101
+18:08:23.462 > [F_RESPONSE]Event task: 🔐 authTask, msg: auth response received, code: 9
+18:08:23.468 > Monday, December 29 2025 18:08:24
+18:08:23.468 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Terminating the server connection...
+18:08:23.479 > [F_RESPONSE]Event task: 🔐 authTask, msg: ready, code: 10
+18:08:23.479 > [F_AUTH] Avtentikacija uspešna ob:
+18:08:23.485 > Monday, December 29 2025 18:08:24
+18:08:23.518 > Vrstica 3: Init Firebase...OK
+18:08:23.553 > Vrstica 2: Link Firebase...
+18:08:23.553 > [F_CONNECT] Free Heap: 205736
+18:08:24.763 > Vrstica 2: Link Firebase...OK
+18:08:24.798 > Vrstica 5: [INIT] Reading Interval...
+18:08:24.799 > [F_GET_INTERVAL] Reading interval (poskus 1/3)...
+18:08:26.093 > Monday, December 29 2025 18:08:26
+18:08:26.093 > [F_RESPONSE] Debug task: getChartIntervalTask, msg: Connecting to server...
+18:08:26.098 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/charts/Interval
+18:08:26.110 > [F_RESPONSE] Sensor read interval set to: 5 minutes ✅
+18:08:26.110 > [INIT] Uspeh pri branju intervala.
+18:08:26.115 > --- ZACENJAM INICIALIZACIJO RELE MODULA ---
+18:08:26.149 > Vrstica 5: [INIT] Starting...
+18:08:26.149 > [INIT] Korak 1: Posiljam cas...
+18:08:26.183 > Vrstica 5: [INIT] UTC time
+18:08:26.183 > Pripravljam paket za sinhronizacijo casa (CMD_SET_TIME)...
+18:08:26.189 >   Čas od polnoči: 65306 sekund
+18:08:26.189 >   Posiljam timestamp: 1767028106
+18:08:26.195 > [Lora] Preostala velikost sklada: 1932 bajtov
+18:08:26.200 > OUT ID: 0, CMD: 1
+18:08:26.200 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:26.355 > [LORA] Paket uspesno poslan.
+18:08:26.355 > [LORA] Preklop v RX po TX uspesen.
+18:08:26.358 > -------------------------
+18:08:26.358 > 
+18:08:26.749 > [LORA RX] ID:0 CMD:103 RSSI:0 SNR:9.2
+18:08:26.749 > In ID: 0, CMD: 103
+18:08:26.749 > CRC OK.
+18:08:26.755 > Prejet odgovor: 65306
+18:08:26.755 > --------------------
+18:08:26.755 > [INIT] Uspeh pri čakanju na 'odgovor za čas'.
+18:08:26.760 > [INIT] Korak 3: Posiljam zahtevo za senzorje...
+18:08:26.796 > Vrstica 5: [INIT] Sensors
+18:08:26.796 > Pripravljam paket za branje senzorjev (CMD_GET_SENSORS)...
+18:08:26.802 > [Lora] Preostala velikost sklada: 1932 bajtov
+18:08:26.807 > OUT ID: 1, CMD: 5
+18:08:26.807 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:26.955 > [LORA] Paket uspesno poslan.
+18:08:26.956 > [LORA] Preklop v RX po TX uspesen.
+18:08:26.958 > -------------------------
+18:08:26.958 > 
+18:08:27.361 > [LORA RX] ID:1 CMD:104 RSSI:0 SNR:9.8
+18:08:27.361 > In ID: 1, CMD: 104
+18:08:27.361 > CRC OK.
+18:08:27.366 > Prejeti podatki senzorjev:
+18:08:27.366 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+18:08:27.378 > --------------------
+18:08:27.378 > [INIT] Uspeh pri čakanju na 'odgovor za senzorje'.
+18:08:27.382 > [INIT] Posiljam zahtevo za urnik kanala 1...
+18:08:27.414 > Vrstica 5: [INIT] Urnik K1
+18:08:27.414 > Branje urnika za kanal 1 (CMD_GET_URNIK)...
+18:08:27.420 > [Lora] Preostala velikost sklada: 1932 bajtov
+18:08:27.420 > OUT ID: 2, CMD: 3
+18:08:27.425 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:27.438 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767028108
+18:08:27.443 > [F_RESPONSE] Sensor data uploaded ✅
+18:08:27.575 > [LORA] Paket uspesno poslan.
+18:08:27.575 > [LORA] Preklop v RX po TX uspesen.
+18:08:27.578 > -------------------------
+18:08:27.578 > 
+18:08:27.928 > [LORA RX] ID:2 CMD:102 RSSI:0 SNR:10.0
+18:08:27.928 > In ID: 2, CMD: 102
+18:08:27.928 > CRC OK.
+18:08:27.933 > [INIT] Prejet urnik za kanal 1: 20:15 - 22:00 (Start sec=72900, End sec=79200)
+18:08:27.938 > --------------------
+18:08:27.938 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+18:08:27.944 > [INIT] Posiljam zahtevo za urnik kanala 2...
+18:08:27.974 > Vrstica 5: [INIT] Urnik K2
+18:08:27.974 > Branje urnika za kanal 2 (CMD_GET_URNIK)...
+18:08:27.980 > [Lora] Preostala velikost sklada: 1932 bajtov
+18:08:27.980 > OUT ID: 3, CMD: 3
+18:08:27.986 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:28.133 > [LORA] Paket uspesno poslan.
+18:08:28.133 > [LORA] Preklop v RX po TX uspesen.
+18:08:28.136 > -------------------------
+18:08:28.136 > 
+18:08:28.517 > [LORA RX] ID:3 CMD:102 RSSI:0 SNR:9.2
+18:08:28.517 > In ID: 3, CMD: 102
+18:08:28.517 > CRC OK.
+18:08:28.523 > [INIT] Prejet urnik za kanal 2: 03:50 - 22:00 (Start sec=13800, End sec=79200)
+18:08:28.529 > --------------------
+18:08:28.529 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+18:08:28.535 > [INIT] Posiljam zahtevo za urnik kanala 3...
+18:08:28.563 > Vrstica 5: [INIT] Urnik K3
+18:08:28.563 > Branje urnika za kanal 3 (CMD_GET_URNIK)...
+18:08:28.569 > [Lora] Preostala velikost sklada: 1932 bajtov
+18:08:28.569 > OUT ID: 4, CMD: 3
+18:08:28.574 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:28.724 > [LORA] Paket uspesno poslan.
+18:08:28.724 > [LORA] Preklop v RX po TX uspesen.
+18:08:28.727 > -------------------------
+18:08:28.727 > 
+18:08:29.107 > [LORA RX] ID:4 CMD:102 RSSI:0 SNR:9.5
+18:08:29.749 > In ID: 4, CMD: 102
+18:08:29.749 > CRC OK.
+18:08:29.749 > [INIT] Prejet urnik za kanal 3: 06:00 - 11:05 (Start sec=21600, End sec=39900)
+18:08:29.755 > --------------------
+18:08:29.761 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+18:08:29.761 > [INIT] Posiljam zahtevo za urnik kanala 4...
+18:08:29.794 > Vrstica 5: [INIT] Urnik K4
+18:08:29.794 > Branje urnika za kanal 4 (CMD_GET_URNIK)...
+18:08:29.800 > [Lora] Preostala velikost sklada: 1932 bajtov
+18:08:29.800 > OUT ID: 5, CMD: 3
+18:08:29.805 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:29.955 > [LORA] Paket uspesno poslan.
+18:08:29.955 > [LORA] Preklop v RX po TX uspesen.
+18:08:29.958 > -------------------------
+18:08:29.958 > 
+18:08:30.308 > [LORA RX] ID:5 CMD:102 RSSI:0 SNR:9.5
+18:08:30.308 > In ID: 5, CMD: 102
+18:08:30.308 > CRC OK.
+18:08:30.314 > [INIT] Prejet urnik za kanal 4: 04:53 - 16:45 (Start sec=17580, End sec=60300)
+18:08:30.319 > --------------------
+18:08:30.319 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+18:08:30.324 > [INIT] Posiljam zahtevo za urnik kanala 5...
+18:08:30.355 > Vrstica 5: [INIT] Urnik K5
+18:08:30.355 > Branje urnika za kanal 5 (CMD_GET_URNIK)...
+18:08:30.360 > [Lora] Preostala velikost sklada: 1932 bajtov
+18:08:30.360 > OUT ID: 6, CMD: 3
+18:08:30.366 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:30.514 > [LORA] Paket uspesno poslan.
+18:08:30.514 > [LORA] Preklop v RX po TX uspesen.
+18:08:30.517 > -------------------------
+18:08:30.517 > 
+18:08:30.902 > [LORA RX] ID:6 CMD:102 RSSI:0 SNR:9.5
+18:08:30.902 > In ID: 6, CMD: 102
+18:08:30.902 > CRC OK.
+18:08:30.907 > [INIT] Prejet urnik za kanal 5: 06:56 - 22:15 (Start sec=24960, End sec=80100)
+18:08:30.911 > --------------------
+18:08:31.240 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+18:08:31.240 > [INIT] Posiljam zahtevo za urnik kanala 6...
+18:08:31.275 > Vrstica 5: [INIT] Urnik K6
+18:08:31.275 > Branje urnika za kanal 6 (CMD_GET_URNIK)...
+18:08:31.280 > [Lora] Preostala velikost sklada: 1932 bajtov
+18:08:31.280 > OUT ID: 7, CMD: 3
+18:08:31.286 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:31.435 > [LORA] Paket uspesno poslan.
+18:08:31.435 > [LORA] Preklop v RX po TX uspesen.
+18:08:31.438 > -------------------------
+18:08:31.438 > 
+18:08:31.817 > [LORA RX] ID:7 CMD:102 RSSI:0 SNR:9.5
+18:08:31.880 > In ID: 7, CMD: 102
+18:08:31.880 > CRC OK.
+18:08:31.880 > [INIT] Prejet urnik za kanal 6: 04:55 - 15:05 (Start sec=17700, End sec=54300)
+18:08:31.886 > --------------------
+18:08:31.891 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+18:08:31.891 > [INIT] Posiljam zahtevo za urnik kanala 7...
+18:08:31.925 > Vrstica 5: [INIT] Urnik K7
+18:08:31.925 > Branje urnika za kanal 7 (CMD_GET_URNIK)...
+18:08:31.931 > [Lora] Preostala velikost sklada: 1932 bajtov
+18:08:31.931 > OUT ID: 8, CMD: 3
+18:08:31.937 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:32.086 > [LORA] Paket uspesno poslan.
+18:08:32.086 > [LORA] Preklop v RX po TX uspesen.
+18:08:32.088 > -------------------------
+18:08:32.088 > 
+18:08:32.440 > [LORA RX] ID:8 CMD:102 RSSI:0 SNR:9.8
+18:08:32.440 > In ID: 8, CMD: 102
+18:08:32.440 > CRC OK.
+18:08:32.446 > [INIT] Prejet urnik za kanal 7: 09:35 - 10:00 (Start sec=34500, End sec=36000)
+18:08:32.451 > --------------------
+18:08:32.451 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+18:08:32.457 > [INIT] Posiljam zahtevo za urnik kanala 8...
+18:08:32.486 > Vrstica 5: [INIT] Urnik K8
+18:08:32.486 > Branje urnika za kanal 8 (CMD_GET_URNIK)...
+18:08:32.491 > [Lora] Preostala velikost sklada: 1932 bajtov
+18:08:32.491 > OUT ID: 9, CMD: 3
+18:08:32.497 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:32.645 > [LORA] Paket uspesno poslan.
+18:08:32.645 > [LORA] Preklop v RX po TX uspesen.
+18:08:32.649 > -------------------------
+18:08:32.649 > 
+18:08:33.038 > [LORA RX] ID:9 CMD:102 RSSI:0 SNR:9.0
+18:08:33.038 > In ID: 9, CMD: 102
+18:08:33.038 > CRC OK.
+18:08:33.044 > [INIT] Prejet urnik za kanal 8: 05:30 - 07:30 (Start sec=19800, End sec=27000)
+18:08:33.050 > --------------------
+18:08:33.050 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+18:08:33.055 > [INIT] Vsi urniki uspesno prebrani.
+18:08:33.055 > [INIT] Branje urnika iz Firebase za kanal 1...
+18:08:33.095 > Vrstica 5: [INIT] Branje K1
+18:08:33.095 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+18:08:33.200 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal1
+18:08:33.206 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 0, Prejet kanal: 0
+18:08:33.211 > [F_RESPONSE] Prejeta oba dela za kanal 0. Signaliziram uspeh ✅
+18:08:33.217 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:33.222 > [INIT] Branje urnika iz Firebase za kanal 2...
+18:08:33.256 > Vrstica 5: [INIT] Branje K2
+18:08:33.256 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+18:08:33.318 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal2
+18:08:33.323 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 1, Prejet kanal: 1
+18:08:33.329 > [F_RESPONSE] Prejeta oba dela za kanal 1. Signaliziram uspeh ✅
+18:08:33.334 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:33.339 > [INIT] Branje urnika iz Firebase za kanal 3...
+18:08:33.373 > Vrstica 5: [INIT] Branje K3
+18:08:33.373 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+18:08:33.523 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal3
+18:08:33.529 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 2, Prejet kanal: 2
+18:08:33.534 > [F_RESPONSE] Prejeta oba dela za kanal 2. Signaliziram uspeh ✅
+18:08:33.540 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:33.545 > [INIT] Branje urnika iz Firebase za kanal 4...
+18:08:33.579 > Vrstica 5: [INIT] Branje K4
+18:08:33.579 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+18:08:33.641 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal4
+18:08:33.647 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 3, Prejet kanal: 3
+18:08:33.652 > [F_RESPONSE] Prejeta oba dela za kanal 3. Signaliziram uspeh ✅
+18:08:33.658 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:33.663 > [INIT] Branje urnika iz Firebase za kanal 5...
+18:08:33.698 > Vrstica 5: [INIT] Branje K5
+18:08:33.698 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+18:08:33.849 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal5
+18:08:33.854 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 4, Prejet kanal: 4
+18:08:33.860 > [F_RESPONSE] Prejeta oba dela za kanal 4. Signaliziram uspeh ✅
+18:08:33.865 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:33.870 > [INIT] Branje urnika iz Firebase za kanal 6...
+18:08:33.904 > Vrstica 5: [INIT] Branje K6
+18:08:33.905 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+18:08:33.966 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal6
+18:08:33.972 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 5, Prejet kanal: 5
+18:08:33.977 > [F_RESPONSE] Prejeta oba dela za kanal 5. Signaliziram uspeh ✅
+18:08:33.983 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:33.988 > [INIT] Branje urnika iz Firebase za kanal 7...
+18:08:34.021 > Vrstica 5: [INIT] Branje K7
+18:08:34.021 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+18:08:34.357 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal7
+18:08:34.362 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 6, Prejet kanal: 6
+18:08:34.368 > [F_RESPONSE] Prejeta oba dela za kanal 6. Signaliziram uspeh ✅
+18:08:34.374 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:34.379 > [INIT] Branje urnika iz Firebase za kanal 8...
+18:08:34.412 > Vrstica 5: [INIT] Branje K8
+18:08:34.412 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+18:08:34.473 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal8
+18:08:34.479 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 7, Prejet kanal: 7
+18:08:34.484 > [F_RESPONSE] Prejeta oba dela za kanal 7. Signaliziram uspeh ✅
+18:08:34.490 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:34.495 > [INIT] Vsi urniki iz Firebase uspesno prebrani.
+18:08:34.495 > [INIT] Urnik za kanal 1 je ze usklajen.
+18:08:34.532 > [INIT] Urnik za kanal 2 je ze usklajen.
+18:08:34.532 > [INIT] Urnik za kanal 3 je ze usklajen.
+18:08:34.532 > [INIT] Urnik za kanal 4 je ze usklajen.
+18:08:34.532 > [INIT] Urnik za kanal 5 je ze usklajen.
+18:08:34.532 > [INIT] Urnik za kanal 6 je ze usklajen.
+18:08:34.532 > [INIT] Urnik za kanal 7 je ze usklajen.
+18:08:34.532 > [INIT] Urnik za kanal 8 je ze usklajen.
+18:08:34.532 > [INIT] Korak 2: Posiljam zahtevo za status relejev...
+18:08:34.562 > Vrstica 5: [INIT] Status
+18:08:34.565 > Preverjanje stanja relejev (CMD_GET_STATUS)...
+18:08:34.569 > [Lora] Preostala velikost sklada: 1932 bajtov
+18:08:34.569 > OUT ID: 10, CMD: 2
+18:08:34.576 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:34.723 > [LORA] Paket uspesno poslan.
+18:08:34.723 > [LORA] Preklop v RX po TX uspesen.
+18:08:34.726 > -------------------------
+18:08:34.726 > 
+18:08:35.148 > [LORA RX] ID:10 CMD:101 RSSI:0 SNR:9.5
+18:08:35.148 > In ID: 10, CMD: 101
+18:08:35.148 > CRC OK.
+18:08:35.154 > Prejeto stanje relejev:
+18:08:35.154 >   Rele 1: OFF
+18:08:35.154 >   Rele 2: ON
+18:08:35.154 >   Rele 3: OFF
+18:08:35.159 >   Rele 4: OFF
+18:08:35.159 >   Rele 5: ON
+18:08:35.159 >   Rele 6: OFF
+18:08:35.159 >   Rele 7: OFF
+18:08:35.159 >   Rele 8: OFF
+18:08:35.165 > --------------------
+18:08:35.165 > [INIT] Uspeh pri čakanju na 'odgovor za status'.
+18:08:35.170 > [INIT] Posodabljanje stanja v Firebase za kanal 1...
+18:08:35.204 > Vrstica 5: [INIT] Posodabljanje K1
+18:08:35.204 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+18:08:35.267 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal1/state
+18:08:35.273 > [F_RESPONSE] State data uploaded ✅
+18:08:35.273 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:35.279 > [INIT] Posodabljanje stanja v Firebase za kanal 2...
+18:08:35.312 > Vrstica 5: [INIT] Posodabljanje K2
+18:08:35.313 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+18:08:35.375 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal2/state
+18:08:35.380 > [F_RESPONSE] State data uploaded ✅
+18:08:35.380 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:35.386 > [INIT] Posodabljanje stanja v Firebase za kanal 3...
+18:08:35.420 > Vrstica 5: [INIT] Posodabljanje K3
+18:08:35.420 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+18:08:35.487 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal3/state
+18:08:35.492 > [F_RESPONSE] State data uploaded ✅
+18:08:35.492 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:35.498 > [INIT] Posodabljanje stanja v Firebase za kanal 4...
+18:08:35.532 > Vrstica 5: [INIT] Posodabljanje K4
+18:08:35.532 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+18:08:35.594 > [F_STREAM] Debug task: mainStreamTask, msg: Connecting to server...
+18:08:35.600 > [STREAM] event: put
+18:08:35.600 > [STREAM] Payload: "OFF"
+18:08:35.600 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal4/state
+18:08:35.611 > [F_RESPONSE] State data uploaded ✅
+18:08:35.611 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:35.616 > [INIT] Posodabljanje stanja v Firebase za kanal 5...
+18:08:35.653 > Vrstica 5: [INIT] Posodabljanje K5
+18:08:35.653 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+18:08:35.714 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal5/state
+18:08:35.719 > [F_RESPONSE] State data uploaded ✅
+18:08:35.719 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:35.724 > [INIT] Posodabljanje stanja v Firebase za kanal 6...
+18:08:35.759 > Vrstica 5: [INIT] Posodabljanje K6
+18:08:35.759 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+18:08:35.824 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal6/state
+18:08:35.829 > [F_RESPONSE] State data uploaded ✅
+18:08:35.829 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:35.835 > [INIT] Posodabljanje stanja v Firebase za kanal 7...
+18:08:35.869 > Vrstica 5: [INIT] Posodabljanje K7
+18:08:35.869 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+18:08:35.935 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal7/state
+18:08:35.941 > [F_RESPONSE] State data uploaded ✅
+18:08:35.941 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:35.946 > [INIT] Posodabljanje stanja v Firebase za kanal 8...
+18:08:35.981 > Vrstica 5: [INIT] Posodabljanje K8
+18:08:35.981 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+18:08:36.043 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal8/state
+18:08:36.048 > [F_RESPONSE] State data uploaded ✅
+18:08:36.048 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+18:08:36.054 > [INIT] Vsi statusi kanalov iz Firebase uspesno posodobljeni.
+18:08:36.059 > [INIT] Obvestilo Rele modulu, da je inicializacija končana...
+18:08:36.098 > Vrstica 5: [INIT] Finalizing...
+18:08:36.098 > [Lora] Preostala velikost sklada: 1852 bajtov
+18:08:36.103 > OUT ID: 11, CMD: 12
+18:08:36.103 > [LORA] Način inicializacije - brez splošnih poskusov.
+18:08:36.258 > [LORA] Paket uspesno poslan.
+18:08:36.258 > [LORA] Preklop v RX po TX uspesen.
+18:08:36.261 > -------------------------
+18:08:36.261 > 
+18:08:36.653 > [LORA RX] ID:11 CMD:107 RSSI:0 SNR:9.8
+18:08:36.653 > In ID: 11, CMD: 107
+18:08:36.653 > CRC OK.
+18:08:36.658 > Rele modul je potrdil, da je inicializacija končana.
+18:08:36.658 > --------------------
+18:08:36.663 > [INIT] Uspeh pri čakanju na 'odgovor za init done'.
+18:08:36.668 > [INIT] Inicializacija uspesno zakljucena.
+18:08:36.694 > Vrstica 5: [INIT] Done
+18:08:59.277 > [SENSORS] Prvi sinhroniziran klic ob prehodu minute.
+18:08:59.278 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+18:08:59.283 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+18:08:59.343 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+18:08:59.343 > [Lora] Preostala velikost sklada: 1852 bajtov
+18:08:59.349 > OUT ID: 12, CMD: 5
+18:08:59.349 > [LORA] Način samo ACK - brez poskusov.
+18:08:59.503 > [LORA] Paket uspesno poslan.
+18:08:59.503 > [LORA] Preklop v RX po TX uspesen.
+18:08:59.506 > -------------------------
+18:08:59.506 > 
+18:08:59.909 > [LORA RX] ID:12 CMD:104 RSSI:0 SNR:10.0
+18:08:59.909 > In ID: 12, CMD: 104
+18:08:59.909 > CRC OK.
+18:08:59.914 > Prejeti podatki senzorjev:
+18:08:59.914 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:08:59.920 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+18:08:59.930 > --------------------
+18:08:59.986 > [STREAM] event: put
+18:08:59.993 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767028140
+18:08:59.999 > [F_RESPONSE] Sensor data uploaded ✅
+18:08:59.999 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:09:00.048 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:09:00.151 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+18:09:00.151 > [Lora] Preostala velikost sklada: 1852 bajtov
+18:09:00.157 > OUT ID: 13, CMD: 13
+18:09:00.157 > [LORA] Način samo ACK - brez poskusov.
+18:09:00.312 > [LORA] Paket uspesno poslan.
+18:09:00.312 > [LORA] Preklop v RX po TX uspesen.
+18:09:00.315 > -------------------------
+18:09:00.315 > 
+18:09:00.708 > [LORA RX] ID:13 CMD:110 RSSI:0 SNR:9.8
+18:09:00.708 > In ID: 13, CMD: 110
+18:09:00.708 > CRC OK.
+18:09:00.715 > Prejeti podatki iz INA3221 senzorja.
+18:09:00.715 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:09:00.723 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+18:09:00.734 > --------------------
+18:09:00.793 > [STREAM] event: put
+18:09:00.802 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767028141
+18:09:00.807 > [F_RESPONSE] INA3221 data uploaded ✅
+18:09:00.807 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:09:00.856 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:09:30.912 > [STREAM] event: keep-alive
+18:10:00.814 > [STREAM] event: keep-alive
+18:10:30.818 > [STREAM] event: keep-alive
+18:11:00.925 > [STREAM] event: keep-alive
+18:11:31.030 > [STREAM] event: keep-alive
+18:12:00.934 > [STREAM] event: keep-alive
+18:12:31.039 > [STREAM] event: keep-alive
+18:13:00.940 > [STREAM] event: keep-alive
+18:13:30.944 > [STREAM] event: keep-alive
+18:13:59.282 > [SENSORS] Periodično branje senzorjev.
+18:13:59.282 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+18:13:59.287 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+18:13:59.318 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+18:13:59.318 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:13:59.323 > OUT ID: 14, CMD: 5
+18:13:59.323 > [LORA] Način samo ACK - brez poskusov.
+18:13:59.477 > [LORA] Paket uspesno poslan.
+18:13:59.477 > [LORA] Preklop v RX po TX uspesen.
+18:13:59.480 > -------------------------
+18:13:59.480 > 
+18:13:59.883 > [LORA RX] ID:14 CMD:104 RSSI:0 SNR:9.5
+18:13:59.883 > In ID: 14, CMD: 104
+18:13:59.883 > CRC OK.
+18:13:59.889 > Prejeti podatki senzorjev:
+18:13:59.889 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:13:59.895 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+18:14:01.282 > --------------------
+18:14:01.287 > [STREAM] event: keep-alive
+18:14:01.334 > [STREAM] event: put
+18:14:01.341 > Monday, December 29 2025 18:14:02
+18:14:01.342 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+18:14:01.347 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767028440
+18:14:01.352 > [F_RESPONSE] Sensor data uploaded ✅
+18:14:01.358 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:14:01.386 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:14:01.490 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+18:14:01.490 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:14:01.495 > OUT ID: 15, CMD: 13
+18:14:01.495 > [LORA] Način samo ACK - brez poskusov.
+18:14:01.650 > [LORA] Paket uspesno poslan.
+18:14:01.650 > [LORA] Preklop v RX po TX uspesen.
+18:14:01.653 > -------------------------
+18:14:01.653 > 
+18:14:02.055 > [LORA RX] ID:15 CMD:110 RSSI:0 SNR:9.5
+18:14:02.056 > In ID: 15, CMD: 110
+18:14:02.056 > CRC OK.
+18:14:02.061 > Prejeti podatki iz INA3221 senzorja.
+18:14:02.061 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:14:02.070 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+18:14:02.079 > --------------------
+18:14:02.130 > [STREAM] event: put
+18:14:02.138 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767028442
+18:14:02.144 > [F_RESPONSE] INA3221 data uploaded ✅
+18:14:02.144 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:14:02.194 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:14:32.284 > [STREAM] event: keep-alive
+18:15:02.185 > [STREAM] event: keep-alive
+18:15:32.191 > [STREAM] event: keep-alive
+18:16:02.296 > [STREAM] event: keep-alive
+18:16:32.203 > [STREAM] event: keep-alive
+18:17:02.202 > [STREAM] event: keep-alive
+18:17:32.205 > [STREAM] event: keep-alive
+18:18:02.209 > [STREAM] event: keep-alive
+18:18:32.213 > [STREAM] event: keep-alive
+18:18:59.286 > [SENSORS] Periodično branje senzorjev.
+18:18:59.286 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+18:18:59.292 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+18:18:59.343 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+18:18:59.344 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:18:59.349 > OUT ID: 16, CMD: 5
+18:18:59.349 > [LORA] Način samo ACK - brez poskusov.
+18:18:59.504 > [LORA] Paket uspesno poslan.
+18:18:59.504 > [LORA] Preklop v RX po TX uspesen.
+18:18:59.507 > -------------------------
+18:18:59.507 > 
+18:18:59.909 > [LORA RX] ID:16 CMD:104 RSSI:0 SNR:10.0
+18:18:59.909 > In ID: 16, CMD: 104
+18:18:59.909 > CRC OK.
+18:18:59.914 > Prejeti podatki senzorjev:
+18:18:59.914 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:18:59.919 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+18:19:01.116 > --------------------
+18:19:01.167 > [STREAM] event: put
+18:19:01.174 > Monday, December 29 2025 18:19:01
+18:19:01.174 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+18:19:01.180 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767028740
+18:19:01.185 > [F_RESPONSE] Sensor data uploaded ✅
+18:19:01.191 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:19:01.219 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:19:01.323 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+18:19:01.323 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:19:01.328 > OUT ID: 17, CMD: 13
+18:19:01.328 > [LORA] Način samo ACK - brez poskusov.
+18:19:01.483 > [LORA] Paket uspesno poslan.
+18:19:01.483 > [LORA] Preklop v RX po TX uspesen.
+18:19:01.486 > -------------------------
+18:19:01.486 > 
+18:19:01.878 > [LORA RX] ID:17 CMD:110 RSSI:0 SNR:9.5
+18:19:01.878 > In ID: 17, CMD: 110
+18:19:01.878 > CRC OK.
+18:19:01.884 > Prejeti podatki iz INA3221 senzorja.
+18:19:01.884 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:19:01.894 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+18:19:01.907 > --------------------
+18:19:01.963 > [STREAM] event: put
+18:19:01.972 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767028742
+18:19:01.978 > [F_RESPONSE] INA3221 data uploaded ✅
+18:19:01.978 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:19:02.027 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:19:32.120 > [STREAM] event: keep-alive
+18:20:02.021 > [STREAM] event: keep-alive
+18:20:32.025 > [STREAM] event: keep-alive
+18:21:02.029 > [STREAM] event: keep-alive
+18:21:32.033 > [STREAM] event: keep-alive
+18:22:02.037 > [STREAM] event: keep-alive
+18:22:32.041 > [STREAM] event: keep-alive
+18:23:02.049 > [STREAM] event: keep-alive
+18:23:32.049 > [STREAM] event: keep-alive
+18:23:59.291 > [SENSORS] Periodično branje senzorjev.
+18:23:59.291 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+18:23:59.297 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+18:23:59.378 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+18:23:59.378 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:23:59.384 > OUT ID: 18, CMD: 5
+18:23:59.384 > [LORA] Način samo ACK - brez poskusov.
+18:23:59.538 > [LORA] Paket uspesno poslan.
+18:23:59.538 > [LORA] Preklop v RX po TX uspesen.
+18:23:59.541 > -------------------------
+18:23:59.541 > 
+18:23:59.944 > [LORA RX] ID:18 CMD:104 RSSI:0 SNR:10.5
+18:23:59.944 > In ID: 18, CMD: 104
+18:23:59.944 > CRC OK.
+18:23:59.950 > Prejeti podatki senzorjev:
+18:23:59.950 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:23:59.955 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+18:24:01.137 > --------------------
+18:24:01.188 > [STREAM] event: put
+18:24:01.195 > Monday, December 29 2025 18:24:01
+18:24:01.195 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+18:24:01.201 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767029040
+18:24:01.206 > [F_RESPONSE] Sensor data uploaded ✅
+18:24:01.212 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:24:01.240 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:24:01.343 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+18:24:01.343 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:24:01.349 > OUT ID: 19, CMD: 13
+18:24:01.349 > [LORA] Način samo ACK - brez poskusov.
+18:24:01.503 > [LORA] Paket uspesno poslan.
+18:24:01.503 > [LORA] Preklop v RX po TX uspesen.
+18:24:01.506 > -------------------------
+18:24:01.506 > 
+18:24:01.898 > [LORA RX] ID:19 CMD:110 RSSI:0 SNR:10.5
+18:24:01.899 > In ID: 19, CMD: 110
+18:24:01.899 > CRC OK.
+18:24:01.904 > Prejeti podatki iz INA3221 senzorja.
+18:24:01.904 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:24:01.914 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+18:24:01.925 > --------------------
+18:24:01.978 > [STREAM] event: put
+18:24:01.987 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767029042
+18:24:01.993 > [F_RESPONSE] INA3221 data uploaded ✅
+18:24:01.993 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:24:02.048 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:24:32.058 > [STREAM] event: keep-alive
+18:25:02.062 > [STREAM] event: keep-alive
+18:25:32.066 > [STREAM] event: keep-alive
+18:26:02.069 > [STREAM] event: keep-alive
+18:26:32.075 > [STREAM] event: keep-alive
+18:27:02.077 > [STREAM] event: keep-alive
+18:27:32.286 > [STREAM] event: keep-alive
+18:28:02.290 > [STREAM] event: keep-alive
+18:28:32.294 > [STREAM] event: keep-alive
+18:28:59.296 > [SENSORS] Periodično branje senzorjev.
+18:28:59.296 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+18:28:59.302 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+18:28:59.308 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+18:28:59.312 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:28:59.313 > OUT ID: 20, CMD: 5
+18:28:59.317 > [LORA] Način samo ACK - brez poskusov.
+18:28:59.467 > [LORA] Paket uspesno poslan.
+18:28:59.467 > [LORA] Preklop v RX po TX uspesen.
+18:28:59.470 > -------------------------
+18:28:59.470 > 
+18:28:59.873 > [LORA RX] ID:20 CMD:104 RSSI:0 SNR:9.8
+18:28:59.873 > In ID: 20, CMD: 104
+18:28:59.873 > CRC OK.
+18:28:59.878 > Prejeti podatki senzorjev:
+18:28:59.878 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:28:59.884 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+18:29:01.180 > --------------------
+18:29:01.231 > [STREAM] event: put
+18:29:01.238 > Monday, December 29 2025 18:29:01
+18:29:01.239 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+18:29:01.244 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767029340
+18:29:01.250 > [F_RESPONSE] Sensor data uploaded ✅
+18:29:01.255 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:29:01.283 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:29:01.387 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+18:29:01.387 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:29:01.392 > OUT ID: 21, CMD: 13
+18:29:01.392 > [LORA] Način samo ACK - brez poskusov.
+18:29:01.547 > [LORA] Paket uspesno poslan.
+18:29:01.547 > [LORA] Preklop v RX po TX uspesen.
+18:29:01.550 > -------------------------
+18:29:01.550 > 
+18:29:01.943 > [LORA RX] ID:21 CMD:110 RSSI:0 SNR:9.8
+18:29:01.943 > In ID: 21, CMD: 110
+18:29:01.943 > CRC OK.
+18:29:01.949 > Prejeti podatki iz INA3221 senzorja.
+18:29:01.949 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:29:01.958 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+18:29:01.970 > --------------------
+18:29:02.023 > [STREAM] event: put
+18:29:02.032 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767029342
+18:29:02.038 > [F_RESPONSE] INA3221 data uploaded ✅
+18:29:02.038 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:29:02.092 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:29:32.201 > [STREAM] event: keep-alive
+18:30:02.102 > [STREAM] event: keep-alive
+18:30:32.106 > [STREAM] event: keep-alive
+18:31:02.110 > [STREAM] event: keep-alive
+18:31:32.114 > [STREAM] event: keep-alive
+18:32:02.118 > [STREAM] event: keep-alive
+18:32:32.327 > [STREAM] event: keep-alive
+18:33:02.126 > [STREAM] event: keep-alive
+18:33:32.130 > [STREAM] event: keep-alive
+18:33:59.301 > [SENSORS] Periodično branje senzorjev.
+18:33:59.301 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+18:33:59.307 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+18:33:59.342 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+18:33:59.342 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:33:59.348 > OUT ID: 22, CMD: 5
+18:33:59.348 > [LORA] Način samo ACK - brez poskusov.
+18:33:59.501 > [LORA] Paket uspesno poslan.
+18:33:59.501 > [LORA] Preklop v RX po TX uspesen.
+18:33:59.504 > -------------------------
+18:33:59.504 > 
+18:33:59.907 > [LORA RX] ID:22 CMD:104 RSSI:0 SNR:10.0
+18:33:59.907 > In ID: 22, CMD: 104
+18:33:59.907 > CRC OK.
+18:33:59.912 > Prejeti podatki senzorjev:
+18:33:59.912 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:33:59.918 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+18:34:01.088 > --------------------
+18:34:01.140 > [STREAM] event: put
+18:34:01.147 > Monday, December 29 2025 18:34:01
+18:34:01.148 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+18:34:01.153 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767029640
+18:34:01.158 > [F_RESPONSE] Sensor data uploaded ✅
+18:34:01.164 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:34:01.191 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:34:01.294 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+18:34:01.294 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:34:01.299 > OUT ID: 23, CMD: 13
+18:34:01.299 > [LORA] Način samo ACK - brez poskusov.
+18:34:01.454 > [LORA] Paket uspesno poslan.
+18:34:01.454 > [LORA] Preklop v RX po TX uspesen.
+18:34:01.457 > -------------------------
+18:34:01.457 > 
+18:34:01.849 > [LORA RX] ID:23 CMD:110 RSSI:0 SNR:9.2
+18:34:01.849 > In ID: 23, CMD: 110
+18:34:01.849 > CRC OK.
+18:34:01.855 > Prejeti podatki iz INA3221 senzorja.
+18:34:01.855 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:34:01.864 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+18:34:01.874 > --------------------
+18:34:01.934 > [STREAM] event: put
+18:34:01.942 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767029642
+18:34:01.948 > [F_RESPONSE] INA3221 data uploaded ✅
+18:34:01.948 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:34:01.999 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:34:32.036 > [STREAM] event: keep-alive
+18:35:02.041 > [STREAM] event: keep-alive
+18:35:32.150 > [STREAM] event: keep-alive
+18:36:01.946 > [STREAM] event: keep-alive
+18:36:31.950 > [STREAM] event: keep-alive
+18:37:02.056 > [STREAM] event: keep-alive
+18:37:31.959 > [STREAM] event: keep-alive
+18:38:02.064 > [STREAM] event: keep-alive
+18:38:31.968 > [STREAM] event: keep-alive
+18:38:59.306 > [SENSORS] Periodično branje senzorjev.
+18:38:59.306 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+18:38:59.312 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+18:38:59.350 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+18:38:59.350 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:38:59.356 > OUT ID: 24, CMD: 5
+18:38:59.356 > [LORA] Način samo ACK - brez poskusov.
+18:38:59.509 > [LORA] Paket uspesno poslan.
+18:38:59.509 > [LORA] Preklop v RX po TX uspesen.
+18:38:59.512 > -------------------------
+18:38:59.512 > 
+18:38:59.920 > [LORA RX] ID:24 CMD:104 RSSI:0 SNR:9.5
+18:38:59.920 > In ID: 24, CMD: 104
+18:38:59.920 > CRC OK.
+18:38:59.926 > Prejeti podatki senzorjev:
+18:38:59.926 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:38:59.931 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+18:39:01.112 > --------------------
+18:39:01.161 > [STREAM] event: put
+18:39:01.169 > Monday, December 29 2025 18:39:01
+18:39:01.169 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+18:39:01.174 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767029940
+18:39:01.180 > [F_RESPONSE] Sensor data uploaded ✅
+18:39:01.185 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:39:01.215 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:39:01.319 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+18:39:01.319 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:39:01.324 > OUT ID: 25, CMD: 13
+18:39:01.324 > [LORA] Način samo ACK - brez poskusov.
+18:39:01.478 > [LORA] Paket uspesno poslan.
+18:39:01.478 > [LORA] Preklop v RX po TX uspesen.
+18:39:01.481 > -------------------------
+18:39:01.481 > 
+18:39:01.875 > [LORA RX] ID:25 CMD:110 RSSI:0 SNR:9.2
+18:39:01.875 > In ID: 25, CMD: 110
+18:39:01.875 > CRC OK.
+18:39:01.881 > Prejeti podatki iz INA3221 senzorja.
+18:39:01.881 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:39:01.890 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+18:39:01.902 > --------------------
+18:39:01.958 > [STREAM] event: put
+18:39:01.966 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767029942
+18:39:01.972 > [F_RESPONSE] INA3221 data uploaded ✅
+18:39:01.972 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:39:02.022 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:39:31.974 > [STREAM] event: keep-alive
+18:40:02.082 > [STREAM] event: keep-alive
+18:40:31.983 > [STREAM] event: keep-alive
+18:41:01.986 > [STREAM] event: keep-alive
+18:41:31.990 > [STREAM] event: keep-alive
+18:42:01.994 > [STREAM] event: keep-alive
+18:42:31.998 > [STREAM] event: keep-alive
+18:43:02.006 > [STREAM] event: keep-alive
+18:43:32.109 > [STREAM] event: keep-alive
+18:43:59.311 > [SENSORS] Periodično branje senzorjev.
+18:43:59.311 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+18:43:59.317 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+18:43:59.374 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+18:43:59.374 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:43:59.379 > OUT ID: 26, CMD: 5
+18:43:59.379 > [LORA] Način samo ACK - brez poskusov.
+18:43:59.534 > [LORA] Paket uspesno poslan.
+18:43:59.534 > [LORA] Preklop v RX po TX uspesen.
+18:43:59.537 > -------------------------
+18:43:59.537 > 
+18:43:59.939 > [LORA RX] ID:26 CMD:104 RSSI:0 SNR:10.0
+18:43:59.939 > In ID: 26, CMD: 104
+18:43:59.939 > CRC OK.
+18:43:59.945 > Prejeti podatki senzorjev:
+18:43:59.945 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:43:59.950 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+18:44:01.139 > --------------------
+18:44:01.196 > [STREAM] event: put
+18:44:01.203 > Monday, December 29 2025 18:44:01
+18:44:01.204 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+18:44:01.209 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767030240
+18:44:01.215 > [F_RESPONSE] Sensor data uploaded ✅
+18:44:01.220 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:44:01.242 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:44:01.345 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+18:44:01.345 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:44:01.351 > OUT ID: 27, CMD: 13
+18:44:01.351 > [LORA] Način samo ACK - brez poskusov.
+18:44:01.505 > [LORA] Paket uspesno poslan.
+18:44:01.505 > [LORA] Preklop v RX po TX uspesen.
+18:44:01.508 > -------------------------
+18:44:01.508 > 
+18:44:01.902 > [LORA RX] ID:27 CMD:110 RSSI:0 SNR:9.5
+18:44:01.902 > In ID: 27, CMD: 110
+18:44:01.902 > CRC OK.
+18:44:01.907 > Prejeti podatki iz INA3221 senzorja.
+18:44:01.907 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:44:01.917 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+18:44:01.929 > --------------------
+18:44:01.986 > [STREAM] event: put
+18:44:01.995 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767030242
+18:44:02.000 > [F_RESPONSE] INA3221 data uploaded ✅
+18:44:02.000 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:44:02.049 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:44:32.015 > [STREAM] event: keep-alive
+18:45:02.019 > [STREAM] event: keep-alive
+18:45:32.229 > [STREAM] event: keep-alive
+18:46:02.028 > [STREAM] event: keep-alive
+18:46:32.138 > [STREAM] event: keep-alive
+18:47:02.137 > [STREAM] event: keep-alive
+18:47:32.039 > [STREAM] event: keep-alive
+18:48:02.043 > [STREAM] event: keep-alive
+18:48:32.048 > [STREAM] event: keep-alive
+18:48:59.316 > [SENSORS] Periodično branje senzorjev.
+18:48:59.316 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+18:48:59.321 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+18:48:59.402 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+18:48:59.402 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:48:59.407 > OUT ID: 28, CMD: 5
+18:48:59.407 > [LORA] Način samo ACK - brez poskusov.
+18:48:59.561 > [LORA] Paket uspesno poslan.
+18:48:59.562 > [LORA] Preklop v RX po TX uspesen.
+18:48:59.564 > -------------------------
+18:48:59.564 > 
+18:48:59.967 > [LORA RX] ID:28 CMD:104 RSSI:0 SNR:9.5
+18:48:59.967 > In ID: 28, CMD: 104
+18:48:59.967 > CRC OK.
+18:48:59.973 > Prejeti podatki senzorjev:
+18:48:59.973 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:48:59.979 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+18:49:01.170 > --------------------
+18:49:01.223 > [STREAM] event: put
+18:49:01.231 > Monday, December 29 2025 18:49:01
+18:49:01.231 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+18:49:01.237 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767030540
+18:49:01.242 > [F_RESPONSE] Sensor data uploaded ✅
+18:49:01.248 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:49:01.273 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:49:01.377 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+18:49:01.377 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:49:01.383 > OUT ID: 29, CMD: 13
+18:49:01.383 > [LORA] Način samo ACK - brez poskusov.
+18:49:01.536 > [LORA] Paket uspesno poslan.
+18:49:01.536 > [LORA] Preklop v RX po TX uspesen.
+18:49:01.540 > -------------------------
+18:49:01.540 > 
+18:49:01.933 > [LORA RX] ID:29 CMD:110 RSSI:0 SNR:9.5
+18:49:01.933 > In ID: 29, CMD: 110
+18:49:01.933 > CRC OK.
+18:49:01.938 > Prejeti podatki iz INA3221 senzorja.
+18:49:01.938 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:49:01.949 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+18:49:01.959 > --------------------
+18:49:02.013 > [STREAM] event: put
+18:49:02.021 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767030542
+18:49:02.027 > [F_RESPONSE] INA3221 data uploaded ✅
+18:49:02.027 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:49:02.081 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:49:32.055 > [STREAM] event: keep-alive
+18:50:02.367 > [STREAM] event: keep-alive
+18:50:32.064 > [STREAM] event: keep-alive
+18:50:32.169 > [STREAM] event: put
+18:50:32.169 > [STREAM] Nastavljen interval branja senzorjev: 6 minut
+18:51:02.170 > [STREAM] event: keep-alive
+18:51:03.503 > [STREAM] event: put
+18:51:03.503 > [STREAM] Nastavljen interval branja senzorjev: 5 minut
+18:51:04.119 > [STREAM] event: put
+18:51:04.119 > [STREAM] Nastavljen interval branja senzorjev: 4 minut
+18:51:34.636 > [STREAM] event: keep-alive
+18:52:04.127 > [STREAM] event: keep-alive
+18:52:34.128 > [STREAM] event: keep-alive
+18:52:59.320 > [SENSORS] Periodično branje senzorjev.
+18:52:59.320 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+18:52:59.325 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+18:52:59.337 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+18:52:59.337 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:52:59.342 > OUT ID: 30, CMD: 5
+18:52:59.342 > [LORA] Način samo ACK - brez poskusov.
+18:52:59.497 > [LORA] Paket uspesno poslan.
+18:52:59.497 > [LORA] Preklop v RX po TX uspesen.
+18:52:59.500 > -------------------------
+18:52:59.500 > 
+18:52:59.903 > [LORA RX] ID:30 CMD:104 RSSI:0 SNR:9.8
+18:52:59.903 > In ID: 30, CMD: 104
+18:52:59.903 > CRC OK.
+18:52:59.909 > Prejeti podatki senzorjev:
+18:52:59.909 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:52:59.914 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+18:53:01.125 > --------------------
+18:53:01.176 > [STREAM] event: put
+18:53:01.184 > Monday, December 29 2025 18:53:01
+18:53:01.184 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+18:53:01.190 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767030780
+18:53:01.195 > [F_RESPONSE] Sensor data uploaded ✅
+18:53:01.201 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:53:01.226 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:53:01.330 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+18:53:01.330 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:53:01.335 > OUT ID: 31, CMD: 13
+18:53:01.335 > [LORA] Način samo ACK - brez poskusov.
+18:53:01.490 > [LORA] Paket uspesno poslan.
+18:53:01.490 > [LORA] Preklop v RX po TX uspesen.
+18:53:01.493 > -------------------------
+18:53:01.493 > 
+18:53:01.886 > [LORA RX] ID:31 CMD:110 RSSI:0 SNR:10.0
+18:53:01.886 > In ID: 31, CMD: 110
+18:53:01.886 > CRC OK.
+18:53:01.892 > Prejeti podatki iz INA3221 senzorja.
+18:53:01.892 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+18:53:01.901 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+18:53:01.911 > --------------------
+18:53:01.973 > [STREAM] event: put
+18:53:01.982 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767030782
+18:53:01.988 > [F_RESPONSE] INA3221 data uploaded ✅
+18:53:01.988 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+18:53:02.034 > [SENSOR_QUEUE] Operacija USPEŠNA.
+18:53:31.986 > [STREAM] event: keep-alive
+18:54:01.990 > [STREAM] event: keep-alive
+18:54:31.994 > [STREAM] event: keep-alive
+18:55:01.997 > [STREAM] event: keep-alive
+18:55:32.001 > [STREAM] event: keep-alive
+18:56:02.005 > [STREAM] event: keep-alive
+18:56:32.010 > [STREAM] event: keep-alive
+18:56:59.324 > [SENSORS] Periodično branje senzorjev.
+18:56:59.324 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+18:56:59.329 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+18:56:59.391 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+18:56:59.391 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:56:59.396 > OUT ID: 32, CMD: 5
+18:56:59.396 > [LORA] Način samo ACK - brez poskusov.
+18:56:59.550 > [LORA] Paket uspesno poslan.
+18:56:59.550 > [LORA] Preklop v RX po TX uspesen.
+18:56:59.553 > -------------------------
+18:56:59.553 > 
+18:57:02.014 > [STREAM] event: keep-alive
+18:57:02.419 > [SENSOR_QUEUE] LoRa timeout pri poskusu 0/3
+18:57:02.723 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+18:57:02.822 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+18:57:02.925 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+18:57:02.925 > [Lora] Preostala velikost sklada: 1776 bajtov
+18:57:02.931 > OUT ID: 33, CMD: 13
+18:57:02.931 > [LORA] Način samo ACK - brez poskusov.
+18:57:03.085 > [LORA] Paket uspesno poslan.
+18:57:03.085 > [LORA] Preklop v RX po TX uspesen.
+18:57:03.088 > -------------------------
+18:57:03.088 > 
+18:57:05.954 > [SENSOR_QUEUE] LoRa timeout pri poskusu 0/3
+18:57:06.258 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+18:57:06.357 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+18:57:32.120 > [STREAM] event: keep-alive
+18:58:02.026 > [STREAM] event: keep-alive
+18:58:32.027 > [STREAM] event: keep-alive
+18:59:02.029 > [STREAM] event: keep-alive
+18:59:32.138 > [STREAM] event: keep-alive
+19:00:02.038 > [STREAM] event: keep-alive
+19:00:32.145 > [STREAM] event: keep-alive
+19:00:59.327 > [SENSORS] Periodično branje senzorjev.
+19:00:59.327 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+19:00:59.333 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+19:00:59.370 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+19:00:59.371 > [Lora] Preostala velikost sklada: 1776 bajtov
+19:00:59.376 > OUT ID: 34, CMD: 5
+19:00:59.376 > [LORA] Način samo ACK - brez poskusov.
+19:00:59.529 > [LORA] Paket uspesno poslan.
+19:00:59.529 > [LORA] Preklop v RX po TX uspesen.
+19:00:59.533 > -------------------------
+19:00:59.533 > 
+19:00:59.935 > [LORA RX] ID:34 CMD:104 RSSI:0 SNR:9.2
+19:00:59.935 > In ID: 34, CMD: 104
+19:00:59.935 > CRC OK.
+19:00:59.941 > Prejeti podatki senzorjev:
+19:00:59.941 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:00:59.947 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:01:01.328 > --------------------
+19:01:01.383 > [STREAM] event: put
+19:01:01.391 > Monday, December 29 2025 19:01:02
+19:01:01.391 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:01:01.396 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767031260
+19:01:01.402 > [F_RESPONSE] Sensor data uploaded ✅
+19:01:01.407 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+19:01:01.430 > [SENSOR_QUEUE] Operacija USPEŠNA.
+19:01:01.534 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+19:01:01.534 > [Lora] Preostala velikost sklada: 1776 bajtov
+19:01:01.539 > OUT ID: 35, CMD: 13
+19:01:01.539 > [LORA] Način samo ACK - brez poskusov.
+19:01:01.694 > [LORA] Paket uspesno poslan.
+19:01:01.694 > [LORA] Preklop v RX po TX uspesen.
+19:01:01.697 > -------------------------
+19:01:01.697 > 
+19:01:02.089 > [LORA RX] ID:35 CMD:110 RSSI:0 SNR:9.8
+19:01:02.089 > In ID: 35, CMD: 110
+19:01:02.089 > CRC OK.
+19:01:02.095 > Prejeti podatki iz INA3221 senzorja.
+19:01:02.095 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:01:02.105 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:01:02.116 > --------------------
+19:01:02.179 > [STREAM] event: put
+19:01:02.187 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767031262
+19:01:02.193 > [F_RESPONSE] INA3221 data uploaded ✅
+19:01:02.193 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+19:01:02.239 > [SENSOR_QUEUE] Operacija USPEŠNA.
+19:01:32.255 > [STREAM] event: keep-alive
+19:02:02.362 > [STREAM] event: keep-alive
+19:02:32.365 > [STREAM] event: keep-alive
+19:03:02.268 > [STREAM] event: keep-alive
+19:03:22.936 > [F_RESPONSE]Event task: 🔐 authTask, msg: authenticating, code: 7
+19:03:22.942 > Monday, December 29 2025 19:03:23
+19:03:22.942 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Connecting to server...
+19:03:22.948 > [F_RESPONSE]Event task: 🔐 authTask, msg: auth request sent, code: 8
+19:03:25.547 > [F_RESPONSE]Event task: 🔐 authTask, msg: auth response received, code: 9
+19:03:25.552 > Monday, December 29 2025 19:03:26
+19:03:25.552 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Terminating the server connection...
+19:03:25.564 > [F_RESPONSE]Event task: 🔐 authTask, msg: ready, code: 10
+19:03:25.564 > [F_AUTH] Avtentikacija uspešna ob:
+19:03:25.569 > Monday, December 29 2025 19:03:26
+19:03:56.853 > [STREAM] event: keep-alive
+19:04:27.159 > [STREAM] event: keep-alive
+19:04:56.856 > [STREAM] event: keep-alive
+19:04:59.331 > [SENSORS] Periodično branje senzorjev.
+19:04:59.332 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+19:04:59.337 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+19:04:59.393 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+19:04:59.393 > [Lora] Preostala velikost sklada: 1776 bajtov
+19:04:59.398 > OUT ID: 36, CMD: 5
+19:04:59.398 > [LORA] Način samo ACK - brez poskusov.
+19:04:59.552 > [LORA] Paket uspesno poslan.
+19:04:59.553 > [LORA] Preklop v RX po TX uspesen.
+19:04:59.555 > -------------------------
+19:04:59.555 > 
+19:04:59.958 > [LORA RX] ID:36 CMD:104 RSSI:0 SNR:10.0
+19:04:59.959 > In ID: 36, CMD: 104
+19:04:59.959 > CRC OK.
+19:04:59.964 > Prejeti podatki senzorjev:
+19:04:59.964 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:04:59.970 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:05:00.015 > Monday, December 29 2025 19:05:00
+19:05:00.015 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:05:00.020 > --------------------
+19:05:10.036 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:05:10.036 > [FB_RETRY] Ponovni poskus...
+19:05:10.036 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:05:10.081 > Monday, December 29 2025 19:05:10
+19:05:10.081 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:05:20.057 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:05:20.057 > [FB_RETRY] Ponovni poskus...
+19:05:20.057 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:05:20.108 > Monday, December 29 2025 19:05:20
+19:05:20.109 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:05:26.861 > [STREAM] event: keep-alive
+19:05:30.077 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:05:30.077 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:05:30.083 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:05:30.115 > [SENSOR_QUEUE] Ponovni poskus...
+19:05:30.115 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 1/3)
+19:05:30.120 > [Lora] Preostala velikost sklada: 1488 bajtov
+19:05:30.120 > OUT ID: 37, CMD: 5
+19:05:30.126 > [LORA] Način samo ACK - brez poskusov.
+19:05:30.276 > [LORA] Paket uspesno poslan.
+19:05:30.276 > [LORA] Preklop v RX po TX uspesen.
+19:05:30.279 > -------------------------
+19:05:30.279 > 
+19:05:30.681 > [LORA RX] ID:37 CMD:104 RSSI:0 SNR:10.0
+19:05:30.681 > In ID: 37, CMD: 104
+19:05:30.681 > CRC OK.
+19:05:30.687 > Prejeti podatki senzorjev:
+19:05:30.687 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:05:30.692 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:05:30.745 > Monday, December 29 2025 19:05:31
+19:05:30.745 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:05:30.751 > --------------------
+19:05:41.099 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:05:41.099 > [FB_RETRY] Ponovni poskus...
+19:05:41.099 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:05:41.143 > Monday, December 29 2025 19:05:41
+19:05:41.143 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:05:51.119 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:05:51.119 > [FB_RETRY] Ponovni poskus...
+19:05:51.119 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:05:51.166 > Monday, December 29 2025 19:05:51
+19:05:51.166 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:05:57.069 > [STREAM] event: keep-alive
+19:06:01.140 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:06:01.140 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:06:01.145 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:06:01.166 > [SENSOR_QUEUE] Ponovni poskus...
+19:06:01.166 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 2/3)
+19:06:01.172 > [Lora] Preostala velikost sklada: 1488 bajtov
+19:06:01.172 > OUT ID: 38, CMD: 5
+19:06:01.177 > [LORA] Način samo ACK - brez poskusov.
+19:06:01.327 > [LORA] Paket uspesno poslan.
+19:06:01.327 > [LORA] Preklop v RX po TX uspesen.
+19:06:01.330 > -------------------------
+19:06:01.330 > 
+19:06:01.732 > [LORA RX] ID:38 CMD:104 RSSI:0 SNR:9.8
+19:06:01.732 > In ID: 38, CMD: 104
+19:06:01.732 > CRC OK.
+19:06:01.737 > Prejeti podatki senzorjev:
+19:06:01.737 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:06:01.743 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:06:01.832 > Monday, December 29 2025 19:06:02
+19:06:01.832 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:06:01.837 > --------------------
+19:06:12.162 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:06:12.162 > [FB_RETRY] Ponovni poskus...
+19:06:12.162 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:06:12.207 > Monday, December 29 2025 19:06:12
+19:06:12.207 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:06:22.182 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:06:22.182 > [FB_RETRY] Ponovni poskus...
+19:06:22.182 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:06:22.228 > Monday, December 29 2025 19:06:22
+19:06:22.228 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:06:26.869 > [STREAM] event: keep-alive
+19:06:32.202 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:06:32.202 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:06:32.208 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:06:32.234 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:06:32.334 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:06:32.437 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+19:06:32.437 > [Lora] Preostala velikost sklada: 1488 bajtov
+19:06:32.443 > OUT ID: 39, CMD: 13
+19:06:32.443 > [LORA] Način samo ACK - brez poskusov.
+19:06:32.597 > [LORA] Paket uspesno poslan.
+19:06:32.597 > [LORA] Preklop v RX po TX uspesen.
+19:06:32.600 > -------------------------
+19:06:32.600 > 
+19:06:32.993 > [LORA RX] ID:39 CMD:110 RSSI:0 SNR:10.0
+19:06:32.993 > In ID: 39, CMD: 110
+19:06:32.993 > CRC OK.
+19:06:32.999 > Prejeti podatki iz INA3221 senzorja.
+19:06:32.999 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:06:33.009 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:06:33.060 > Monday, December 29 2025 19:06:33
+19:06:33.060 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:06:33.065 > --------------------
+19:06:43.224 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:06:43.224 > [FB_RETRY] Ponovni poskus...
+19:06:43.224 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:06:43.278 > Monday, December 29 2025 19:06:43
+19:06:43.278 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:06:53.245 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:06:53.245 > [FB_RETRY] Ponovni poskus...
+19:06:53.245 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:06:53.293 > Monday, December 29 2025 19:06:53
+19:06:53.294 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:06:56.873 > [STREAM] event: keep-alive
+19:07:03.265 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:07:03.265 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:07:03.270 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:07:03.295 > [SENSOR_QUEUE] Ponovni poskus...
+19:07:03.295 > [SENSOR_QUEUE] Izvajam: INA (poskus 1/3)
+19:07:03.301 > [Lora] Preostala velikost sklada: 1072 bajtov
+19:07:03.301 > OUT ID: 40, CMD: 13
+19:07:03.306 > [LORA] Način samo ACK - brez poskusov.
+19:07:03.455 > [LORA] Paket uspesno poslan.
+19:07:03.455 > [LORA] Preklop v RX po TX uspesen.
+19:07:03.458 > -------------------------
+19:07:03.458 > 
+19:07:03.861 > [LORA RX] ID:40 CMD:110 RSSI:0 SNR:9.0
+19:07:03.861 > In ID: 40, CMD: 110
+19:07:03.861 > CRC OK.
+19:07:03.867 > Prejeti podatki iz INA3221 senzorja.
+19:07:03.867 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:07:03.876 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:07:03.923 > Monday, December 29 2025 19:07:04
+19:07:03.923 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:07:03.929 > --------------------
+19:07:14.286 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:07:14.286 > [FB_RETRY] Ponovni poskus...
+19:07:14.286 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:07:14.342 > Monday, December 29 2025 19:07:15
+19:07:14.342 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:07:24.306 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:07:24.307 > [FB_RETRY] Ponovni poskus...
+19:07:24.307 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:07:24.356 > Monday, December 29 2025 19:07:25
+19:07:24.356 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:07:27.285 > [STREAM] event: keep-alive
+19:07:34.326 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:07:34.327 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:07:34.333 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:07:34.357 > [SENSOR_QUEUE] Ponovni poskus...
+19:07:34.359 > [SENSOR_QUEUE] Izvajam: INA (poskus 2/3)
+19:07:34.363 > [Lora] Preostala velikost sklada: 1072 bajtov
+19:07:34.363 > OUT ID: 41, CMD: 13
+19:07:34.375 > [LORA] Način samo ACK - brez poskusov.
+19:07:34.517 > [LORA] Paket uspesno poslan.
+19:07:34.521 > [LORA] Preklop v RX po TX uspesen.
+19:07:34.521 > -------------------------
+19:07:34.521 > 
+19:07:34.923 > [LORA RX] ID:41 CMD:110 RSSI:0 SNR:9.2
+19:07:34.924 > In ID: 41, CMD: 110
+19:07:34.924 > CRC OK.
+19:07:34.929 > Prejeti podatki iz INA3221 senzorja.
+19:07:34.929 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:07:34.938 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:07:34.986 > Monday, December 29 2025 19:07:35
+19:07:34.987 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:07:34.992 > --------------------
+19:07:45.349 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:07:45.349 > [FB_RETRY] Ponovni poskus...
+19:07:45.349 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:07:45.404 > Monday, December 29 2025 19:07:46
+19:07:45.405 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:07:55.369 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:07:55.369 > [FB_RETRY] Ponovni poskus...
+19:07:55.369 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:07:55.420 > Monday, December 29 2025 19:07:56
+19:07:55.420 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:07:56.881 > [STREAM] event: keep-alive
+19:08:05.389 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:08:05.390 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:08:05.396 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:08:05.419 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:08:05.518 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:08:26.885 > [STREAM] event: keep-alive
+19:08:56.890 > [STREAM] event: keep-alive
+19:08:59.335 > [SENSORS] Periodično branje senzorjev.
+19:08:59.335 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+19:08:59.341 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+19:08:59.355 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+19:08:59.356 > [Lora] Preostala velikost sklada: 1072 bajtov
+19:08:59.361 > OUT ID: 42, CMD: 5
+19:08:59.361 > [LORA] Način samo ACK - brez poskusov.
+19:08:59.516 > [LORA] Paket uspesno poslan.
+19:08:59.516 > [LORA] Preklop v RX po TX uspesen.
+19:08:59.518 > -------------------------
+19:08:59.518 > 
+19:08:59.921 > [LORA RX] ID:42 CMD:104 RSSI:0 SNR:9.5
+19:08:59.921 > In ID: 42, CMD: 104
+19:08:59.921 > CRC OK.
+19:08:59.927 > Prejeti podatki senzorjev:
+19:08:59.927 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:08:59.932 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:08:59.982 > Monday, December 29 2025 19:09:00
+19:08:59.982 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:08:59.988 > --------------------
+19:09:10.019 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:09:10.020 > [FB_RETRY] Ponovni poskus...
+19:09:10.020 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:09:10.070 > Monday, December 29 2025 19:09:10
+19:09:10.070 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:09:20.040 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:09:20.040 > [FB_RETRY] Ponovni poskus...
+19:09:20.040 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:09:20.084 > Monday, December 29 2025 19:09:20
+19:09:20.084 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:09:26.893 > [STREAM] event: keep-alive
+19:09:30.060 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:09:30.060 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:09:30.065 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:09:30.084 > [SENSOR_QUEUE] Ponovni poskus...
+19:09:30.084 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 1/3)
+19:09:30.090 > [Lora] Preostala velikost sklada: 1072 bajtov
+19:09:30.090 > OUT ID: 43, CMD: 5
+19:09:30.095 > [LORA] Način samo ACK - brez poskusov.
+19:09:30.244 > [LORA] Paket uspesno poslan.
+19:09:30.244 > [LORA] Preklop v RX po TX uspesen.
+19:09:30.247 > -------------------------
+19:09:30.247 > 
+19:09:30.650 > [LORA RX] ID:43 CMD:104 RSSI:0 SNR:9.8
+19:09:30.651 > In ID: 43, CMD: 104
+19:09:30.651 > CRC OK.
+19:09:30.656 > Prejeti podatki senzorjev:
+19:09:30.656 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:09:30.661 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:09:30.712 > Monday, December 29 2025 19:09:31
+19:09:30.713 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:09:30.718 > --------------------
+19:09:41.082 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:09:41.082 > [FB_RETRY] Ponovni poskus...
+19:09:41.082 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:09:41.127 > Monday, December 29 2025 19:09:41
+19:09:41.127 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:09:51.102 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:09:51.102 > [FB_RETRY] Ponovni poskus...
+19:09:51.102 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:09:51.147 > Monday, December 29 2025 19:09:51
+19:09:51.147 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:09:56.897 > [STREAM] event: keep-alive
+19:10:01.122 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:10:01.123 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:10:01.128 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:10:01.147 > [SENSOR_QUEUE] Ponovni poskus...
+19:10:01.147 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 2/3)
+19:10:01.152 > [Lora] Preostala velikost sklada: 1072 bajtov
+19:10:01.152 > OUT ID: 44, CMD: 5
+19:10:01.158 > [LORA] Način samo ACK - brez poskusov.
+19:10:01.307 > [LORA] Paket uspesno poslan.
+19:10:01.308 > [LORA] Preklop v RX po TX uspesen.
+19:10:01.310 > -------------------------
+19:10:01.310 > 
+19:10:01.713 > [LORA RX] ID:44 CMD:104 RSSI:0 SNR:9.8
+19:10:01.714 > In ID: 44, CMD: 104
+19:10:01.714 > CRC OK.
+19:10:01.719 > Prejeti podatki senzorjev:
+19:10:01.719 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:10:01.724 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:10:01.770 > Monday, December 29 2025 19:10:02
+19:10:01.770 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:10:01.776 > --------------------
+19:10:12.145 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:10:12.145 > [FB_RETRY] Ponovni poskus...
+19:10:12.145 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:10:12.195 > Monday, December 29 2025 19:10:12
+19:10:12.195 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:10:22.165 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:10:22.165 > [FB_RETRY] Ponovni poskus...
+19:10:22.165 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:10:22.215 > Monday, December 29 2025 19:10:22
+19:10:22.215 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:10:27.106 > [STREAM] event: keep-alive
+19:10:32.185 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:10:32.185 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:10:32.190 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:10:32.215 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:10:32.314 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:10:32.417 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+19:10:32.417 > [Lora] Preostala velikost sklada: 1072 bajtov
+19:10:32.422 > OUT ID: 45, CMD: 13
+19:10:32.422 > [LORA] Način samo ACK - brez poskusov.
+19:10:32.577 > [LORA] Paket uspesno poslan.
+19:10:32.577 > [LORA] Preklop v RX po TX uspesen.
+19:10:32.579 > -------------------------
+19:10:32.579 > 
+19:10:32.942 > [LORA RX] ID:45 CMD:110 RSSI:0 SNR:9.8
+19:10:32.942 > In ID: 45, CMD: 110
+19:10:32.942 > CRC OK.
+19:10:32.948 > Prejeti podatki iz INA3221 senzorja.
+19:10:32.948 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:10:32.958 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:10:33.009 > Monday, December 29 2025 19:10:33
+19:10:33.009 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:10:33.014 > --------------------
+19:10:43.207 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:10:43.207 > [FB_RETRY] Ponovni poskus...
+19:10:43.207 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:10:43.261 > Monday, December 29 2025 19:10:43
+19:10:43.261 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:10:53.227 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:10:53.227 > [FB_RETRY] Ponovni poskus...
+19:10:53.227 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:10:53.277 > Monday, December 29 2025 19:10:53
+19:10:53.277 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:10:56.907 > [STREAM] event: keep-alive
+19:11:03.248 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:11:03.248 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:11:03.253 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:11:03.277 > [SENSOR_QUEUE] Ponovni poskus...
+19:11:03.277 > [SENSOR_QUEUE] Izvajam: INA (poskus 1/3)
+19:11:03.283 > [Lora] Preostala velikost sklada: 1072 bajtov
+19:11:03.283 > OUT ID: 46, CMD: 13
+19:11:03.287 > [LORA] Način samo ACK - brez poskusov.
+19:11:03.437 > [LORA] Paket uspesno poslan.
+19:11:03.437 > [LORA] Preklop v RX po TX uspesen.
+19:11:03.440 > -------------------------
+19:11:03.440 > 
+19:11:03.811 > [LORA RX] ID:46 CMD:110 RSSI:0 SNR:9.8
+19:11:03.811 > In ID: 46, CMD: 110
+19:11:03.811 > CRC OK.
+19:11:03.817 > Prejeti podatki iz INA3221 senzorja.
+19:11:03.817 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:11:03.826 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:11:04.013 > Monday, December 29 2025 19:11:04
+19:11:04.013 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:11:04.019 > --------------------
+19:11:14.269 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:11:14.269 > [FB_RETRY] Ponovni poskus...
+19:11:14.269 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:11:14.322 > Monday, December 29 2025 19:11:14
+19:11:14.322 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:11:24.290 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:11:24.290 > [FB_RETRY] Ponovni poskus...
+19:11:24.290 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:11:24.339 > Monday, December 29 2025 19:11:25
+19:11:24.339 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:11:26.909 > [STREAM] event: keep-alive
+19:11:34.310 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:11:34.310 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:11:34.315 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:11:34.339 > [SENSOR_QUEUE] Ponovni poskus...
+19:11:34.340 > [SENSOR_QUEUE] Izvajam: INA (poskus 2/3)
+19:11:34.345 > [Lora] Preostala velikost sklada: 1072 bajtov
+19:11:34.345 > OUT ID: 47, CMD: 13
+19:11:34.350 > [LORA] Način samo ACK - brez poskusov.
+19:11:34.499 > [LORA] Paket uspesno poslan.
+19:11:34.500 > [LORA] Preklop v RX po TX uspesen.
+19:11:34.502 > -------------------------
+19:11:34.502 > 
+19:11:34.906 > [LORA RX] ID:47 CMD:110 RSSI:0 SNR:10.2
+19:11:34.906 > In ID: 47, CMD: 110
+19:11:34.906 > CRC OK.
+19:11:34.911 > Prejeti podatki iz INA3221 senzorja.
+19:11:34.911 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:11:34.921 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:11:34.972 > Monday, December 29 2025 19:11:35
+19:11:34.972 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:11:34.978 > --------------------
+19:11:45.332 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:11:45.332 > [FB_RETRY] Ponovni poskus...
+19:11:45.336 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:11:45.387 > Monday, December 29 2025 19:11:46
+19:11:45.388 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:11:55.352 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:11:55.352 > [FB_RETRY] Ponovni poskus...
+19:11:55.352 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:11:55.404 > Monday, December 29 2025 19:11:56
+19:11:55.404 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:11:57.015 > [STREAM] event: keep-alive
+19:12:05.372 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:12:05.373 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:12:05.378 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:12:05.404 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:12:05.504 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:12:26.917 > [STREAM] event: keep-alive
+19:12:56.817 > [STREAM] event: keep-alive
+19:12:59.339 > [SENSORS] Periodično branje senzorjev.
+19:12:59.339 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+19:12:59.345 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+19:12:59.350 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+19:12:59.355 > [Lora] Preostala velikost sklada: 764 bajtov
+19:12:59.356 > OUT ID: 48, CMD: 5
+19:12:59.360 > [LORA] Način samo ACK - brez poskusov.
+19:12:59.509 > [LORA] Paket uspesno poslan.
+19:12:59.509 > [LORA] Preklop v RX po TX uspesen.
+19:12:59.512 > -------------------------
+19:12:59.512 > 
+19:12:59.915 > [LORA RX] ID:48 CMD:104 RSSI:0 SNR:9.5
+19:12:59.915 > In ID: 48, CMD: 104
+19:12:59.915 > CRC OK.
+19:12:59.921 > Prejeti podatki senzorjev:
+19:12:59.921 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:12:59.926 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:12:59.974 > Monday, December 29 2025 19:13:00
+19:12:59.974 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:12:59.979 > --------------------
+19:13:10.002 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:13:10.002 > [FB_RETRY] Ponovni poskus...
+19:13:10.002 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:13:10.048 > Monday, December 29 2025 19:13:10
+19:13:10.048 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:13:20.023 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:13:20.023 > [FB_RETRY] Ponovni poskus...
+19:13:20.023 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:13:20.070 > Monday, December 29 2025 19:13:20
+19:13:20.070 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:13:26.925 > [STREAM] event: keep-alive
+19:13:30.042 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:13:30.043 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:13:30.048 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:13:30.073 > [SENSOR_QUEUE] Ponovni poskus...
+19:13:30.074 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 1/3)
+19:13:30.079 > [Lora] Preostala velikost sklada: 764 bajtov
+19:13:30.079 > OUT ID: 49, CMD: 5
+19:13:30.084 > [LORA] Način samo ACK - brez poskusov.
+19:13:30.234 > [LORA] Paket uspesno poslan.
+19:13:30.234 > [LORA] Preklop v RX po TX uspesen.
+19:13:30.237 > -------------------------
+19:13:30.237 > 
+19:13:30.639 > [LORA RX] ID:49 CMD:104 RSSI:0 SNR:8.5
+19:13:30.639 > In ID: 49, CMD: 104
+19:13:30.639 > CRC OK.
+19:13:30.645 > Prejeti podatki senzorjev:
+19:13:30.645 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:13:30.651 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:13:30.699 > Monday, December 29 2025 19:13:31
+19:13:30.699 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:13:30.705 > --------------------
+19:13:41.065 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:13:41.066 > [FB_RETRY] Ponovni poskus...
+19:13:41.066 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:13:41.114 > Monday, December 29 2025 19:13:41
+19:13:41.114 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:13:51.085 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:13:51.085 > [FB_RETRY] Ponovni poskus...
+19:13:51.085 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:13:51.129 > Monday, December 29 2025 19:13:51
+19:13:51.129 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:13:56.827 > [STREAM] event: keep-alive
+19:14:01.105 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:14:01.105 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:14:01.111 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:14:01.130 > [SENSOR_QUEUE] Ponovni poskus...
+19:14:01.130 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 2/3)
+19:14:01.136 > [Lora] Preostala velikost sklada: 764 bajtov
+19:14:01.136 > OUT ID: 50, CMD: 5
+19:14:01.140 > [LORA] Način samo ACK - brez poskusov.
+19:14:01.290 > [LORA] Paket uspesno poslan.
+19:14:01.290 > [LORA] Preklop v RX po TX uspesen.
+19:14:01.293 > -------------------------
+19:14:01.293 > 
+19:14:01.697 > [LORA RX] ID:50 CMD:104 RSSI:0 SNR:9.8
+19:14:01.697 > In ID: 50, CMD: 104
+19:14:01.697 > CRC OK.
+19:14:01.702 > Prejeti podatki senzorjev:
+19:14:01.702 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:14:01.708 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:14:01.759 > Monday, December 29 2025 19:14:02
+19:14:01.759 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:14:01.765 > --------------------
+19:14:12.127 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:14:12.127 > [FB_RETRY] Ponovni poskus...
+19:14:12.127 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:14:12.180 > Monday, December 29 2025 19:14:12
+19:14:12.180 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:14:22.148 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:14:22.148 > [FB_RETRY] Ponovni poskus...
+19:14:22.148 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:14:22.197 > Monday, December 29 2025 19:14:22
+19:14:22.197 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:14:26.831 > [STREAM] event: keep-alive
+19:14:32.167 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:14:32.167 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:14:32.173 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:14:32.197 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:14:32.296 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:14:32.400 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+19:14:32.400 > [Lora] Preostala velikost sklada: 764 bajtov
+19:14:32.405 > OUT ID: 51, CMD: 13
+19:14:32.405 > [LORA] Način samo ACK - brez poskusov.
+19:14:32.560 > [LORA] Paket uspesno poslan.
+19:14:32.560 > [LORA] Preklop v RX po TX uspesen.
+19:14:32.563 > -------------------------
+19:14:32.563 > 
+19:14:32.955 > [LORA RX] ID:51 CMD:110 RSSI:0 SNR:9.8
+19:14:32.955 > In ID: 51, CMD: 110
+19:14:32.955 > CRC OK.
+19:14:32.961 > Prejeti podatki iz INA3221 senzorja.
+19:14:32.961 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:14:32.971 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:14:33.025 > Monday, December 29 2025 19:14:33
+19:14:33.025 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:14:33.030 > --------------------
+19:14:43.190 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:14:43.191 > [FB_RETRY] Ponovni poskus...
+19:14:43.191 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:14:43.244 > Monday, December 29 2025 19:14:43
+19:14:43.244 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:14:53.210 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:14:53.210 > [FB_RETRY] Ponovni poskus...
+19:14:53.210 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:14:53.259 > Monday, December 29 2025 19:14:53
+19:14:53.259 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:14:56.837 > [STREAM] event: keep-alive
+19:15:03.230 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:15:03.230 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:15:03.236 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:15:03.260 > [SENSOR_QUEUE] Ponovni poskus...
+19:15:03.260 > [SENSOR_QUEUE] Izvajam: INA (poskus 1/3)
+19:15:03.266 > [Lora] Preostala velikost sklada: 764 bajtov
+19:15:03.266 > OUT ID: 52, CMD: 13
+19:15:03.271 > [LORA] Način samo ACK - brez poskusov.
+19:15:03.420 > [LORA] Paket uspesno poslan.
+19:15:03.420 > [LORA] Preklop v RX po TX uspesen.
+19:15:03.423 > -------------------------
+19:15:03.423 > 
+19:15:03.826 > [LORA RX] ID:52 CMD:110 RSSI:0 SNR:9.5
+19:15:03.826 > In ID: 52, CMD: 110
+19:15:03.826 > CRC OK.
+19:15:03.831 > Prejeti podatki iz INA3221 senzorja.
+19:15:03.831 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:15:03.841 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:15:03.888 > Monday, December 29 2025 19:15:04
+19:15:03.888 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:15:03.894 > --------------------
+19:15:14.252 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:15:14.252 > [FB_RETRY] Ponovni poskus...
+19:15:14.252 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:15:14.307 > Monday, December 29 2025 19:15:14
+19:15:14.340 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:15:24.273 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:15:24.273 > [FB_RETRY] Ponovni poskus...
+19:15:24.277 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:15:24.324 > Monday, December 29 2025 19:15:24
+19:15:24.324 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:15:26.839 > [STREAM] event: keep-alive
+19:15:34.293 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:15:34.293 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:15:34.298 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:15:34.324 > [SENSOR_QUEUE] Ponovni poskus...
+19:15:34.324 > [SENSOR_QUEUE] Izvajam: INA (poskus 2/3)
+19:15:34.330 > [Lora] Preostala velikost sklada: 764 bajtov
+19:15:34.330 > OUT ID: 53, CMD: 13
+19:15:34.335 > [LORA] Način samo ACK - brez poskusov.
+19:15:34.484 > [LORA] Paket uspesno poslan.
+19:15:34.484 > [LORA] Preklop v RX po TX uspesen.
+19:15:34.487 > -------------------------
+19:15:34.487 > 
+19:15:34.890 > [LORA RX] ID:53 CMD:110 RSSI:0 SNR:9.8
+19:15:34.891 > In ID: 53, CMD: 110
+19:15:34.891 > CRC OK.
+19:15:34.896 > Prejeti podatki iz INA3221 senzorja.
+19:15:34.896 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:15:34.905 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:15:34.957 > Monday, December 29 2025 19:15:35
+19:15:34.957 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:15:34.963 > --------------------
+19:15:45.315 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:15:45.315 > [FB_RETRY] Ponovni poskus...
+19:15:45.315 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:15:45.363 > Monday, December 29 2025 19:15:46
+19:15:45.363 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:15:55.335 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:15:55.335 > [FB_RETRY] Ponovni poskus...
+19:15:55.335 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:15:55.384 > Monday, December 29 2025 19:15:56
+19:15:55.384 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:15:56.843 > [STREAM] event: keep-alive
+19:16:05.355 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:16:05.355 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:16:05.361 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:16:05.383 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:16:05.483 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:16:27.256 > [STREAM] event: keep-alive
+19:16:56.854 > [STREAM] event: keep-alive
+19:16:59.343 > [SENSORS] Periodično branje senzorjev.
+19:16:59.343 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+19:16:59.349 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+19:16:59.420 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+19:16:59.420 > [Lora] Preostala velikost sklada: 764 bajtov
+19:16:59.426 > OUT ID: 54, CMD: 5
+19:16:59.426 > [LORA] Način samo ACK - brez poskusov.
+19:16:59.580 > [LORA] Paket uspesno poslan.
+19:16:59.580 > [LORA] Preklop v RX po TX uspesen.
+19:16:59.583 > -------------------------
+19:16:59.583 > 
+19:16:59.986 > [LORA RX] ID:54 CMD:104 RSSI:0 SNR:9.5
+19:16:59.986 > In ID: 54, CMD: 104
+19:16:59.986 > CRC OK.
+19:16:59.992 > Prejeti podatki senzorjev:
+19:16:59.992 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:16:59.997 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:17:00.087 > Monday, December 29 2025 19:17:00
+19:17:00.087 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:17:00.092 > --------------------
+19:17:10.486 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:17:10.486 > [FB_RETRY] Ponovni poskus...
+19:17:10.486 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:17:10.535 > Monday, December 29 2025 19:17:11
+19:17:10.535 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:17:20.506 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:17:20.507 > [FB_RETRY] Ponovni poskus...
+19:17:20.507 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:17:20.550 > Monday, December 29 2025 19:17:21
+19:17:20.550 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:17:26.855 > [STREAM] event: keep-alive
+19:17:30.527 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:17:30.527 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:17:30.532 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:17:30.550 > [SENSOR_QUEUE] Ponovni poskus...
+19:17:30.550 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 1/3)
+19:17:30.556 > [Lora] Preostala velikost sklada: 764 bajtov
+19:17:30.556 > OUT ID: 55, CMD: 5
+19:17:30.561 > [LORA] Način samo ACK - brez poskusov.
+19:17:30.711 > [LORA] Paket uspesno poslan.
+19:17:30.711 > [LORA] Preklop v RX po TX uspesen.
+19:17:30.714 > -------------------------
+19:17:30.714 > 
+19:17:31.117 > [LORA RX] ID:55 CMD:104 RSSI:0 SNR:9.8
+19:17:31.117 > In ID: 55, CMD: 104
+19:17:31.117 > CRC OK.
+19:17:31.123 > Prejeti podatki senzorjev:
+19:17:31.123 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:17:31.129 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:17:31.179 > Monday, December 29 2025 19:17:31
+19:17:31.179 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:17:31.184 > --------------------
+19:17:41.549 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:17:41.549 > [FB_RETRY] Ponovni poskus...
+19:17:41.549 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:17:41.594 > Monday, December 29 2025 19:17:42
+19:17:41.594 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:17:51.569 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:17:51.569 > [FB_RETRY] Ponovni poskus...
+19:17:51.569 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:17:51.619 > Monday, December 29 2025 19:17:52
+19:17:51.619 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:17:56.961 > [STREAM] event: keep-alive
+19:18:01.589 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:18:01.589 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:18:01.594 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:18:01.619 > [SENSOR_QUEUE] Ponovni poskus...
+19:18:01.619 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 2/3)
+19:18:01.624 > [Lora] Preostala velikost sklada: 764 bajtov
+19:18:01.624 > OUT ID: 56, CMD: 5
+19:18:01.630 > [LORA] Način samo ACK - brez poskusov.
+19:18:01.779 > [LORA] Paket uspesno poslan.
+19:18:01.779 > [LORA] Preklop v RX po TX uspesen.
+19:18:01.782 > -------------------------
+19:18:01.782 > 
+19:18:02.184 > [LORA RX] ID:56 CMD:104 RSSI:0 SNR:9.8
+19:18:02.185 > In ID: 56, CMD: 104
+19:18:02.185 > CRC OK.
+19:18:02.190 > Prejeti podatki senzorjev:
+19:18:02.190 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:18:02.195 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:18:02.242 > Monday, December 29 2025 19:18:02
+19:18:02.242 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:18:02.248 > --------------------
+19:18:12.611 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:18:12.611 > [FB_RETRY] Ponovni poskus...
+19:18:12.611 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:18:12.661 > Monday, December 29 2025 19:18:13
+19:18:12.661 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:18:22.631 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:18:22.631 > [FB_RETRY] Ponovni poskus...
+19:18:22.631 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:18:22.679 > Monday, December 29 2025 19:18:23
+19:18:22.679 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:18:26.863 > [STREAM] event: keep-alive
+19:18:32.651 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:18:32.652 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:18:32.657 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:18:32.679 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:18:32.779 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:18:32.881 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+19:18:32.881 > [Lora] Preostala velikost sklada: 764 bajtov
+19:18:32.887 > OUT ID: 57, CMD: 13
+19:18:32.887 > [LORA] Način samo ACK - brez poskusov.
+19:18:33.041 > [LORA] Paket uspesno poslan.
+19:18:33.041 > [LORA] Preklop v RX po TX uspesen.
+19:18:33.045 > -------------------------
+19:18:33.045 > 
+19:18:33.437 > [LORA RX] ID:57 CMD:110 RSSI:0 SNR:9.2
+19:18:33.437 > In ID: 57, CMD: 110
+19:18:33.437 > CRC OK.
+19:18:33.443 > Prejeti podatki iz INA3221 senzorja.
+19:18:33.443 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:18:33.452 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:18:33.504 > Monday, December 29 2025 19:18:34
+19:18:33.504 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:18:33.509 > --------------------
+19:18:43.674 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:18:43.674 > [FB_RETRY] Ponovni poskus...
+19:18:43.674 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:18:43.729 > Monday, December 29 2025 19:18:44
+19:18:43.729 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:18:53.694 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:18:53.695 > [FB_RETRY] Ponovni poskus...
+19:18:53.695 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:18:53.747 > Monday, December 29 2025 19:18:54
+19:18:53.747 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:18:56.866 > [STREAM] event: keep-alive
+19:19:03.714 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:19:03.714 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:19:03.719 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:19:03.748 > [SENSOR_QUEUE] Ponovni poskus...
+19:19:03.748 > [SENSOR_QUEUE] Izvajam: INA (poskus 1/3)
+19:19:03.754 > [Lora] Preostala velikost sklada: 764 bajtov
+19:19:03.754 > OUT ID: 58, CMD: 13
+19:19:03.758 > [LORA] Način samo ACK - brez poskusov.
+19:19:03.908 > [LORA] Paket uspesno poslan.
+19:19:03.908 > [LORA] Preklop v RX po TX uspesen.
+19:19:03.911 > -------------------------
+19:19:03.911 > 
+19:19:04.303 > [LORA RX] ID:58 CMD:110 RSSI:0 SNR:9.2
+19:19:04.304 > In ID: 58, CMD: 110
+19:19:04.304 > CRC OK.
+19:19:04.309 > Prejeti podatki iz INA3221 senzorja.
+19:19:04.309 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:19:04.318 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:19:04.369 > Monday, December 29 2025 19:19:05
+19:19:04.369 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:19:04.375 > --------------------
+19:19:14.736 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:19:14.736 > [FB_RETRY] Ponovni poskus...
+19:19:14.736 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:19:14.787 > Monday, December 29 2025 19:19:15
+19:19:14.788 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:19:24.757 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:19:24.757 > [FB_RETRY] Ponovni poskus...
+19:19:24.757 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:19:24.810 > Monday, December 29 2025 19:19:25
+19:19:24.810 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:19:26.871 > [STREAM] event: keep-alive
+19:19:34.777 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:19:34.777 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:19:34.782 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:19:34.812 > [SENSOR_QUEUE] Ponovni poskus...
+19:19:34.812 > [SENSOR_QUEUE] Izvajam: INA (poskus 2/3)
+19:19:34.817 > [Lora] Preostala velikost sklada: 764 bajtov
+19:19:34.817 > OUT ID: 59, CMD: 13
+19:19:34.822 > [LORA] Način samo ACK - brez poskusov.
+19:19:34.972 > [LORA] Paket uspesno poslan.
+19:19:34.972 > [LORA] Preklop v RX po TX uspesen.
+19:19:34.975 > -------------------------
+19:19:34.975 > 
+19:19:35.368 > [LORA RX] ID:59 CMD:110 RSSI:0 SNR:10.0
+19:19:35.368 > In ID: 59, CMD: 110
+19:19:35.368 > CRC OK.
+19:19:35.373 > Prejeti podatki iz INA3221 senzorja.
+19:19:35.373 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:19:35.383 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:19:35.429 > Monday, December 29 2025 19:19:36
+19:19:35.429 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:19:35.434 > --------------------
+19:19:45.799 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:19:45.799 > [FB_RETRY] Ponovni poskus...
+19:19:45.799 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:19:45.852 > Monday, December 29 2025 19:19:46
+19:19:45.852 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:19:55.819 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:19:55.819 > [FB_RETRY] Ponovni poskus...
+19:19:55.819 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:19:55.873 > Monday, December 29 2025 19:19:56
+19:19:55.873 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:19:56.876 > [STREAM] event: keep-alive
+19:20:05.839 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:20:05.839 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:20:05.845 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:20:05.874 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:20:05.973 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:20:26.878 > [STREAM] event: keep-alive
+19:20:56.985 > [STREAM] event: keep-alive
+19:20:59.346 > [SENSORS] Periodično branje senzorjev.
+19:20:59.346 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+19:20:59.352 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+19:20:59.405 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+19:20:59.405 > [Lora] Preostala velikost sklada: 764 bajtov
+19:20:59.410 > OUT ID: 60, CMD: 5
+19:20:59.410 > [LORA] Način samo ACK - brez poskusov.
+19:20:59.564 > [LORA] Paket uspesno poslan.
+19:20:59.564 > [LORA] Preklop v RX po TX uspesen.
+19:20:59.567 > -------------------------
+19:20:59.567 > 
+19:20:59.970 > [LORA RX] ID:60 CMD:104 RSSI:0 SNR:9.2
+19:20:59.970 > In ID: 60, CMD: 104
+19:20:59.970 > CRC OK.
+19:20:59.976 > Prejeti podatki senzorjev:
+19:20:59.976 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:20:59.981 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:21:00.026 > Monday, December 29 2025 19:21:00
+19:21:00.026 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:21:00.032 > --------------------
+19:21:10.469 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:21:10.469 > [FB_RETRY] Ponovni poskus...
+19:21:10.469 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:21:10.515 > Monday, December 29 2025 19:21:11
+19:21:10.515 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:21:20.490 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:21:20.490 > [FB_RETRY] Ponovni poskus...
+19:21:20.490 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:21:20.538 > Monday, December 29 2025 19:21:21
+19:21:20.538 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:21:26.990 > [STREAM] event: keep-alive
+19:21:30.510 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:21:30.510 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:21:30.515 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:21:30.538 > [SENSOR_QUEUE] Ponovni poskus...
+19:21:30.538 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 1/3)
+19:21:30.544 > [Lora] Preostala velikost sklada: 764 bajtov
+19:21:30.544 > OUT ID: 61, CMD: 5
+19:21:30.549 > [LORA] Način samo ACK - brez poskusov.
+19:21:30.699 > [LORA] Paket uspesno poslan.
+19:21:30.699 > [LORA] Preklop v RX po TX uspesen.
+19:21:30.702 > -------------------------
+19:21:30.702 > 
+19:21:31.104 > [LORA RX] ID:61 CMD:104 RSSI:0 SNR:9.8
+19:21:31.104 > In ID: 61, CMD: 104
+19:21:31.104 > CRC OK.
+19:21:31.109 > Prejeti podatki senzorjev:
+19:21:31.109 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:21:31.115 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:21:31.166 > Monday, December 29 2025 19:21:31
+19:21:31.166 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:21:31.172 > --------------------
+19:21:41.532 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:21:41.532 > [FB_RETRY] Ponovni poskus...
+19:21:41.532 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:21:41.582 > Monday, December 29 2025 19:21:42
+19:21:41.582 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:21:51.552 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:21:51.552 > [FB_RETRY] Ponovni poskus...
+19:21:51.552 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:21:51.602 > Monday, December 29 2025 19:21:52
+19:21:51.602 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:21:57.098 > [STREAM] event: keep-alive
+19:22:01.572 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:22:01.572 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:22:01.577 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:22:01.602 > [SENSOR_QUEUE] Ponovni poskus...
+19:22:01.602 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 2/3)
+19:22:01.608 > [Lora] Preostala velikost sklada: 764 bajtov
+19:22:01.608 > OUT ID: 62, CMD: 5
+19:22:01.614 > [LORA] Način samo ACK - brez poskusov.
+19:22:01.763 > [LORA] Paket uspesno poslan.
+19:22:01.763 > [LORA] Preklop v RX po TX uspesen.
+19:22:01.766 > -------------------------
+19:22:01.766 > 
+19:22:02.169 > [LORA RX] ID:62 CMD:104 RSSI:0 SNR:8.5
+19:22:02.169 > In ID: 62, CMD: 104
+19:22:02.169 > CRC OK.
+19:22:02.174 > Prejeti podatki senzorjev:
+19:22:02.174 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:22:02.180 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:22:02.458 > Monday, December 29 2025 19:22:03
+19:22:02.458 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:22:02.464 > --------------------
+19:22:12.594 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:22:12.595 > [FB_RETRY] Ponovni poskus...
+19:22:12.595 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:22:12.639 > Monday, December 29 2025 19:22:13
+19:22:12.639 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:22:22.614 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:22:22.614 > [FB_RETRY] Ponovni poskus...
+19:22:22.614 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:22:22.671 > Monday, December 29 2025 19:22:23
+19:22:22.671 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:22:26.895 > [STREAM] event: keep-alive
+19:22:32.634 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:22:32.634 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:22:32.640 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:22:32.670 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:22:32.770 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:22:32.873 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+19:22:32.873 > [Lora] Preostala velikost sklada: 764 bajtov
+19:22:32.879 > OUT ID: 63, CMD: 13
+19:22:32.879 > [LORA] Način samo ACK - brez poskusov.
+19:22:33.033 > [LORA] Paket uspesno poslan.
+19:22:33.034 > [LORA] Preklop v RX po TX uspesen.
+19:22:33.037 > -------------------------
+19:22:33.037 > 
+19:22:33.429 > [LORA RX] ID:63 CMD:110 RSSI:0 SNR:9.2
+19:22:33.429 > In ID: 63, CMD: 110
+19:22:33.429 > CRC OK.
+19:22:33.435 > Prejeti podatki iz INA3221 senzorja.
+19:22:33.435 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:22:33.445 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:22:33.500 > Monday, December 29 2025 19:22:34
+19:22:33.500 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:22:33.505 > --------------------
+19:22:43.657 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:22:43.657 > [FB_RETRY] Ponovni poskus...
+19:22:43.657 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:22:43.707 > Monday, December 29 2025 19:22:44
+19:22:43.707 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:22:53.677 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:22:53.677 > [FB_RETRY] Ponovni poskus...
+19:22:53.677 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:22:53.731 > Monday, December 29 2025 19:22:54
+19:22:53.736 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:22:56.899 > [STREAM] event: keep-alive
+19:23:03.697 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:23:03.697 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:23:03.702 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:23:03.732 > [SENSOR_QUEUE] Ponovni poskus...
+19:23:03.732 > [SENSOR_QUEUE] Izvajam: INA (poskus 1/3)
+19:23:03.738 > [Lora] Preostala velikost sklada: 764 bajtov
+19:23:03.738 > OUT ID: 64, CMD: 13
+19:23:03.743 > [LORA] Način samo ACK - brez poskusov.
+19:23:03.893 > [LORA] Paket uspesno poslan.
+19:23:03.893 > [LORA] Preklop v RX po TX uspesen.
+19:23:03.896 > -------------------------
+19:23:03.896 > 
+19:23:04.299 > [LORA RX] ID:64 CMD:110 RSSI:0 SNR:9.5
+19:23:04.299 > In ID: 64, CMD: 110
+19:23:04.299 > CRC OK.
+19:23:04.304 > Prejeti podatki iz INA3221 senzorja.
+19:23:04.304 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:23:04.314 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:23:04.360 > Monday, December 29 2025 19:23:05
+19:23:04.360 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:23:04.365 > --------------------
+19:23:14.719 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:23:14.719 > [FB_RETRY] Ponovni poskus...
+19:23:14.719 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:23:15.033 > Monday, December 29 2025 19:23:15
+19:23:15.033 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:23:24.739 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:23:24.739 > [FB_RETRY] Ponovni poskus...
+19:23:24.739 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:23:24.790 > Monday, December 29 2025 19:23:25
+19:23:24.790 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:23:26.907 > [STREAM] event: keep-alive
+19:23:34.760 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:23:34.760 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:23:34.765 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:23:34.830 > [SENSOR_QUEUE] Ponovni poskus...
+19:23:34.830 > [SENSOR_QUEUE] Izvajam: INA (poskus 2/3)
+19:23:34.836 > [Lora] Preostala velikost sklada: 764 bajtov
+19:23:34.836 > OUT ID: 65, CMD: 13
+19:23:34.841 > [LORA] Način samo ACK - brez poskusov.
+19:23:34.990 > [LORA] Paket uspesno poslan.
+19:23:34.990 > [LORA] Preklop v RX po TX uspesen.
+19:23:34.992 > -------------------------
+19:23:34.992 > 
+19:23:35.400 > [LORA RX] ID:65 CMD:110 RSSI:0 SNR:9.8
+19:23:35.400 > In ID: 65, CMD: 110
+19:23:35.400 > CRC OK.
+19:23:35.406 > Prejeti podatki iz INA3221 senzorja.
+19:23:35.406 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:23:35.415 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:23:35.463 > Monday, December 29 2025 19:23:36
+19:23:35.463 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:23:35.468 > --------------------
+19:23:45.781 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:23:45.781 > [FB_RETRY] Ponovni poskus...
+19:23:45.781 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:23:45.833 > Monday, December 29 2025 19:23:46
+19:23:45.833 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:23:55.802 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:23:55.802 > [FB_RETRY] Ponovni poskus...
+19:23:55.802 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:23:55.859 > Monday, December 29 2025 19:23:56
+19:23:55.859 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:23:57.112 > [STREAM] event: keep-alive
+19:24:05.822 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:24:05.823 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:24:05.828 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:24:05.865 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:24:05.965 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:24:26.912 > [STREAM] event: keep-alive
+19:24:56.915 > [STREAM] event: keep-alive
+19:24:59.351 > [SENSORS] Periodično branje senzorjev.
+19:24:59.351 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+19:24:59.356 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+19:24:59.397 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+19:24:59.397 > [Lora] Preostala velikost sklada: 764 bajtov
+19:24:59.403 > OUT ID: 66, CMD: 5
+19:24:59.403 > [LORA] Način samo ACK - brez poskusov.
+19:24:59.557 > [LORA] Paket uspesno poslan.
+19:24:59.557 > [LORA] Preklop v RX po TX uspesen.
+19:24:59.560 > -------------------------
+19:24:59.560 > 
+19:24:59.963 > [LORA RX] ID:66 CMD:104 RSSI:0 SNR:10.0
+19:24:59.963 > In ID: 66, CMD: 104
+19:24:59.963 > CRC OK.
+19:24:59.968 > Prejeti podatki senzorjev:
+19:24:59.968 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:24:59.974 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:25:00.024 > Monday, December 29 2025 19:25:00
+19:25:00.024 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:25:00.030 > --------------------
+19:25:10.452 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:25:10.452 > [FB_RETRY] Ponovni poskus...
+19:25:10.452 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:25:10.502 > Monday, December 29 2025 19:25:11
+19:25:10.503 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:25:20.472 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:25:20.472 > [FB_RETRY] Ponovni poskus...
+19:25:20.472 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:25:20.521 > Monday, December 29 2025 19:25:21
+19:25:20.521 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:25:27.023 > [STREAM] event: keep-alive
+19:25:30.493 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:25:30.493 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:25:30.498 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:25:30.528 > [SENSOR_QUEUE] Ponovni poskus...
+19:25:30.528 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 1/3)
+19:25:30.533 > [Lora] Preostala velikost sklada: 764 bajtov
+19:25:30.533 > OUT ID: 67, CMD: 5
+19:25:30.539 > [LORA] Način samo ACK - brez poskusov.
+19:25:30.688 > [LORA] Paket uspesno poslan.
+19:25:30.688 > [LORA] Preklop v RX po TX uspesen.
+19:25:30.691 > -------------------------
+19:25:30.691 > 
+19:25:31.093 > [LORA RX] ID:67 CMD:104 RSSI:0 SNR:8.5
+19:25:31.093 > In ID: 67, CMD: 104
+19:25:31.093 > CRC OK.
+19:25:31.099 > Prejeti podatki senzorjev:
+19:25:31.099 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:25:31.105 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:25:31.150 > Monday, December 29 2025 19:25:31
+19:25:31.151 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:25:31.156 > --------------------
+19:25:41.514 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:25:41.515 > [FB_RETRY] Ponovni poskus...
+19:25:41.515 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:25:41.567 > Monday, December 29 2025 19:25:42
+19:25:41.567 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:25:51.535 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:25:51.535 > [FB_RETRY] Ponovni poskus...
+19:25:51.535 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:25:51.579 > Monday, December 29 2025 19:25:52
+19:25:51.579 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:25:56.925 > [STREAM] event: keep-alive
+19:26:01.555 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:26:01.555 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:26:01.560 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:26:01.578 > [SENSOR_QUEUE] Ponovni poskus...
+19:26:01.578 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 2/3)
+19:26:01.585 > [Lora] Preostala velikost sklada: 764 bajtov
+19:26:01.585 > OUT ID: 68, CMD: 5
+19:26:01.589 > [LORA] Način samo ACK - brez poskusov.
+19:26:01.738 > [LORA] Paket uspesno poslan.
+19:26:01.738 > [LORA] Preklop v RX po TX uspesen.
+19:26:01.741 > -------------------------
+19:26:01.741 > 
+19:26:02.146 > [LORA RX] ID:68 CMD:104 RSSI:0 SNR:9.2
+19:26:02.146 > In ID: 68, CMD: 104
+19:26:02.146 > CRC OK.
+19:26:02.152 > Prejeti podatki senzorjev:
+19:26:02.152 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:26:02.158 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:26:02.208 > Monday, December 29 2025 19:26:02
+19:26:02.208 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:26:02.214 > --------------------
+19:26:12.577 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:26:12.577 > [FB_RETRY] Ponovni poskus...
+19:26:12.577 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:26:12.630 > Monday, December 29 2025 19:26:13
+19:26:12.630 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:26:22.597 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:26:22.597 > [FB_RETRY] Ponovni poskus...
+19:26:22.597 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:26:22.652 > Monday, December 29 2025 19:26:23
+19:26:22.652 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:26:26.928 > [STREAM] event: keep-alive
+19:26:32.616 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:26:32.617 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:26:32.624 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:26:32.653 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:26:32.752 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:26:32.855 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+19:26:32.855 > [Lora] Preostala velikost sklada: 764 bajtov
+19:26:32.861 > OUT ID: 69, CMD: 13
+19:26:32.861 > [LORA] Način samo ACK - brez poskusov.
+19:26:33.015 > [LORA] Paket uspesno poslan.
+19:26:33.015 > [LORA] Preklop v RX po TX uspesen.
+19:26:33.019 > -------------------------
+19:26:33.019 > 
+19:26:33.411 > [LORA RX] ID:69 CMD:110 RSSI:0 SNR:9.5
+19:26:33.411 > In ID: 69, CMD: 110
+19:26:33.411 > CRC OK.
+19:26:33.416 > Prejeti podatki iz INA3221 senzorja.
+19:26:33.416 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:26:33.426 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:26:33.474 > Monday, December 29 2025 19:26:34
+19:26:33.474 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:26:33.480 > --------------------
+19:26:43.640 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:26:43.640 > [FB_RETRY] Ponovni poskus...
+19:26:43.640 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:26:43.694 > Monday, December 29 2025 19:26:44
+19:26:43.694 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:26:53.660 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:26:53.660 > [FB_RETRY] Ponovni poskus...
+19:26:53.660 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:26:53.715 > Monday, December 29 2025 19:26:54
+19:26:53.716 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:26:56.932 > [STREAM] event: keep-alive
+19:27:03.680 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:27:03.680 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:27:03.685 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:27:03.715 > [SENSOR_QUEUE] Ponovni poskus...
+19:27:03.716 > [SENSOR_QUEUE] Izvajam: INA (poskus 1/3)
+19:27:03.721 > [Lora] Preostala velikost sklada: 764 bajtov
+19:27:03.721 > OUT ID: 70, CMD: 13
+19:27:03.726 > [LORA] Način samo ACK - brez poskusov.
+19:27:03.875 > [LORA] Paket uspesno poslan.
+19:27:03.875 > [LORA] Preklop v RX po TX uspesen.
+19:27:03.879 > -------------------------
+19:27:03.879 > 
+19:27:04.282 > [LORA RX] ID:70 CMD:110 RSSI:0 SNR:9.2
+19:27:04.282 > In ID: 70, CMD: 110
+19:27:04.282 > CRC OK.
+19:27:04.288 > Prejeti podatki iz INA3221 senzorja.
+19:27:04.288 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:27:04.297 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:27:04.391 > Monday, December 29 2025 19:27:05
+19:27:04.391 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:27:04.397 > --------------------
+19:27:14.702 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:27:14.702 > [FB_RETRY] Ponovni poskus...
+19:27:14.702 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:27:14.756 > Monday, December 29 2025 19:27:15
+19:27:14.756 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:27:24.722 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:27:24.722 > [FB_RETRY] Ponovni poskus...
+19:27:24.722 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:27:24.772 > Monday, December 29 2025 19:27:25
+19:27:24.772 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:27:26.937 > [STREAM] event: keep-alive
+19:27:34.742 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:27:34.742 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:27:34.748 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:27:34.794 > [SENSOR_QUEUE] Ponovni poskus...
+19:27:34.794 > [SENSOR_QUEUE] Izvajam: INA (poskus 2/3)
+19:27:34.799 > [Lora] Preostala velikost sklada: 764 bajtov
+19:27:34.799 > OUT ID: 71, CMD: 13
+19:27:34.805 > [LORA] Način samo ACK - brez poskusov.
+19:27:34.954 > [LORA] Paket uspesno poslan.
+19:27:34.954 > [LORA] Preklop v RX po TX uspesen.
+19:27:34.957 > -------------------------
+19:27:34.957 > 
+19:27:35.360 > [LORA RX] ID:71 CMD:110 RSSI:0 SNR:9.2
+19:27:35.360 > In ID: 71, CMD: 110
+19:27:35.360 > CRC OK.
+19:27:35.365 > Prejeti podatki iz INA3221 senzorja.
+19:27:35.365 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:27:35.375 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:27:35.421 > Monday, December 29 2025 19:27:36
+19:27:35.421 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:27:35.427 > --------------------
+19:27:45.765 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:27:45.765 > [FB_RETRY] Ponovni poskus...
+19:27:45.765 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:27:45.815 > Monday, December 29 2025 19:27:46
+19:27:45.816 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:27:55.785 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:27:55.785 > [FB_RETRY] Ponovni poskus...
+19:27:55.785 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:27:55.834 > Monday, December 29 2025 19:27:56
+19:27:55.834 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:27:56.838 > [STREAM] event: keep-alive
+19:28:05.805 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:28:05.805 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:28:05.810 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:28:05.834 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:28:05.933 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:28:26.944 > [STREAM] event: keep-alive
+19:28:56.846 > [STREAM] event: keep-alive
+19:28:59.355 > [SENSORS] Periodično branje senzorjev.
+19:28:59.355 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+19:28:59.360 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+19:28:59.365 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+19:28:59.371 > [Lora] Preostala velikost sklada: 764 bajtov
+19:28:59.371 > OUT ID: 72, CMD: 5
+19:28:59.375 > [LORA] Način samo ACK - brez poskusov.
+19:28:59.526 > [LORA] Paket uspesno poslan.
+19:28:59.526 > [LORA] Preklop v RX po TX uspesen.
+19:28:59.530 > -------------------------
+19:28:59.530 > 
+19:28:59.932 > [LORA RX] ID:72 CMD:104 RSSI:0 SNR:6.2
+19:28:59.932 > In ID: 72, CMD: 104
+19:28:59.932 > CRC OK.
+19:28:59.938 > Prejeti podatki senzorjev:
+19:28:59.938 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:28:59.943 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:28:59.994 > Monday, December 29 2025 19:29:00
+19:28:59.994 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:28:59.999 > --------------------
+19:29:10.435 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:29:10.435 > [FB_RETRY] Ponovni poskus...
+19:29:10.435 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:29:10.486 > Monday, December 29 2025 19:29:11
+19:29:10.486 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:29:20.455 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:29:20.455 > [FB_RETRY] Ponovni poskus...
+19:29:20.455 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:29:20.507 > Monday, December 29 2025 19:29:21
+19:29:20.507 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:29:26.853 > [STREAM] event: keep-alive
+19:29:30.475 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:29:30.476 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:29:30.481 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:29:30.507 > [SENSOR_QUEUE] Ponovni poskus...
+19:29:30.507 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 1/3)
+19:29:30.513 > [Lora] Preostala velikost sklada: 764 bajtov
+19:29:30.513 > OUT ID: 73, CMD: 5
+19:29:30.518 > [LORA] Način samo ACK - brez poskusov.
+19:29:30.667 > [LORA] Paket uspesno poslan.
+19:29:30.667 > [LORA] Preklop v RX po TX uspesen.
+19:29:30.670 > -------------------------
+19:29:30.670 > 
+19:29:31.072 > [LORA RX] ID:73 CMD:104 RSSI:0 SNR:9.2
+19:29:31.073 > In ID: 73, CMD: 104
+19:29:31.073 > CRC OK.
+19:29:31.078 > Prejeti podatki senzorjev:
+19:29:31.078 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:29:31.083 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:29:31.128 > Monday, December 29 2025 19:29:31
+19:29:31.128 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:29:31.133 > --------------------
+19:29:41.497 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:29:41.498 > [FB_RETRY] Ponovni poskus...
+19:29:41.498 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:29:41.545 > Monday, December 29 2025 19:29:42
+19:29:41.545 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:29:51.518 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:29:51.519 > [FB_RETRY] Ponovni poskus...
+19:29:51.519 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:29:51.566 > Monday, December 29 2025 19:29:52
+19:29:51.566 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:29:56.854 > [STREAM] event: keep-alive
+19:30:01.537 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:30:01.538 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:30:01.543 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:30:01.567 > [SENSOR_QUEUE] Ponovni poskus...
+19:30:01.567 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 2/3)
+19:30:01.572 > [Lora] Preostala velikost sklada: 764 bajtov
+19:30:01.572 > OUT ID: 74, CMD: 5
+19:30:01.578 > [LORA] Način samo ACK - brez poskusov.
+19:30:01.726 > [LORA] Paket uspesno poslan.
+19:30:01.726 > [LORA] Preklop v RX po TX uspesen.
+19:30:01.730 > -------------------------
+19:30:01.730 > 
+19:30:02.133 > [LORA RX] ID:74 CMD:104 RSSI:0 SNR:9.5
+19:30:02.133 > In ID: 74, CMD: 104
+19:30:02.133 > CRC OK.
+19:30:02.138 > Prejeti podatki senzorjev:
+19:30:02.138 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:30:02.143 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:30:02.195 > Monday, December 29 2025 19:30:02
+19:30:02.195 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:30:02.201 > --------------------
+19:30:12.560 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:30:12.560 > [FB_RETRY] Ponovni poskus...
+19:30:12.560 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:30:12.610 > Monday, December 29 2025 19:30:13
+19:30:12.611 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:30:22.580 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:30:22.580 > [FB_RETRY] Ponovni poskus...
+19:30:22.580 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:30:22.626 > Monday, December 29 2025 19:30:23
+19:30:22.626 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:30:26.858 > [STREAM] event: keep-alive
+19:30:32.600 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:30:32.601 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:30:32.606 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:30:32.625 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:30:32.725 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:30:32.828 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+19:30:32.828 > [Lora] Preostala velikost sklada: 764 bajtov
+19:30:32.834 > OUT ID: 75, CMD: 13
+19:30:32.834 > [LORA] Način samo ACK - brez poskusov.
+19:30:32.988 > [LORA] Paket uspesno poslan.
+19:30:32.988 > [LORA] Preklop v RX po TX uspesen.
+19:30:32.991 > -------------------------
+19:30:32.991 > 
+19:30:33.384 > [LORA RX] ID:75 CMD:110 RSSI:0 SNR:9.8
+19:30:33.384 > In ID: 75, CMD: 110
+19:30:33.384 > CRC OK.
+19:30:33.390 > Prejeti podatki iz INA3221 senzorja.
+19:30:33.390 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:30:33.399 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:30:33.452 > Monday, December 29 2025 19:30:34
+19:30:33.452 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:30:33.458 > --------------------
+19:30:43.622 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:30:43.622 > [FB_RETRY] Ponovni poskus...
+19:30:43.622 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:30:43.678 > Monday, December 29 2025 19:30:44
+19:30:43.678 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:30:53.642 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:30:53.642 > [FB_RETRY] Ponovni poskus...
+19:30:53.642 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:30:53.693 > Monday, December 29 2025 19:30:54
+19:30:53.694 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:30:56.863 > [STREAM] event: keep-alive
+19:31:03.662 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:31:03.666 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:31:03.668 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:31:03.694 > [SENSOR_QUEUE] Ponovni poskus...
+19:31:03.694 > [SENSOR_QUEUE] Izvajam: INA (poskus 1/3)
+19:31:03.700 > [Lora] Preostala velikost sklada: 764 bajtov
+19:31:03.700 > OUT ID: 76, CMD: 13
+19:31:03.705 > [LORA] Način samo ACK - brez poskusov.
+19:31:03.854 > [LORA] Paket uspesno poslan.
+19:31:03.854 > [LORA] Preklop v RX po TX uspesen.
+19:31:03.857 > -------------------------
+19:31:03.857 > 
+19:31:04.260 > [LORA RX] ID:76 CMD:110 RSSI:0 SNR:10.5
+19:31:04.283 > In ID: 76, CMD: 110
+19:31:04.283 > CRC OK.
+19:31:04.283 > Prejeti podatki iz INA3221 senzorja.
+19:31:04.283 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:31:04.283 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:31:04.327 > Monday, December 29 2025 19:31:04
+19:31:04.356 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:31:04.356 > --------------------
+19:31:14.685 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:31:14.686 > [FB_RETRY] Ponovni poskus...
+19:31:14.686 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:31:14.739 > Monday, December 29 2025 19:31:15
+19:31:14.740 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:31:24.705 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:31:24.705 > [FB_RETRY] Ponovni poskus...
+19:31:24.705 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:31:24.757 > Monday, December 29 2025 19:31:25
+19:31:24.757 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:31:26.868 > [STREAM] event: keep-alive
+19:31:34.725 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:31:34.726 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:31:34.731 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:31:34.758 > [SENSOR_QUEUE] Ponovni poskus...
+19:31:34.758 > [SENSOR_QUEUE] Izvajam: INA (poskus 2/3)
+19:31:34.764 > [Lora] Preostala velikost sklada: 764 bajtov
+19:31:34.764 > OUT ID: 77, CMD: 13
+19:31:34.769 > [LORA] Način samo ACK - brez poskusov.
+19:31:34.919 > [LORA] Paket uspesno poslan.
+19:31:34.919 > [LORA] Preklop v RX po TX uspesen.
+19:31:34.921 > -------------------------
+19:31:34.921 > 
+19:31:35.313 > [LORA RX] ID:77 CMD:110 RSSI:0 SNR:10.0
+19:31:35.313 > In ID: 77, CMD: 110
+19:31:35.313 > CRC OK.
+19:31:35.319 > Prejeti podatki iz INA3221 senzorja.
+19:31:35.319 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:31:35.329 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:31:35.372 > Monday, December 29 2025 19:31:36
+19:31:35.372 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:31:35.378 > --------------------
+19:31:45.747 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:31:45.747 > [FB_RETRY] Ponovni poskus...
+19:31:45.747 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:31:45.803 > Monday, December 29 2025 19:31:46
+19:31:45.803 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:31:55.768 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:31:55.768 > [FB_RETRY] Ponovni poskus...
+19:31:55.768 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:31:55.817 > Monday, December 29 2025 19:31:56
+19:31:55.817 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:31:56.870 > [STREAM] event: keep-alive
+19:32:05.788 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:32:05.788 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:32:05.793 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:32:05.817 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:32:05.917 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:32:26.873 > [STREAM] event: keep-alive
+19:32:56.878 > [STREAM] event: keep-alive
+19:32:59.358 > [SENSORS] Periodično branje senzorjev.
+19:32:59.358 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+19:32:59.364 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+19:32:59.449 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+19:32:59.450 > [Lora] Preostala velikost sklada: 764 bajtov
+19:32:59.455 > OUT ID: 78, CMD: 5
+19:32:59.455 > [LORA] Način samo ACK - brez poskusov.
+19:32:59.609 > [LORA] Paket uspesno poslan.
+19:32:59.609 > [LORA] Preklop v RX po TX uspesen.
+19:32:59.612 > -------------------------
+19:32:59.612 > 
+19:33:00.015 > [LORA RX] ID:78 CMD:104 RSSI:0 SNR:10.0
+19:33:00.016 > In ID: 78, CMD: 104
+19:33:00.016 > CRC OK.
+19:33:00.021 > Prejeti podatki senzorjev:
+19:33:00.021 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:33:00.026 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:33:00.112 > Monday, December 29 2025 19:33:00
+19:33:00.112 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:33:00.118 > --------------------
+19:33:10.418 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:33:10.418 > [FB_RETRY] Ponovni poskus...
+19:33:10.418 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:33:10.464 > Monday, December 29 2025 19:33:11
+19:33:10.464 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:33:20.437 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:33:20.438 > [FB_RETRY] Ponovni poskus...
+19:33:20.438 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:33:20.486 > Monday, December 29 2025 19:33:21
+19:33:20.486 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:33:26.881 > [STREAM] event: keep-alive
+19:33:30.458 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:33:30.458 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:33:30.464 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:33:30.514 > [SENSOR_QUEUE] Ponovni poskus...
+19:33:30.515 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 1/3)
+19:33:30.521 > [Lora] Preostala velikost sklada: 764 bajtov
+19:33:30.521 > OUT ID: 79, CMD: 5
+19:33:30.526 > [LORA] Način samo ACK - brez poskusov.
+19:33:30.675 > [LORA] Paket uspesno poslan.
+19:33:30.675 > [LORA] Preklop v RX po TX uspesen.
+19:33:30.678 > -------------------------
+19:33:30.678 > 
+19:33:31.081 > [LORA RX] ID:79 CMD:104 RSSI:0 SNR:9.5
+19:33:31.081 > In ID: 79, CMD: 104
+19:33:31.081 > CRC OK.
+19:33:31.087 > Prejeti podatki senzorjev:
+19:33:31.087 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:33:31.092 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:33:31.142 > Monday, December 29 2025 19:33:31
+19:33:31.142 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:33:31.147 > --------------------
+19:33:41.481 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:33:41.481 > [FB_RETRY] Ponovni poskus...
+19:33:41.481 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:33:41.531 > Monday, December 29 2025 19:33:42
+19:33:41.531 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:33:51.500 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:33:51.500 > [FB_RETRY] Ponovni poskus...
+19:33:51.500 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:33:51.549 > Monday, December 29 2025 19:33:52
+19:33:51.549 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:33:57.194 > [STREAM] event: keep-alive
+19:34:01.520 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:34:01.521 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:34:01.526 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:34:01.550 > [SENSOR_QUEUE] Ponovni poskus...
+19:34:01.550 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 2/3)
+19:34:01.556 > [Lora] Preostala velikost sklada: 764 bajtov
+19:34:01.556 > OUT ID: 80, CMD: 5
+19:34:01.561 > [LORA] Način samo ACK - brez poskusov.
+19:34:01.710 > [LORA] Paket uspesno poslan.
+19:34:01.710 > [LORA] Preklop v RX po TX uspesen.
+19:34:01.714 > -------------------------
+19:34:01.714 > 
+19:34:02.116 > [LORA RX] ID:80 CMD:104 RSSI:0 SNR:9.8
+19:34:02.117 > In ID: 80, CMD: 104
+19:34:02.117 > CRC OK.
+19:34:02.122 > Prejeti podatki senzorjev:
+19:34:02.122 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:34:02.128 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:34:02.181 > Monday, December 29 2025 19:34:02
+19:34:02.181 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:34:02.186 > --------------------
+19:34:12.542 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:34:12.542 > [FB_RETRY] Ponovni poskus...
+19:34:12.542 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:34:12.595 > Monday, December 29 2025 19:34:13
+19:34:12.595 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:34:22.562 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:34:22.562 > [FB_RETRY] Ponovni poskus...
+19:34:22.562 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:34:22.608 > Monday, December 29 2025 19:34:23
+19:34:22.608 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:34:26.890 > [STREAM] event: keep-alive
+19:34:32.583 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:34:32.583 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:34:32.589 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:34:32.609 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:34:32.708 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:34:32.811 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+19:34:32.811 > [Lora] Preostala velikost sklada: 764 bajtov
+19:34:32.817 > OUT ID: 81, CMD: 13
+19:34:32.817 > [LORA] Način samo ACK - brez poskusov.
+19:34:32.971 > [LORA] Paket uspesno poslan.
+19:34:32.971 > [LORA] Preklop v RX po TX uspesen.
+19:34:32.974 > -------------------------
+19:34:32.974 > 
+19:34:33.366 > [LORA RX] ID:81 CMD:110 RSSI:0 SNR:9.8
+19:34:33.366 > In ID: 81, CMD: 110
+19:34:33.366 > CRC OK.
+19:34:33.372 > Prejeti podatki iz INA3221 senzorja.
+19:34:33.372 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:34:33.381 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:34:33.428 > Monday, December 29 2025 19:34:34
+19:34:33.428 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:34:33.433 > --------------------
+19:34:43.605 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:34:43.605 > [FB_RETRY] Ponovni poskus...
+19:34:43.605 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:34:43.660 > Monday, December 29 2025 19:34:44
+19:34:43.661 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:34:53.625 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:34:53.625 > [FB_RETRY] Ponovni poskus...
+19:34:53.625 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:34:53.679 > Monday, December 29 2025 19:34:54
+19:34:53.680 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:34:56.893 > [STREAM] event: keep-alive
+19:35:03.645 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:35:03.646 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:35:03.651 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:35:03.680 > [SENSOR_QUEUE] Ponovni poskus...
+19:35:03.680 > [SENSOR_QUEUE] Izvajam: INA (poskus 1/3)
+19:35:03.686 > [Lora] Preostala velikost sklada: 764 bajtov
+19:35:03.686 > OUT ID: 82, CMD: 13
+19:35:03.691 > [LORA] Način samo ACK - brez poskusov.
+19:35:03.840 > [LORA] Paket uspesno poslan.
+19:35:03.840 > [LORA] Preklop v RX po TX uspesen.
+19:35:03.843 > -------------------------
+19:35:03.843 > 
+19:35:04.245 > [LORA RX] ID:82 CMD:110 RSSI:0 SNR:9.5
+19:35:04.246 > In ID: 82, CMD: 110
+19:35:04.246 > CRC OK.
+19:35:04.252 > Prejeti podatki iz INA3221 senzorja.
+19:35:04.252 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:35:04.261 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:35:04.308 > Monday, December 29 2025 19:35:04
+19:35:04.308 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:35:04.313 > --------------------
+19:35:14.668 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:35:14.668 > [FB_RETRY] Ponovni poskus...
+19:35:14.668 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:35:14.726 > Monday, December 29 2025 19:35:15
+19:35:14.726 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:35:24.688 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:35:24.688 > [FB_RETRY] Ponovni poskus...
+19:35:24.688 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:35:24.739 > Monday, December 29 2025 19:35:25
+19:35:24.739 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:35:27.103 > [STREAM] event: keep-alive
+19:35:34.708 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:35:34.708 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:35:34.714 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:35:34.740 > [SENSOR_QUEUE] Ponovni poskus...
+19:35:34.740 > [SENSOR_QUEUE] Izvajam: INA (poskus 2/3)
+19:35:34.746 > [Lora] Preostala velikost sklada: 764 bajtov
+19:35:34.746 > OUT ID: 83, CMD: 13
+19:35:34.750 > [LORA] Način samo ACK - brez poskusov.
+19:35:34.900 > [LORA] Paket uspesno poslan.
+19:35:34.900 > [LORA] Preklop v RX po TX uspesen.
+19:35:34.903 > -------------------------
+19:35:34.903 > 
+19:35:35.306 > [LORA RX] ID:83 CMD:110 RSSI:0 SNR:10.0
+19:35:35.306 > In ID: 83, CMD: 110
+19:35:35.306 > CRC OK.
+19:35:35.311 > Prejeti podatki iz INA3221 senzorja.
+19:35:35.311 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:35:35.320 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:35:35.367 > Monday, December 29 2025 19:35:36
+19:35:35.367 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:35:35.372 > --------------------
+19:35:45.731 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:35:45.731 > [FB_RETRY] Ponovni poskus...
+19:35:45.731 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:35:45.785 > Monday, December 29 2025 19:35:46
+19:35:45.785 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:35:55.750 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:35:55.751 > [FB_RETRY] Ponovni poskus...
+19:35:55.751 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:35:55.802 > Monday, December 29 2025 19:35:56
+19:35:55.802 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:35:56.902 > [STREAM] event: keep-alive
+19:36:05.770 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:36:05.771 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:36:05.776 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:36:05.803 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:36:05.902 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:36:26.906 > [STREAM] event: keep-alive
+19:36:57.012 > [STREAM] event: keep-alive
+19:36:59.362 > [SENSORS] Periodično branje senzorjev.
+19:36:59.362 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+19:36:59.368 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+19:36:59.436 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+19:36:59.436 > [Lora] Preostala velikost sklada: 764 bajtov
+19:36:59.441 > OUT ID: 84, CMD: 5
+19:36:59.441 > [LORA] Način samo ACK - brez poskusov.
+19:36:59.595 > [LORA] Paket uspesno poslan.
+19:36:59.595 > [LORA] Preklop v RX po TX uspesen.
+19:36:59.598 > -------------------------
+19:36:59.598 > 
+19:37:00.001 > [LORA RX] ID:84 CMD:104 RSSI:0 SNR:8.8
+19:37:00.001 > In ID: 84, CMD: 104
+19:37:00.001 > CRC OK.
+19:37:00.007 > Prejeti podatki senzorjev:
+19:37:00.007 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:37:00.012 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:37:00.058 > Monday, December 29 2025 19:37:00
+19:37:00.058 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:37:00.064 > --------------------
+19:37:10.400 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:37:10.401 > [FB_RETRY] Ponovni poskus...
+19:37:10.401 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:37:10.447 > Monday, December 29 2025 19:37:11
+19:37:10.447 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:37:20.421 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:37:20.421 > [FB_RETRY] Ponovni poskus...
+19:37:20.421 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:37:20.470 > Monday, December 29 2025 19:37:21
+19:37:20.470 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:37:26.914 > [STREAM] event: keep-alive
+19:37:30.441 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:37:30.441 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:37:30.446 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:37:30.471 > [SENSOR_QUEUE] Ponovni poskus...
+19:37:30.471 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 1/3)
+19:37:30.476 > [Lora] Preostala velikost sklada: 764 bajtov
+19:37:30.476 > OUT ID: 85, CMD: 5
+19:37:30.482 > [LORA] Način samo ACK - brez poskusov.
+19:37:30.631 > [LORA] Paket uspesno poslan.
+19:37:30.631 > [LORA] Preklop v RX po TX uspesen.
+19:37:30.634 > -------------------------
+19:37:30.634 > 
+19:37:31.036 > [LORA RX] ID:85 CMD:104 RSSI:0 SNR:10.2
+19:37:31.036 > In ID: 85, CMD: 104
+19:37:31.036 > CRC OK.
+19:37:31.042 > Prejeti podatki senzorjev:
+19:37:31.042 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:37:31.048 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:37:31.093 > Monday, December 29 2025 19:37:31
+19:37:31.093 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:37:31.098 > --------------------
+19:37:41.463 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:37:41.463 > [FB_RETRY] Ponovni poskus...
+19:37:41.463 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:37:41.513 > Monday, December 29 2025 19:37:42
+19:37:41.513 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:37:51.483 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:37:51.483 > [FB_RETRY] Ponovni poskus...
+19:37:51.483 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:37:51.535 > Monday, December 29 2025 19:37:52
+19:37:51.535 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:37:56.918 > [STREAM] event: keep-alive
+19:38:01.503 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:38:01.503 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:38:01.509 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:38:01.534 > [SENSOR_QUEUE] Ponovni poskus...
+19:38:01.535 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 2/3)
+19:38:01.540 > [Lora] Preostala velikost sklada: 764 bajtov
+19:38:01.540 > OUT ID: 86, CMD: 5
+19:38:01.546 > [LORA] Način samo ACK - brez poskusov.
+19:38:01.695 > [LORA] Paket uspesno poslan.
+19:38:01.695 > [LORA] Preklop v RX po TX uspesen.
+19:38:01.698 > -------------------------
+19:38:01.698 > 
+19:38:02.100 > [LORA RX] ID:86 CMD:104 RSSI:0 SNR:10.5
+19:38:02.101 > In ID: 86, CMD: 104
+19:38:02.101 > CRC OK.
+19:38:02.107 > Prejeti podatki senzorjev:
+19:38:02.107 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:38:02.111 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:38:02.280 > Monday, December 29 2025 19:38:02
+19:38:02.281 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:38:02.285 > --------------------
+19:38:12.525 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:38:12.526 > [FB_RETRY] Ponovni poskus...
+19:38:12.526 > [F_UPDATE_SENSOR] Sending sensor data (poskus 2/3)...
+19:38:12.577 > Monday, December 29 2025 19:38:13
+19:38:12.577 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:38:22.546 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:38:22.546 > [FB_RETRY] Ponovni poskus...
+19:38:22.546 > [F_UPDATE_SENSOR] Sending sensor data (poskus 3/3)...
+19:38:22.594 > Monday, December 29 2025 19:38:23
+19:38:22.594 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:38:26.922 > [STREAM] event: keep-alive
+19:38:32.566 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:38:32.566 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:38:32.572 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:38:32.594 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:38:32.694 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:38:32.797 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+19:38:32.797 > [Lora] Preostala velikost sklada: 764 bajtov
+19:38:32.803 > OUT ID: 87, CMD: 13
+19:38:32.803 > [LORA] Način samo ACK - brez poskusov.
+19:38:32.957 > [LORA] Paket uspesno poslan.
+19:38:32.957 > [LORA] Preklop v RX po TX uspesen.
+19:38:32.960 > -------------------------
+19:38:32.960 > 
+19:38:33.353 > [LORA RX] ID:87 CMD:110 RSSI:0 SNR:9.2
+19:38:33.353 > In ID: 87, CMD: 110
+19:38:33.353 > CRC OK.
+19:38:33.359 > Prejeti podatki iz INA3221 senzorja.
+19:38:33.359 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:38:33.368 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:38:33.415 > Monday, December 29 2025 19:38:34
+19:38:33.415 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:38:33.421 > --------------------
+19:38:43.588 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:38:43.588 > [FB_RETRY] Ponovni poskus...
+19:38:43.588 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:38:43.637 > Monday, December 29 2025 19:38:44
+19:38:43.637 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:38:53.608 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:38:53.608 > [FB_RETRY] Ponovni poskus...
+19:38:53.608 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:38:53.661 > Monday, December 29 2025 19:38:54
+19:38:53.662 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:38:56.927 > [STREAM] event: keep-alive
+19:39:03.629 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:39:03.629 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:39:03.634 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:39:03.662 > [SENSOR_QUEUE] Ponovni poskus...
+19:39:03.662 > [SENSOR_QUEUE] Izvajam: INA (poskus 1/3)
+19:39:03.668 > [Lora] Preostala velikost sklada: 764 bajtov
+19:39:03.668 > OUT ID: 88, CMD: 13
+19:39:03.673 > [LORA] Način samo ACK - brez poskusov.
+19:39:03.822 > [LORA] Paket uspesno poslan.
+19:39:03.822 > [LORA] Preklop v RX po TX uspesen.
+19:39:03.825 > -------------------------
+19:39:03.825 > 
+19:39:04.229 > [LORA RX] ID:88 CMD:110 RSSI:0 SNR:10.0
+19:39:04.229 > In ID: 88, CMD: 110
+19:39:04.229 > CRC OK.
+19:39:04.234 > Prejeti podatki iz INA3221 senzorja.
+19:39:04.234 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:39:04.244 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:39:04.295 > Monday, December 29 2025 19:39:04
+19:39:04.295 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:39:04.300 > --------------------
+19:39:14.650 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:39:14.650 > [FB_RETRY] Ponovni poskus...
+19:39:14.650 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:39:14.698 > Monday, December 29 2025 19:39:15
+19:39:14.699 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:39:24.671 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:39:24.671 > [FB_RETRY] Ponovni poskus...
+19:39:24.671 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:39:24.728 > Monday, December 29 2025 19:39:25
+19:39:24.728 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:39:27.033 > [STREAM] event: keep-alive
+19:39:34.690 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:39:34.691 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:39:34.697 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:39:34.729 > [SENSOR_QUEUE] Ponovni poskus...
+19:39:34.729 > [SENSOR_QUEUE] Izvajam: INA (poskus 2/3)
+19:39:34.734 > [Lora] Preostala velikost sklada: 764 bajtov
+19:39:34.734 > OUT ID: 89, CMD: 13
+19:39:34.740 > [LORA] Način samo ACK - brez poskusov.
+19:39:34.889 > [LORA] Paket uspesno poslan.
+19:39:34.889 > [LORA] Preklop v RX po TX uspesen.
+19:39:34.891 > -------------------------
+19:39:34.891 > 
+19:39:35.294 > [LORA RX] ID:89 CMD:110 RSSI:0 SNR:9.5
+19:39:35.294 > In ID: 89, CMD: 110
+19:39:35.294 > CRC OK.
+19:39:35.299 > Prejeti podatki iz INA3221 senzorja.
+19:39:35.299 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:39:35.309 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+19:39:35.360 > Monday, December 29 2025 19:39:35
+19:39:35.360 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:39:35.365 > --------------------
+19:39:45.713 > [FB_RETRY] TIMEOUT! Poskus 1/3
+19:39:45.713 > [FB_RETRY] Ponovni poskus...
+19:39:45.713 > [F_UPDATE_INA] Sending INA data (poskus 2/3)...
+19:39:45.771 > Monday, December 29 2025 19:39:46
+19:39:45.771 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:39:55.734 > [FB_RETRY] TIMEOUT! Poskus 2/3
+19:39:55.734 > [FB_RETRY] Ponovni poskus...
+19:39:55.734 > [F_UPDATE_INA] Sending INA data (poskus 3/3)...
+19:39:55.785 > Monday, December 29 2025 19:39:56
+19:39:55.785 > [F_RESPONSE] Debug task: updateINA3221Task, msg: Connecting to server...
+19:39:57.140 > [STREAM] event: keep-alive
+19:40:05.753 > [FB_RETRY] TIMEOUT! Poskus 3/3
+19:40:05.753 > [FB_RETRY] Maksimalno število poskusov doseženo. NEUSPEH!
+19:40:05.759 > [SENSOR_QUEUE] Firebase NAPAKA.
+19:40:05.786 > [SENSOR_QUEUE] NAPAKA: Preseženo število poskusov!
+19:40:05.885 > [SENSOR_QUEUE] Operacija NEUSPEŠNA.
+19:40:26.938 > [STREAM] event: keep-alive
+19:40:56.942 > [STREAM] event: keep-alive
+19:40:59.365 > [SENSORS] Periodično branje senzorjev.
+19:40:59.366 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+19:40:59.372 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+19:40:59.417 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+19:40:59.418 > [Lora] Preostala velikost sklada: 764 bajtov
+19:40:59.424 > OUT ID: 90, CMD: 5
+19:40:59.424 > [LORA] Način samo ACK - brez poskusov.
+19:40:59.577 > [LORA] Paket uspesno poslan.
+19:40:59.578 > [LORA] Preklop v RX po TX uspesen.
+19:40:59.581 > -------------------------
+19:40:59.581 > 
+19:40:59.983 > [LORA RX] ID:90 CMD:104 RSSI:0 SNR:9.2
+19:40:59.983 > In ID: 90, CMD: 104
+19:40:59.983 > CRC OK.
+19:40:59.989 > Prejeti podatki senzorjev:
+19:40:59.989 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+19:40:59.994 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:41:00.040 > Monday, December 29 2025 19:41:00
+19:41:00.040 > [F_RESPONSE] Debug task: updateSensorTask, msg: Connecting to server...
+19:41:00.046 > --------------------
+19:41:14.446 > ets Jun  8 2016 00:22:57
+19:41:14.446 > 
+19:41:14.446 > rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+19:41:14.452 > configsip: 188777542, SPIWP:0xee
+19:41:14.452 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+19:41:14.463 > mode:DIO, clock div:2
+19:41:14.463 > load:0x3fff0030,len:1184
+19:41:14.463 > load:0x40078000,len:13232
+19:41:14.565 > load:0x40080400,len:3028
+19:41:14.565 > entry 0x400805e4
+19:41:15.320 > Vrstica 2: Povezujem WiFi...
+19:41:15.917 > .Vrstica 2: WiFi povezan!
+19:41:15.955 > 
+19:41:15.955 > WiFi povezan
+19:41:15.955 > IP naslov: 192.168.64.105
+19:41:15.986 > Vrstica 3: Sync cas...
+19:41:16.020 > Cakam na NTP sinhronizacijo... 
+19:41:18.337 > NTP sinhronizacija uspesna!
+19:41:18.371 > Vrstica 3: NTP OK
+19:41:18.371 > Monday, December 29 2025 19:41:19
+19:41:18.371 > Trenutni čas: 1767033679
+19:41:18.401 > Vrstica 1: Master LoRa
+19:41:18.434 > Vrstica 2: Setup board...
+19:41:18.967 > Vrstica 3: WiFi: 1765845184
+19:41:19.398 > Vrstica 3: Init Lora...
+19:41:19.453 > Vrstica 2: [LORA] Ready.
+19:41:19.453 > [LORA] Init uspesen. Cakam na sporocila...
+19:41:19.886 > Vrstica 3: Init Firebase...
+19:41:19.886 > [F_RESPONSE]Event task: 🔐 authTask, msg: authenticating, code: 7
+19:41:19.892 > Monday, December 29 2025 19:41:20
+19:41:19.897 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Connecting to server...
+19:41:19.902 > [F_RESPONSE]Event task: 🔐 authTask, msg: auth request sent, code: 8
+19:41:19.932 > Vrstica 3: Init Firebase...OK
+19:41:20.332 > [SENSOR_QUEUE] Inicializirana.
+19:41:20.363 > Vrstica 3: Init done.
+19:41:20.396 > Vrstica 2: Setup board...OK
+19:41:20.431 > Vrstica 4: WAITING FOR DATA
+19:41:20.432 > Setup končan.
+19:41:20.432 > Monday, December 29 2025 19:41:21
+19:41:20.436 > Trenutni čas: 1767033681
+19:41:22.977 > [F_RESPONSE]Event task: 🔐 authTask, msg: auth response received, code: 9
+19:41:22.983 > Monday, December 29 2025 19:41:23
+19:41:22.983 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Terminating the server connection...
+19:41:22.994 > [F_RESPONSE]Event task: 🔐 authTask, msg: ready, code: 10
+19:41:22.994 > [F_AUTH] Avtentikacija uspešna ob:
+19:41:22.999 > Monday, December 29 2025 19:41:23
+19:41:23.032 > Vrstica 3: Init Firebase...OK
+19:41:23.067 > Vrstica 2: Link Firebase...
+19:41:23.067 > [F_CONNECT] Free Heap: 205724
+19:41:24.252 > Vrstica 2: Link Firebase...OK
+19:41:24.288 > Vrstica 5: [INIT] Reading Interval...
+19:41:24.288 > [F_GET_INTERVAL] Reading interval (poskus 1/3)...
+19:41:25.605 > Monday, December 29 2025 19:41:26
+19:41:25.605 > [F_RESPONSE] Debug task: getChartIntervalTask, msg: Connecting to server...
+19:41:25.611 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/charts/Interval
+19:41:25.622 > [F_RESPONSE] Sensor read interval set to: 4 minutes ✅
+19:41:25.622 > [INIT] Uspeh pri branju intervala.
+19:41:25.627 > --- ZACENJAM INICIALIZACIJO RELE MODULA ---
+19:41:25.662 > Vrstica 5: [INIT] Starting...
+19:41:25.662 > [INIT] Korak 1: Posiljam cas...
+19:41:25.696 > Vrstica 5: [INIT] UTC time
+19:41:25.696 > Pripravljam paket za sinhronizacijo casa (CMD_SET_TIME)...
+19:41:25.701 >   Čas od polnoči: 70886 sekund
+19:41:25.701 >   Posiljam timestamp: 1767033686
+19:41:25.707 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:25.712 > OUT ID: 0, CMD: 1
+19:41:25.712 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:25.866 > [LORA] Paket uspesno poslan.
+19:41:25.866 > [LORA] Preklop v RX po TX uspesen.
+19:41:25.870 > -------------------------
+19:41:25.870 > 
+19:41:26.262 > [LORA RX] ID:0 CMD:103 RSSI:0 SNR:9.8
+19:41:26.262 > In ID: 0, CMD: 103
+19:41:26.262 > CRC OK.
+19:41:26.268 > Prejet odgovor: 70886
+19:41:26.268 > --------------------
+19:41:26.268 > [INIT] Uspeh pri čakanju na 'odgovor za čas'.
+19:41:26.273 > [INIT] Korak 3: Posiljam zahtevo za senzorje...
+19:41:26.308 > Vrstica 5: [INIT] Sensors
+19:41:26.308 > Pripravljam paket za branje senzorjev (CMD_GET_SENSORS)...
+19:41:26.314 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:26.319 > OUT ID: 1, CMD: 5
+19:41:26.319 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:26.468 > [LORA] Paket uspesno poslan.
+19:41:26.469 > [LORA] Preklop v RX po TX uspesen.
+19:41:26.471 > -------------------------
+19:41:26.471 > 
+19:41:26.875 > [LORA RX] ID:1 CMD:104 RSSI:0 SNR:9.8
+19:41:26.875 > In ID: 1, CMD: 104
+19:41:26.875 > CRC OK.
+19:41:26.879 > Prejeti podatki senzorjev:
+19:41:26.879 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+19:41:26.887 > --------------------
+19:41:26.893 > [INIT] Uspeh pri čakanju na 'odgovor za senzorje'.
+19:41:26.893 > [INIT] Posiljam zahtevo za urnik kanala 1...
+19:41:26.928 > Vrstica 5: [INIT] Urnik K1
+19:41:26.928 > Branje urnika za kanal 1 (CMD_GET_URNIK)...
+19:41:26.934 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:26.934 > OUT ID: 2, CMD: 3
+19:41:26.939 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:26.954 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767033687
+19:41:26.960 > [F_RESPONSE] Sensor data uploaded ✅
+19:41:27.088 > [LORA] Paket uspesno poslan.
+19:41:27.088 > [LORA] Preklop v RX po TX uspesen.
+19:41:27.091 > -------------------------
+19:41:27.091 > 
+19:41:27.471 > [LORA RX] ID:2 CMD:102 RSSI:0 SNR:10.0
+19:41:27.471 > In ID: 2, CMD: 102
+19:41:27.471 > CRC OK.
+19:41:27.477 > [INIT] Prejet urnik za kanal 1: 20:15 - 22:00 (Start sec=72900, End sec=79200)
+19:41:27.482 > --------------------
+19:41:27.482 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+19:41:27.488 > [INIT] Posiljam zahtevo za urnik kanala 2...
+19:41:27.518 > Vrstica 5: [INIT] Urnik K2
+19:41:27.518 > Branje urnika za kanal 2 (CMD_GET_URNIK)...
+19:41:27.524 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:27.524 > OUT ID: 3, CMD: 3
+19:41:27.529 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:27.678 > [LORA] Paket uspesno poslan.
+19:41:27.678 > [LORA] Preklop v RX po TX uspesen.
+19:41:27.681 > -------------------------
+19:41:27.681 > 
+19:41:28.063 > [LORA RX] ID:3 CMD:102 RSSI:0 SNR:9.8
+19:41:28.063 > In ID: 3, CMD: 102
+19:41:28.063 > CRC OK.
+19:41:28.068 > [INIT] Prejet urnik za kanal 2: 03:50 - 22:00 (Start sec=13800, End sec=79200)
+19:41:28.073 > --------------------
+19:41:29.220 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+19:41:29.221 > [INIT] Posiljam zahtevo za urnik kanala 3...
+19:41:29.255 > Vrstica 5: [INIT] Urnik K3
+19:41:29.255 > Branje urnika za kanal 3 (CMD_GET_URNIK)...
+19:41:29.260 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:29.260 > OUT ID: 4, CMD: 3
+19:41:29.266 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:29.415 > [LORA] Paket uspesno poslan.
+19:41:29.415 > [LORA] Preklop v RX po TX uspesen.
+19:41:29.418 > -------------------------
+19:41:29.418 > 
+19:41:29.776 > [LORA RX] ID:4 CMD:102 RSSI:0 SNR:9.8
+19:41:29.816 > In ID: 4, CMD: 102
+19:41:29.816 > CRC OK.
+19:41:29.816 > [INIT] Prejet urnik za kanal 3: 06:00 - 11:05 (Start sec=21600, End sec=39900)
+19:41:29.822 > --------------------
+19:41:29.827 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+19:41:29.827 > [INIT] Posiljam zahtevo za urnik kanala 4...
+19:41:29.861 > Vrstica 5: [INIT] Urnik K4
+19:41:29.862 > Branje urnika za kanal 4 (CMD_GET_URNIK)...
+19:41:29.867 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:29.867 > OUT ID: 5, CMD: 3
+19:41:29.873 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:30.021 > [LORA] Paket uspesno poslan.
+19:41:30.021 > [LORA] Preklop v RX po TX uspesen.
+19:41:30.025 > -------------------------
+19:41:30.025 > 
+19:41:30.419 > [LORA RX] ID:5 CMD:102 RSSI:0 SNR:9.5
+19:41:30.419 > In ID: 5, CMD: 102
+19:41:30.419 > CRC OK.
+19:41:30.425 > [INIT] Prejet urnik za kanal 4: 04:53 - 16:45 (Start sec=17580, End sec=60300)
+19:41:30.430 > --------------------
+19:41:30.430 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+19:41:30.436 > [INIT] Posiljam zahtevo za urnik kanala 5...
+19:41:30.464 > Vrstica 5: [INIT] Urnik K5
+19:41:30.465 > Branje urnika za kanal 5 (CMD_GET_URNIK)...
+19:41:30.470 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:30.470 > OUT ID: 6, CMD: 3
+19:41:30.475 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:30.624 > [LORA] Paket uspesno poslan.
+19:41:30.625 > [LORA] Preklop v RX po TX uspesen.
+19:41:30.628 > -------------------------
+19:41:30.628 > 
+19:41:31.006 > [LORA RX] ID:6 CMD:102 RSSI:0 SNR:9.8
+19:41:31.068 > In ID: 6, CMD: 102
+19:41:31.069 > CRC OK.
+19:41:31.069 > [INIT] Prejet urnik za kanal 5: 06:56 - 22:15 (Start sec=24960, End sec=80100)
+19:41:31.074 > --------------------
+19:41:31.080 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+19:41:31.080 > [INIT] Posiljam zahtevo za urnik kanala 6...
+19:41:31.114 > Vrstica 5: [INIT] Urnik K6
+19:41:31.114 > Branje urnika za kanal 6 (CMD_GET_URNIK)...
+19:41:31.119 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:31.119 > OUT ID: 7, CMD: 3
+19:41:31.125 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:31.274 > [LORA] Paket uspesno poslan.
+19:41:31.274 > [LORA] Preklop v RX po TX uspesen.
+19:41:31.277 > -------------------------
+19:41:31.277 > 
+19:41:31.663 > [LORA RX] ID:7 CMD:102 RSSI:0 SNR:10.0
+19:41:31.663 > In ID: 7, CMD: 102
+19:41:31.663 > CRC OK.
+19:41:31.668 > [INIT] Prejet urnik za kanal 6: 04:55 - 15:05 (Start sec=17700, End sec=54300)
+19:41:31.673 > --------------------
+19:41:31.673 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+19:41:31.679 > [INIT] Posiljam zahtevo za urnik kanala 7...
+19:41:31.708 > Vrstica 5: [INIT] Urnik K7
+19:41:31.708 > Branje urnika za kanal 7 (CMD_GET_URNIK)...
+19:41:31.714 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:31.714 > OUT ID: 8, CMD: 3
+19:41:31.719 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:31.868 > [LORA] Paket uspesno poslan.
+19:41:31.868 > [LORA] Preklop v RX po TX uspesen.
+19:41:31.871 > -------------------------
+19:41:31.871 > 
+19:41:32.220 > [LORA RX] ID:8 CMD:102 RSSI:0 SNR:9.5
+19:41:32.221 > In ID: 8, CMD: 102
+19:41:32.221 > CRC OK.
+19:41:32.226 > [INIT] Prejet urnik za kanal 7: 09:35 - 10:00 (Start sec=34500, End sec=36000)
+19:41:32.231 > --------------------
+19:41:32.231 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+19:41:32.237 > [INIT] Posiljam zahtevo za urnik kanala 8...
+19:41:32.267 > Vrstica 5: [INIT] Urnik K8
+19:41:32.267 > Branje urnika za kanal 8 (CMD_GET_URNIK)...
+19:41:32.272 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:32.272 > OUT ID: 9, CMD: 3
+19:41:32.278 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:32.427 > [LORA] Paket uspesno poslan.
+19:41:32.427 > [LORA] Preklop v RX po TX uspesen.
+19:41:32.430 > -------------------------
+19:41:32.430 > 
+19:41:32.810 > [LORA RX] ID:9 CMD:102 RSSI:0 SNR:9.2
+19:41:32.810 > In ID: 9, CMD: 102
+19:41:32.810 > CRC OK.
+19:41:32.816 > [INIT] Prejet urnik za kanal 8: 05:30 - 07:30 (Start sec=19800, End sec=27000)
+19:41:32.820 > --------------------
+19:41:32.869 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+19:41:32.869 > [INIT] Vsi urniki uspesno prebrani.
+19:41:32.875 > [INIT] Branje urnika iz Firebase za kanal 1...
+19:41:32.903 > Vrstica 5: [INIT] Branje K1
+19:41:32.903 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+19:41:33.054 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal1
+19:41:33.059 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 0, Prejet kanal: 0
+19:41:33.064 > [F_RESPONSE] Prejeta oba dela za kanal 0. Signaliziram uspeh ✅
+19:41:33.070 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:33.074 > [INIT] Branje urnika iz Firebase za kanal 2...
+19:41:33.109 > Vrstica 5: [INIT] Branje K2
+19:41:33.109 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+19:41:33.174 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal2
+19:41:33.179 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 1, Prejet kanal: 1
+19:41:33.185 > [F_RESPONSE] Prejeta oba dela za kanal 1. Signaliziram uspeh ✅
+19:41:33.191 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:33.195 > [INIT] Branje urnika iz Firebase za kanal 3...
+19:41:33.229 > Vrstica 5: [INIT] Branje K3
+19:41:33.229 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+19:41:33.291 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal3
+19:41:33.297 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 2, Prejet kanal: 2
+19:41:33.302 > [F_RESPONSE] Prejeta oba dela za kanal 2. Signaliziram uspeh ✅
+19:41:33.308 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:33.313 > [INIT] Branje urnika iz Firebase za kanal 4...
+19:41:33.347 > Vrstica 5: [INIT] Branje K4
+19:41:33.347 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+19:41:33.410 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal4
+19:41:33.416 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 3, Prejet kanal: 3
+19:41:33.421 > [F_RESPONSE] Prejeta oba dela za kanal 3. Signaliziram uspeh ✅
+19:41:33.427 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:33.432 > [INIT] Branje urnika iz Firebase za kanal 5...
+19:41:33.466 > Vrstica 5: [INIT] Branje K5
+19:41:33.466 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+19:41:33.531 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal5
+19:41:33.536 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 4, Prejet kanal: 4
+19:41:33.542 > [F_RESPONSE] Prejeta oba dela za kanal 4. Signaliziram uspeh ✅
+19:41:33.547 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:33.552 > [INIT] Branje urnika iz Firebase za kanal 6...
+19:41:33.586 > Vrstica 5: [INIT] Branje K6
+19:41:33.586 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+19:41:33.654 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal6
+19:41:33.659 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 5, Prejet kanal: 5
+19:41:33.665 > [F_RESPONSE] Prejeta oba dela za kanal 5. Signaliziram uspeh ✅
+19:41:33.670 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:33.675 > [INIT] Branje urnika iz Firebase za kanal 7...
+19:41:33.709 > Vrstica 5: [INIT] Branje K7
+19:41:33.709 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+19:41:33.774 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal7
+19:41:33.779 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 6, Prejet kanal: 6
+19:41:33.785 > [F_RESPONSE] Prejeta oba dela za kanal 6. Signaliziram uspeh ✅
+19:41:33.791 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:33.796 > [INIT] Branje urnika iz Firebase za kanal 8...
+19:41:33.830 > Vrstica 5: [INIT] Branje K8
+19:41:33.830 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+19:41:33.894 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal8
+19:41:33.900 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 7, Prejet kanal: 7
+19:41:33.905 > [F_RESPONSE] Prejeta oba dela za kanal 7. Signaliziram uspeh ✅
+19:41:33.911 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:33.916 > [INIT] Vsi urniki iz Firebase uspesno prebrani.
+19:41:33.916 > [INIT] Urnik za kanal 1 je ze usklajen.
+19:41:33.922 > [INIT] Urnik za kanal 2 je ze usklajen.
+19:41:33.927 > [INIT] Urnik za kanal 3 je ze usklajen.
+19:41:33.927 > [INIT] Urnik za kanal 4 je ze usklajen.
+19:41:33.933 > [INIT] Urnik za kanal 5 je ze usklajen.
+19:41:33.933 > [INIT] Urnik za kanal 6 je ze usklajen.
+19:41:33.939 > [INIT] Urnik za kanal 7 je ze usklajen.
+19:41:33.944 > [INIT] Urnik za kanal 8 je ze usklajen.
+19:41:33.944 > [INIT] Korak 2: Posiljam zahtevo za status relejev...
+19:41:33.983 > Vrstica 5: [INIT] Status
+19:41:33.983 > Preverjanje stanja relejev (CMD_GET_STATUS)...
+19:41:33.989 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:33.989 > OUT ID: 10, CMD: 2
+19:41:33.994 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:34.144 > [LORA] Paket uspesno poslan.
+19:41:34.144 > [LORA] Preklop v RX po TX uspesen.
+19:41:34.147 > -------------------------
+19:41:34.147 > 
+19:41:34.569 > [LORA RX] ID:10 CMD:101 RSSI:0 SNR:9.0
+19:41:34.569 > In ID: 10, CMD: 101
+19:41:34.569 > CRC OK.
+19:41:34.574 > Prejeto stanje relejev:
+19:41:34.574 >   Rele 1: OFF
+19:41:34.574 >   Rele 2: ON
+19:41:34.574 >   Rele 3: OFF
+19:41:34.580 >   Rele 4: OFF
+19:41:34.580 >   Rele 5: ON
+19:41:34.580 >   Rele 6: OFF
+19:41:34.580 >   Rele 7: OFF
+19:41:34.580 >   Rele 8: OFF
+19:41:34.585 > --------------------
+19:41:34.585 > [INIT] Uspeh pri čakanju na 'odgovor za status'.
+19:41:34.591 > [INIT] Posodabljanje stanja v Firebase za kanal 1...
+19:41:34.625 > Vrstica 5: [INIT] Posodabljanje K1
+19:41:34.625 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+19:41:34.698 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal1/state
+19:41:34.703 > [F_RESPONSE] State data uploaded ✅
+19:41:34.703 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:34.708 > [INIT] Posodabljanje stanja v Firebase za kanal 2...
+19:41:34.742 > Vrstica 5: [INIT] Posodabljanje K2
+19:41:34.742 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+19:41:34.807 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal2/state
+19:41:34.813 > [F_RESPONSE] State data uploaded ✅
+19:41:34.813 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:34.819 > [INIT] Posodabljanje stanja v Firebase za kanal 3...
+19:41:34.853 > Vrstica 5: [INIT] Posodabljanje K3
+19:41:34.853 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+19:41:34.918 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal3/state
+19:41:34.924 > [F_RESPONSE] State data uploaded ✅
+19:41:34.924 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:34.930 > [INIT] Posodabljanje stanja v Firebase za kanal 4...
+19:41:34.963 > Vrstica 5: [INIT] Posodabljanje K4
+19:41:34.964 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+19:41:35.040 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal4/state
+19:41:35.045 > [F_RESPONSE] State data uploaded ✅
+19:41:35.045 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:35.050 > [INIT] Posodabljanje stanja v Firebase za kanal 5...
+19:41:35.084 > Vrstica 5: [INIT] Posodabljanje K5
+19:41:35.084 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+19:41:35.150 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal5/state
+19:41:35.156 > [F_RESPONSE] State data uploaded ✅
+19:41:35.156 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:35.161 > [INIT] Posodabljanje stanja v Firebase za kanal 6...
+19:41:35.195 > Vrstica 5: [INIT] Posodabljanje K6
+19:41:35.195 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+19:41:35.262 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal6/state
+19:41:35.267 > [F_RESPONSE] State data uploaded ✅
+19:41:35.267 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:35.273 > [INIT] Posodabljanje stanja v Firebase za kanal 7...
+19:41:35.310 > Vrstica 5: [INIT] Posodabljanje K7
+19:41:35.310 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+19:41:35.369 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal7/state
+19:41:35.374 > [F_RESPONSE] State data uploaded ✅
+19:41:35.374 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:35.389 > [INIT] Posodabljanje stanja v Firebase za kanal 8...
+19:41:35.414 > Vrstica 5: [INIT] Posodabljanje K8
+19:41:35.415 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+19:41:35.480 > [F_RESPONSE] String path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal8/state
+19:41:35.486 > [F_RESPONSE] State data uploaded ✅
+19:41:35.486 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+19:41:35.491 > [INIT] Vsi statusi kanalov iz Firebase uspesno posodobljeni.
+19:41:35.497 > [INIT] Obvestilo Rele modulu, da je inicializacija končana...
+19:41:35.535 > Vrstica 5: [INIT] Finalizing...
+19:41:35.535 > [Lora] Preostala velikost sklada: 2032 bajtov
+19:41:35.541 > OUT ID: 11, CMD: 12
+19:41:35.541 > [LORA] Način inicializacije - brez splošnih poskusov.
+19:41:35.695 > [LORA] Paket uspesno poslan.
+19:41:35.695 > [LORA] Preklop v RX po TX uspesen.
+19:41:35.698 > -------------------------
+19:41:35.698 > 
+19:41:36.089 > [LORA RX] ID:11 CMD:107 RSSI:0 SNR:9.5
+19:41:36.089 > In ID: 11, CMD: 107
+19:41:36.089 > CRC OK.
+19:41:36.094 > Rele modul je potrdil, da je inicializacija končana.
+19:41:36.094 > --------------------
+19:41:36.099 > [INIT] Uspeh pri čakanju na 'odgovor za init done'.
+19:41:36.104 > [INIT] Inicializacija uspesno zakljucena.
+19:41:36.131 > Vrstica 5: [INIT] Done

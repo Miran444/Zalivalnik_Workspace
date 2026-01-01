@@ -43,7 +43,7 @@
 // --- GLOBALNE SPREMENLJIVKE ---
 
 // Čakalna vrsta za ukaze za rele modul
-bool firebaseUpdatePending = false;  // Ali imamo čakajočo posodobitev iz Firebase?
+bool firebaseUpdatePending_OK = false;  // Ali imamo čakajočo posodobitev iz Firebase?
 ChannelUpdateData pendingUpdateData; // Podatki, ki čakajo na pošiljanje
 volatile bool newChannelDataAvailable;
 ChannelUpdateData channelUpdate;
@@ -281,6 +281,17 @@ void formatSecondsToTime(char *buffer, size_t bufferSize, int seconds)
 void set_Interval(uint8_t minutes)
 {
   Interval_mS = minutes * 60UL * 1000UL; // Pretvorba minut v milisekunde
+}
+
+// ----------------------------------------------------------------------------
+// Funkcija za pretvorbo minut intervala v milisekunde
+unsigned long get_Interval()
+{
+  if (Interval_mS == 0)
+  {
+    return DEFAULT_SENSOR_READ_INTERVAL_MINUTES * 60UL * 1000UL;
+  }
+  return Interval_mS;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1269,7 +1280,7 @@ void setup()
 void loop()
 {
   // Ali imamo čakajočo posodobitev IN ali je LoRa sedaj prosta?
-  if (firebaseUpdatePending && !lora_is_busy())
+  if (firebaseUpdatePending_OK)
   {
     Serial.println("[MAIN] Pošiljam čakajočo posodobitev iz Firebase...");
 
@@ -1280,7 +1291,7 @@ void loop()
         pendingUpdateData.end_sec);
 
     // Počistimo zastavico, da ne pošljemo ukaza večkrat
-    firebaseUpdatePending = false;
+    firebaseUpdatePending_OK = false;
   }
 
   //-------------------------------------------------------------------------------------
@@ -1292,9 +1303,7 @@ void loop()
   }
 
   //-------------------------------------------------------------------------------------
-  // Firebase obdelava
-  app.loop(); // To maintain the authentication and async tasks
-
+  // Firebase je pripravljen
   if (app.ready())
   {
     if (!taskComplete) // samo na začetku
@@ -1318,67 +1327,74 @@ void loop()
 
       // Procesiranje senzorske čakalne vrste
       static unsigned long lastSensorCheck = 0;
-      if (millis() - lastSensorCheck > 100) { // 10x na sekundo
-          lastSensorCheck = millis();
-          Sensor_ProcessQueue();
+      if (millis() - lastSensorCheck > 100)
+      { // 10x na sekundo
+        lastSensorCheck = millis();
+        Sensor_ProcessQueue();
       }
-
 
       // NOVO: Sinhronizacija na cele minute
       static bool firstReadDone = false;
-      
-      if (!firstReadDone) {
-          // PRVI KLIC: Počakaj na prehod minute (sekunda == 0)
-          time_t now;
-          struct tm timeinfo;
-          time(&now);
-          localtime_r(&now, &timeinfo);
-          
-          if (timeinfo.tm_sec == 0 && init_done_flag && Interval_mS > 0) {
-              // Točno ob prehodu minute (XX:XX:00)
-              Serial.println("[SENSORS] Prvi sinhroniziran klic ob prehodu minute.");
-              
-              lastSensorRead = millis();
-              firstReadDone = true;
-              
-              // Dodaj operacije v čakalno vrsto
-              Sensor_QueueOperation(SensorTaskType::READ_SENSORS);
-              Sensor_QueueOperation(SensorTaskType::READ_INA);
-          }
-      } else {
-          // NASLEDNJI KLICI: Normalen interval
-          if (init_done_flag && Interval_mS > 0 && (millis() - lastSensorRead >= Interval_mS)) {
-              lastSensorRead = millis();
-              
-              Serial.println("[SENSORS] Periodično branje senzorjev.");
-              
-              // Dodaj operacije v čakalno vrsto
-              Sensor_QueueOperation(SensorTaskType::READ_SENSORS);
-              Sensor_QueueOperation(SensorTaskType::READ_INA);
-          }
+
+      if (!firstReadDone)
+      {
+        // PRVI KLIC: Počakaj na prehod minute (sekunda == 0)
+        time_t now;
+        struct tm timeinfo;
+        time(&now);
+        localtime_r(&now, &timeinfo);
+
+        if (timeinfo.tm_sec == 0 && init_done_flag && Interval_mS > 0)
+        {
+          // Točno ob prehodu minute (XX:XX:00)
+          Serial.println("[SENSORS] Prvi sinhroniziran klic ob prehodu minute.");
+
+          lastSensorRead = millis();
+          firstReadDone = true;
+
+          // Dodaj operacije v čakalno vrsto
+          Sensor_QueueOperation(SensorTaskType::READ_SENSORS);
+          Sensor_QueueOperation(SensorTaskType::READ_INA);
+        }
+      }
+      else
+      {
+        // NASLEDNJI KLICI: Normalen interval
+        if (init_done_flag && Interval_mS > 0 && (millis() - lastSensorRead >= Interval_mS))
+        {
+          lastSensorRead = millis();
+
+          Serial.println("[SENSORS] Periodično branje senzorjev.");
+
+          // Dodaj operacije v čakalno vrsto
+          Sensor_QueueOperation(SensorTaskType::READ_SENSORS);
+          Sensor_QueueOperation(SensorTaskType::READ_INA);
+        }
       }
 
       // NOVO: Procesiranje Firebase čakalne vrste v glavnem loop-u
       // To pokličite periodično (na primer vsakih 100-500ms)
       // NOVO: Preverjanje Firebase retry
-      static unsigned long lastFirebaseCheck = 0;
-      if (millis() - lastFirebaseCheck > 500) // 2x na sekundo
-      {
-        lastFirebaseCheck = millis();
-        Firebase_CheckAndRetry();
-      }
+
+      // preneseno na Firebase_Task
+      // static unsigned long lastFirebaseCheck = 0;
+      // if (millis() - lastFirebaseCheck > 500) // 2x na sekundo
+      // {
+      //   lastFirebaseCheck = millis();
+      //   // Firebase_CheckAndRetry();
+      // }
       // --- konec periodičnih nalog ---
 
       //--------------------------------------------------------------------------------------------------
-      // Preveri, ali so na voljo novi podatki iz Firebase streama
-      if (newChannelDataAvailable)
-      {
-        // Tukaj pokličite funkcijo za pošiljanje podatkov Rele modulu
-        Firebase_handleStreamUpdate(channelUpdate.kanalIndex, channelUpdate.start_sec, channelUpdate.end_sec);
+      // // Preveri, ali so na voljo novi podatki iz Firebase streama
+      // if (newChannelDataAvailable)
+      // {
+      //   // Tukaj pokličite funkcijo za pošiljanje podatkov Rele modulu
+      //   Firebase_handleStreamUpdate(channelUpdate.kanalIndex, channelUpdate.start_sec, channelUpdate.end_sec);
 
-        // Počisti zastavico, da ne obdelamo istih podatkov večkrat
-        newChannelDataAvailable = false;
-      }
+      //   // Počisti zastavico, da ne obdelamo istih podatkov večkrat
+      //   newChannelDataAvailable = false;
+      // }
       //--------------------------------------------------------------------------------------------------
       // Preveri, ali je prišlo do ponovnega zagona Rele modula
       if (reset_occured && !lora_is_busy())

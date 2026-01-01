@@ -14,6 +14,13 @@
 // Authentication
 UserAuth user_auth(FIREBASE_API_KEY, FIREBASE_USER_EMAIL, FIREBASE_USER_PASSWORD);
 
+// FreeRTOS objekti
+SemaphoreHandle_t firebaseSemaphore = NULL;
+TaskHandle_t firebaseTaskHandle = NULL;
+
+// Prototipi funkcij
+void Firebase_Task(void *pvParameters);
+
 // --- SPREMENJENO: Uporaba char nizov namesto String objektov ---
 // Database main path (to be updated in setup with the user UID)
 char databasePath[48];
@@ -27,11 +34,18 @@ bool relayState[8]; // Stanja relejev (za 8 relejev) false = OFF, true = ON
 bool status;        // Spremenljivka za shranjevanje statusa operacij
 bool ssl_avtentikacija = false; // Spremenljivka za shranjevanje stanja SSL avtentikacije
 
+bool firebaseUpdatePending = false;
+
 // DODAJ retry mehanizem:
 static unsigned long lastFirebaseOperationTime = 0;
 static uint8_t firebaseRetryCount = 0;
 const uint8_t MAX_FIREBASE_RETRIES = 3;
 const unsigned long FIREBASE_RESPONSE_TIMEOUT = 10000; // 10 sekund
+
+// DODAJ globalne spremenljivke za stream monitoring
+static unsigned long lastFirebaseActivityTime = 0;
+const unsigned long FIREBASE_RECONNECT_INTERVAL = 180000; //  minute
+static bool FirebaseNeedsReconnect = false;
 
 // Struktura za shranjevanje zadnje operacije (za retry)
 struct LastFirebaseOperation {
@@ -64,17 +78,21 @@ void Init_Firebase()
   // Configure SSL client
   ssl_client.setInsecure();
   ssl_client.setTimeout(10000);
-  ssl_client.setHandshakeTimeout(15);
+  ssl_client.setHandshakeTimeout(20);
 
   // Configure stream SSL client
   stream_ssl_client.setInsecure();
-  stream_ssl_client.setTimeout(5000);
-  stream_ssl_client.setHandshakeTimeout(10);
+  stream_ssl_client.setTimeout(15000);
+  stream_ssl_client.setHandshakeTimeout(20);
 
   // Initialize Firebase
   initializeApp(aClient, app, getAuth(user_auth), Firebase_processResponse, "🔐 authTask");
   app.getApp<RealtimeDatabase>(Database);
   Database.url(FIREBASE_DATABASE_URL);
+
+  // Ustvari Firebase task z velikim skladom
+  xTaskCreate(Firebase_Task, "Firebase", 20480, NULL, 1, &firebaseTaskHandle); // 20KB!
+
 
 }
 
@@ -93,9 +111,70 @@ void Firebase_Connect()
 
   Firebase.printf("[F_CONNECT] Free Heap: %d\n", ESP.getFreeHeap());
 
-  streamClient.setSSEFilters("put,patch,cancel");
+  streamClient.setSSEFilters("put,patch,cancel,auth_revoked,keep-alive");
   Database.get(streamClient, databasePath, streamCallback, true /* SSE mode (HTTP Streaming) */, "mainStreamTask");
 
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+// Firebase task - prenesene ponavljajoče se naloge iz main loop-a
+void Firebase_Task(void *pvParameters)
+{
+  for (;;)
+  {
+
+    // Dodaj diagnostiko za task
+    static unsigned long lastStackCheck = 0;
+    if (millis() - lastStackCheck > 30000) { // Vsakih 30 sekund
+      lastStackCheck = millis();
+
+      UBaseType_t firebaseStackLeft = uxTaskGetStackHighWaterMark(firebaseTaskHandle);
+      Serial.printf("[FIREBASE TASK] Stack left: %d\n", firebaseStackLeft);
+
+      if (firebaseStackLeft < 512) { // OPOZORILO!
+          Serial.println("[FIREBASE TASK] ⚠️ STACK CRITICAL!");
+      }
+    }
+
+
+    app.loop();
+    Firebase_CheckStreamHealth();
+
+    if (app.ready())
+    {
+      Firebase_CheckAndRetry();
+      // Sensor_ProcessQueue();
+
+      //--------------------------------------------------------------------------------------------------
+      // Preveri, ali so na voljo novi podatki iz Firebase streama
+      if (newChannelDataAvailable)
+      {
+        // Tukaj pokličite funkcijo za pošiljanje podatkov Rele modulu
+        Firebase_handleStreamUpdate(channelUpdate.kanalIndex, channelUpdate.start_sec, channelUpdate.end_sec);
+
+        if (lora_is_busy())
+        {
+          Firebase.printf("[STREAM] LoRa zasedena. Shranjujem posodobitev za kasneje.\n");
+          firebaseUpdatePending = true;
+        }
+        else
+        {
+          Firebase.printf("[STREAM] LoRa prosta. Pošiljam posodobitev takoj.\n");
+          firebaseUpdatePending_OK = true;
+        }
+        // Počisti zastavico, da ne obdelamo istih podatkov večkrat
+        newChannelDataAvailable = false;
+      }
+
+      if (firebaseUpdatePending && !lora_is_busy())
+      {
+        Firebase.printf("[STREAM] LoRa prosta. Pošiljam posodobitev.\n");
+        firebaseUpdatePending = false;
+        firebaseUpdatePending_OK = true;
+      }
+    }
+    vTaskDelay(100 / portTICK_PERIOD_MS); // 10x na sekundo
+  }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -131,22 +210,38 @@ void streamCallback(AsyncResult &aResult)
   // Exits when no result is available when calling from the loop.
   if (!aResult.isResult()) return;
 
-  if (aResult.isEvent()) Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.eventLog().message().c_str(), aResult.eventLog().code());
-  if (aResult.isDebug()) Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
-  if (aResult.isError()) Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+  if (aResult.isEvent()) Firebase.printf("[F_STREAM] Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.eventLog().message().c_str(), aResult.eventLog().code());
+  if (aResult.isDebug()) Firebase.printf("[F_STREAM] Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
 
+  if (aResult.isError())
+  {
+    Firebase.printf("[STREAM]  ⚠️  Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+
+    // NOVO: TCP connection failed -> označimo za reconnect
+    if (aResult.error().code() == -1 || aResult.error().code() == 401)
+    {
+      Firebase.printf("[STREAM] ⚠️ TCP povezava prekinjena! Načrtujem reconnect...\n");
+      FirebaseNeedsReconnect = true;
+    }
+    return;
+  }
   if (aResult.available())
   {
     RealtimeDatabaseResult &stream = aResult.to<RealtimeDatabaseResult>();
     if (stream.isStream())
     {
-      Serial.println("----------------------------");
+      //Serial.println("----------------------------");
       Firebase.printf("[STREAM] event: %s\n", stream.event().c_str());
+   
+      if (stream.event() == "keep-alive")   // če je event "keep-alive"
+      {
+        lastFirebaseActivityTime = millis();
+      }
 
-      // PRAVILNO: Najprej shrani v String objekt
+      // Najprej shrani v String objekt
       String path_str = stream.dataPath();
       const char* path = path_str.c_str();  // Zdaj je kazalec veljaven
-      Firebase.printf("[STREAM] String path: %s\n", path);
+      // Firebase.printf("[STREAM] String path: %s\n", path);
 
       //-----------------------------------------------------------------------------------------
       // Ali je sprememba znotraj /Kanali?
@@ -248,19 +343,54 @@ void Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec)
       formatSecondsToTime(firebase_kanal[index].end, sizeof(firebase_kanal[index].end), end_sec);
     }
 
-    if (lora_is_busy())
-    {
-      Firebase.printf("[STREAM] LoRa zasedena. Shranjujem posodobitev za kasneje.\n");
-      pendingUpdateData.kanalIndex = index;
-      pendingUpdateData.start_sec = firebase_kanal[index].start_sec;
-      pendingUpdateData.end_sec = firebase_kanal[index].end_sec;
-      firebaseUpdatePending = true;
-    }
-    else
-    {
-      Firebase.printf("[STREAM] LoRa prosta. Pošiljam posodobitev takoj.\n");
-      Rele_updateRelayUrnik(index, firebase_kanal[index].start_sec, firebase_kanal[index].end_sec);
-    }
+    pendingUpdateData.kanalIndex = index;
+    pendingUpdateData.start_sec = firebase_kanal[index].start_sec;
+    pendingUpdateData.end_sec = firebase_kanal[index].end_sec;
+  }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+// NOVA funkcija: Preverjanje in reconnect streama
+void Firebase_CheckStreamHealth()
+{
+  // Če smo v procesu Wi-Fi reconnecta, počakamo
+  if (!WiFi.isConnected() || !ssl_avtentikacija)
+  {
+    return;
+  }
+  static bool connecting = false;
+  static bool reconnectAttempted = false;
+
+  // Preveri, ali je potreben reconnect
+  unsigned long timeSinceLastActivity = millis() - lastFirebaseActivityTime;
+
+  if (FirebaseNeedsReconnect || timeSinceLastActivity > get_Interval() + 1000)  // Interval + 1 sekunda
+  {
+    Firebase.printf("[F_FIREBASE] ⚠️ Firebase reconnect potreben (čas od zadnje aktivnosti: %lu ms)\n", 
+                    timeSinceLastActivity);
+
+    lastFirebaseActivityTime = millis();
+
+    Database.resetApp();  // NOVO: Ponastavi aplikacijo
+    reconnectAttempted = true;
+  }
+
+  if (!connecting && reconnectAttempted)
+  {    
+    Firebase.printf("[STREAM] Firebase init...\n");
+    connecting = true;
+    reconnectAttempted = false;
+    Init_Firebase();
+    return; // Če je že v teku, ne začni znova
+  }
+
+  // Ponovno vzpostavi aplikacijo
+  if (app.ready() && connecting)
+  {
+    Firebase.printf("[STREAM] Firebase connect...\n");
+    Firebase_Connect();
+    FirebaseNeedsReconnect = false;
+    connecting = false;
   }
 }
 
@@ -494,18 +624,18 @@ void Firebase_processResponse(AsyncResult &aResult)
   // DODAJ: Če je timeout ali connection error, signaliziraj neuspeh
   if (aResult.isError())
   {
-    Firebase.printf("Error task: %s, msg: %s, code: %d\n",
+    Firebase.printf("[F_RESPONSE] Error task: %s, msg: %s, code: %d\n",
                     aResult.uid().c_str(),
                     aResult.error().message().c_str(),
                     aResult.error().code());
 
-    // // Signaliziraj neuspeh za senzorske operacije
-    // if (strcmp(aResult.uid().c_str(), "updateSensorTask") == 0 ||
-    //     strcmp(aResult.uid().c_str(), "updateINA3221Task") == 0)
-    // {
-    //   Sensor_OnFirebaseResponse(false);
-    // }
-      // NE signaliziraj neuspeha takoj - naj retry mehanizem poskrbi
+    // NOVO: TCP connection failed -> označimo za reconnect
+    if (aResult.error().code() == -1 || aResult.error().code() == 401)
+    {
+      Firebase.printf("[F_RESPONSE] ⚠️ TCP povezava prekinjena! Načrtujem reconnect...\n");
+      FirebaseNeedsReconnect = true;
+    }
+    return;
 
     firebase_response_received = false;
     return;
@@ -513,7 +643,7 @@ void Firebase_processResponse(AsyncResult &aResult)
 
   if (aResult.isEvent())
   {
-    Firebase.printf("Event task: %s, msg: %s, code: %d\n",
+    Firebase.printf("[F_RESPONSE]Event task: %s, msg: %s, code: %d\n",
                     aResult.uid().c_str(),
                     aResult.appEvent().message().c_str(),
                     aResult.appEvent().code());
@@ -528,8 +658,8 @@ void Firebase_processResponse(AsyncResult &aResult)
       else if (aResult.appEvent().code() == 10) // konec avtentikacije
       {
         ssl_avtentikacija = true; // Ko se zaključi avtentikacija, omogočimo operacije
-        Firebase.printf("[F_AUTH] Avtentikacija uspešna ob:\n");
-        printLocalTime();
+        // Firebase.printf("[F_AUTH] Avtentikacija uspešna ob:\n");
+        // printLocalTime();
       }
     }
   }
@@ -537,8 +667,8 @@ void Firebase_processResponse(AsyncResult &aResult)
   if (aResult.isDebug())
   {
     // pripišemo trenutni čas
-    printLocalTime();
-    Firebase.printf("Debug task: %s, msg: %s\n",
+    // printLocalTime();
+    Firebase.printf("[F_RESPONSE] Debug task: %s, msg: %s\n",
                     aResult.uid().c_str(),
                     aResult.debug().c_str());
   }
@@ -546,6 +676,8 @@ void Firebase_processResponse(AsyncResult &aResult)
   if (aResult.available())
   {
     // Firebase.printf("[F_RESPONSE] task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
+
+    lastFirebaseActivityTime = millis();
 
     const char *path = aResult.path().c_str();
     Firebase.printf("[F_RESPONSE] String path: %s\n", path);

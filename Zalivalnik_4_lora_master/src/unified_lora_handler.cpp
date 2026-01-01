@@ -148,9 +148,9 @@ void lora_initialize(PacketHandlerCallback callback)
   }
 
   // Kreiranje taskov za obdelavo LoRa dogodkov
-  xTaskCreate(lora_dispatch_task, "LoRaDispatch", 8192, NULL, 2, &loraDispatchTaskHandle); // Visoka prioriteta
-  xTaskCreate(lora_rx_task, "LoRaRX", 6144, NULL, 1, &loraRxTaskHandle);
-  xTaskCreate(lora_tx_task, "LoRaTX", 6144, NULL, 1, &loraTxTaskHandle);
+  xTaskCreate(lora_dispatch_task, "LoRaDispatch", 16384, NULL, 2, &loraDispatchTaskHandle); // Visoka prioriteta
+  xTaskCreate(lora_rx_task, "LoRaRX", 12288, NULL, 1, &loraRxTaskHandle);
+  xTaskCreate(lora_tx_task, "LoRaTX", 10240, NULL, 1, &loraTxTaskHandle);
   // --- KONEC NOVO ---
 
   // int state = radio.begin();
@@ -266,6 +266,14 @@ void lora_tx_task(void *pvParameters) {
         // Čakaj na obvestilo iz dispatch taska
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
+        // DODAJ DIAGNOSTIKO
+        UBaseType_t txStackLeft = uxTaskGetStackHighWaterMark(loraTxTaskHandle);
+        Serial.printf("[TX TASK] Stack left: %d\n", txStackLeft);
+
+        if (txStackLeft < 512) { // OPOZORILO!
+            Serial.println("[TX TASK] ⚠️ STACK CRITICAL!");
+        }
+
         radio.finishTransmit(); // Zaključimo oddajanje
         loraIsTransmitting = false; // Ni več v načinu oddajanja
         Serial.println("[LORA] Paket uspesno poslan.");
@@ -293,6 +301,14 @@ void lora_rx_task(void *pvParameters)
   for (;;)
   {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Čakaj na obvestilo
+
+    // DODAJ DIAGNOSTIKO
+    UBaseType_t rxStackLeft = uxTaskGetStackHighWaterMark(loraRxTaskHandle);
+    Serial.printf("[RX TASK] Stack left: %d\n", rxStackLeft);
+
+    if (rxStackLeft < 512) { // OPOZORILO!
+        Serial.println("[RX TASK] ⚠️ STACK CRITICAL!");
+    }
 
     uint8_t rxBuffer[sizeof(LoRaPacket) + 16];
     int len = radio.getPacketLength();

@@ -15,6 +15,7 @@
 void Init_Firebase();
 void Firebase_Connect();
 void Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec);
+void Firebase_CheckStreamHealth();
 void Firebase_readInterval();
 void Firebase_readKanalUrnik(uint8_t kanalIndex);
 void Firebase_Update_Relay_State(int kanal, bool state);
@@ -22,12 +23,14 @@ void Firebase_Update_Sensor_Data(unsigned long timestamp, SensorDataPayload cons
 void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload& data);
 void Firebase_processResponse(AsyncResult &aResult);
 void streamCallback(AsyncResult &aResult);
+void Firebase_CheckAndRetry();
 
-#define FIREBASE_OPERATION_TIMEOUT 20000 // 20 seconds timeout
+#define FIREBASE_OPERATION_TIMEOUT 10000 // 10 seconds timeout
 
 // --- DEKLARACIJA GLOBALNIH SPREMENLJIVK IZ main.cpp ---
 // S tem povemo, da te spremenljivke obstajajo in so definirane drugje.
-extern bool firebaseUpdatePending;
+// extern bool firebaseUpdatePending;
+extern bool firebaseUpdatePending_OK;
 extern ChannelUpdateData pendingUpdateData;
 // Globalna instanca strukture in zastavica
 extern volatile bool newChannelDataAvailable;
@@ -40,6 +43,7 @@ extern int ParseToInt(String payload);  // Funkcija za pretvorbo String v int
 extern void PrikaziStanjeSenzorjevNaSerial(); // Funkcija za prikaz stanja senzorjev na Serial monitorju
 extern void formatSecondsToTime(char* buffer, size_t bufferSize, int seconds); // Funkcija za pretvorbo sekund v "HH:MM" obliko
 extern void set_Interval(uint8_t minutes); // Funkcija za nastavitev intervala v milisekundah
+extern unsigned long get_Interval(); // Funkcija za pridobitev trenutnega intervala v milisekundah
 
 // --- DEKLARACIJA GLOBALNIH SPREMENLJIVK iz main.cpp ---
 extern int get_intValue; // Spremenljivka za shranjevanje prebrane int vrednosti
@@ -67,9 +71,6 @@ extern RealtimeDatabase Database;
 extern AsyncResult databaseResult;
 extern AsyncResult streamResult;               // Za Firebase streaming
 
-// --- NOVA STRUKTURA: Enostavna čakalna vrsta brez dinamične alokacije ---
-#define FIREBASE_QUEUE_SIZE 10
-
 // --- NOVO: Struktura in čakalna vrsta za Firebase naloge ---
 enum class FirebaseTaskType {
     UPDATE_SENSORS,
@@ -91,6 +92,5 @@ struct FirebaseOperation {
     bool pending;  // Ali je operacija aktivna?
 };
 
-void Firebase_CheckAndRetry();
 
 #endif // FIREBASE_Z_H

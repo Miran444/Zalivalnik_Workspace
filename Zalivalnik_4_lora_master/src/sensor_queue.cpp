@@ -118,6 +118,7 @@ void Sensor_ProcessQueue()
       {
         Serial.printf("[SENSOR_QUEUE] LoRa timeout pri poskusu %d/%d\n",
                       op->retry_count, SENSOR_RETRY_MAX);
+        op->retry_count++;              
         op->state = SensorTaskState::RETRY;
       }
       break;
@@ -127,7 +128,7 @@ void Sensor_ProcessQueue()
       break;
 
     case SensorTaskState::RETRY:
-      op->retry_count++;
+      
 
       if (op->retry_count >= SENSOR_RETRY_MAX)
       {
