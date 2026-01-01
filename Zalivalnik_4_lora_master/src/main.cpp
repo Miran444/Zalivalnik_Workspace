@@ -43,7 +43,7 @@
 // --- GLOBALNE SPREMENLJIVKE ---
 
 // Čakalna vrsta za ukaze za rele modul
-bool firebaseUpdatePending_OK = false;  // Ali imamo čakajočo posodobitev iz Firebase?
+bool firebaseUpdatePending = false;  // Ali imamo čakajočo posodobitev iz Firebase?
 ChannelUpdateData pendingUpdateData; // Podatki, ki čakajo na pošiljanje
 volatile bool newChannelDataAvailable;
 ChannelUpdateData channelUpdate;
@@ -335,24 +335,31 @@ void PrikaziStanjeRelejevNaSerial()
 // Funkcija za pripravo in pošiljanje LoRa paketa
 void Lora_prepare_and_send_packet(CommandType cmd, const void *payload_data, size_t payload_size)
 {
-  LoRaPacket packet;
-  packet.syncWord = LORA_SYNC_WORD;
-  packet.messageId = messageCounter++;
-  packet.command = cmd;
-  memset(packet.payload, 0, sizeof(packet.payload));
+  // LoRaPacket packet;
+    // NAMESTO: LoRaPacket packet;
+  LoRaPacket* packet = (LoRaPacket*)malloc(sizeof(LoRaPacket));
+  if (!packet) {
+    Serial.println("[LORA] Ni spomina za paket!");
+    return;
+  }
+  packet->syncWord = LORA_SYNC_WORD;
+  packet->messageId = messageCounter++;
+  packet->command = cmd;
+  memset(packet->payload, 0, sizeof(packet->payload));
   if (payload_data != nullptr && payload_size > 0)
   {
-    memcpy(packet.payload, payload_data, payload_size);
+    memcpy(packet->payload, payload_data, payload_size);
   }
-    // Preveri porabo sklada
-    UBaseType_t stackLeft = uxTaskGetStackHighWaterMark(NULL);
-    Serial.printf("[Lora] Preostala velikost sklada: %d bajtov\n", stackLeft); 
+
+  // Preveri porabo sklada
+  UBaseType_t stackLeft = uxTaskGetStackHighWaterMark(NULL);
+  Serial.printf("[Lora] Preostala velikost sklada: %d bajtov\n", stackLeft); 
 
   char logBuffer[32];
-  snprintf(logBuffer, sizeof(logBuffer), "OUT ID: %d, CMD: %d", packet.messageId, (uint8_t)packet.command);
+  snprintf(logBuffer, sizeof(logBuffer), "OUT ID: %d, CMD: %d", packet->messageId, (uint8_t)packet->command);
   Serial.println(logBuffer);
   // displayLogOnLine(4, logBuffer);
-  packet.crc = calculate_crc((const uint8_t *)&packet, offsetof(LoRaPacket, crc));
+  packet->crc = calculate_crc((const uint8_t *)packet, offsetof(LoRaPacket, crc));
 
   // Če smo v načinu inicializacije ali pošiljamo iz SENSOR_QUEUE preskočimo nastavitev konteksta za ponovni poskus
   if (lora_get_context() != LoRaContext::INITIALIZATION && lora_get_context() != LoRaContext::SENSOR_QUEUE)
@@ -362,7 +369,8 @@ void Lora_prepare_and_send_packet(CommandType cmd, const void *payload_data, siz
   }
 
   // ENOSTAVNO: Samo pošlji - vsa logika je v lora_send_packet!
-  if (!lora_send_packet(packet))
+  // pri napaki pošiljanja resetiraj kontekst
+  if (!lora_send_packet(*packet))
   {
     Serial.println("[MAIN] Napaka pri pošiljanju paketa!");
     lora_set_context(LoRaContext::IDLE); // Reset konteksta
@@ -1279,23 +1287,12 @@ void setup()
 //---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
-  // Ali imamo čakajočo posodobitev IN ali je LoRa sedaj prosta?
-  if (firebaseUpdatePending_OK)
-  {
-    Serial.println("[MAIN] Pošiljam čakajočo posodobitev iz Firebase...");
-
-    // Pošljemo podatke, ki so bili shranjeni v nabiralniku
-    Rele_updateRelayUrnik(
-        pendingUpdateData.kanalIndex,
-        pendingUpdateData.start_sec,
-        pendingUpdateData.end_sec);
-
-    // Počistimo zastavico, da ne pošljemo ukaza večkrat
-    firebaseUpdatePending_OK = false;
-  }
+  // 1. FIREBASE PROCESSING (najprej!)
+  app.loop();
 
   //-------------------------------------------------------------------------------------
-  if (WiFi.status() != WL_CONNECTED) // Preverimo WiFi povezavo
+  // 2. Preverimo WiFi povezavo
+  if (WiFi.status() != WL_CONNECTED)
   {
     Serial.println("WiFi povezava izgubljena! Poskušam ponovno...");
     displayLogOnLine(LINE_RSSI_SNR, "WiFi lost! "); // display ima samo 16 znakov!
@@ -1303,7 +1300,7 @@ void loop()
   }
 
   //-------------------------------------------------------------------------------------
-  // Firebase je pripravljen
+  // 3. Firebase je pripravljen
   if (app.ready())
   {
     if (!taskComplete) // samo na začetku
@@ -1373,47 +1370,62 @@ void loop()
       }
 
       // NOVO: Procesiranje Firebase čakalne vrste v glavnem loop-u
-      // To pokličite periodično (na primer vsakih 100-500ms)
-      // NOVO: Preverjanje Firebase retry
-
-      // preneseno na Firebase_Task
-      // static unsigned long lastFirebaseCheck = 0;
-      // if (millis() - lastFirebaseCheck > 500) // 2x na sekundo
-      // {
-      //   lastFirebaseCheck = millis();
-      //   // Firebase_CheckAndRetry();
-      // }
-      // --- konec periodičnih nalog ---
-
-      //--------------------------------------------------------------------------------------------------
-      // // Preveri, ali so na voljo novi podatki iz Firebase streama
-      // if (newChannelDataAvailable)
-      // {
-      //   // Tukaj pokličite funkcijo za pošiljanje podatkov Rele modulu
-      //   Firebase_handleStreamUpdate(channelUpdate.kanalIndex, channelUpdate.start_sec, channelUpdate.end_sec);
-
-      //   // Počisti zastavico, da ne obdelamo istih podatkov večkrat
-      //   newChannelDataAvailable = false;
-      // }
-      //--------------------------------------------------------------------------------------------------
-      // Preveri, ali je prišlo do ponovnega zagona Rele modula
-      if (reset_occured && !lora_is_busy())
+      static unsigned long lastFirebaseCheck = 0;
+      if (millis() - lastFirebaseCheck > 200) // 5x na sekundo
       {
-        // Zaženemo inicializacijski avtomat znova
-        init_done_flag = false; // Ponastavi zastavico, da inicializacija ni končana
-        Serial.println("[INIT] Ponovna inicializacija zaradi ponastavitve Rele modula...");
-        initState_timeout_start = millis(); // Zaženemo timer za timeout
-        currentInitState = InitState::START;
-        reset_occured = false; // Ponastavi zastavico
+        lastFirebaseCheck = millis();
+
+        // 2. Preveri timeouts in retry
+        Firebase_CheckAndRetry();
+
+        // 3. Stream monitoring
+        Firebase_CheckStreamHealth();
+
+        // Preveri, ali so na voljo novi podatki iz Firebase streama
+        if (newChannelDataAvailable)
+        {
+          // Tukaj pokličite funkcijo za pošiljanje podatkov Rele modulu
+          if (Firebase_handleStreamUpdate(channelUpdate.kanalIndex, channelUpdate.start_sec, channelUpdate.end_sec))
+          {
+            firebaseUpdatePending = true; // čakamo na prosto LoRa
+          }
+          // Počisti zastavico, da ne obdelamo istih podatkov večkrat
+          newChannelDataAvailable = false;
+        }
+
+        // Ko je Lora prosta, pošlji posodobitev prek LoRa
+        if (firebaseUpdatePending && !lora_is_busy())
+        {
+          Firebase.printf("[STREAM] LoRa prosta. Pošiljam posodobitev.\n");
+          // Pošljemo podatke, ki so bili shranjeni v nabiralniku
+          Rele_updateRelayUrnik(
+              pendingUpdateData.kanalIndex,
+              pendingUpdateData.start_sec,
+              pendingUpdateData.end_sec);
+          firebaseUpdatePending = false;
+        }
       }
+      // --- konec periodičnih nalog ---
+    }
+
+    // 4. LoRa inicializacijski avtomatika
+    manageReleInitialization();
+
+    // 5. LoRa obdelava prejetih paketov
+    lora_process_received_packets(); // Namesto vsega v LoRaTask
+
+    //--------------------------------------------------------------------------------------------------
+    // 6. Preveri, ali je prišlo do ponovnega zagona Rele modula
+    if (reset_occured && !lora_is_busy())
+    {
+      // Zaženemo inicializacijski avtomat znova
+      init_done_flag = false; // Ponastavi zastavico, da inicializacija ni končana
+      Serial.println("[INIT] Ponovna inicializacija zaradi ponastavitve Rele modula...");
+      initState_timeout_start = millis(); // Zaženemo timer za timeout
+      currentInitState = InitState::START;
+      reset_occured = false; // Ponastavi zastavico
     }
   }
-
-  // --- KLIČEMO NAŠ SEKVENČNI AVTOMAT ZA INICIJALIZACIJO ---
-  manageReleInitialization();
-
-  // ZAMENJAJ LoRa obdelavo z enim klicem:
-  lora_process_received_packets(); // Namesto vsega v LoRaTask
 
   // --- ONBOARD LED BLINK ---
   if (currentInitState == InitState::ERROR)

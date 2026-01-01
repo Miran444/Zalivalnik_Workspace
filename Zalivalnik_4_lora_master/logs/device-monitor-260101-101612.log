@@ -1,0 +1,494 @@
+10:16:12.418 > ets Jun  8 2016 00:22:57
+10:16:12.418 > 
+10:16:12.418 > rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+10:16:12.423 > configsip: 188777542, SPIWP:0xee
+10:16:12.423 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+10:16:12.434 > mode:DIO, clock div:2
+10:16:12.434 > load:0x3fff0030,len:1184
+10:16:12.434 > load:0x40078000,len:13232
+10:16:12.552 > load:0x40080400,len:3028
+10:16:12.552 > entry 0x400805e4
+10:16:13.293 > Vrstica 2: Povezujem WiFi...
+10:16:13.890 > .Vrstica 2: WiFi povezan!
+10:16:13.929 > 
+10:16:13.929 > WiFi povezan
+10:16:13.929 > IP naslov: 192.168.64.105
+10:16:13.961 > Vrstica 3: Sync cas...
+10:16:13.961 > Cakam na NTP sinhronizacijo... 
+10:16:18.590 > NTP sinhronizacija uspesna!
+10:16:18.625 > Vrstica 3: NTP OK
+10:16:18.625 > Thursday, January 01 2026 10:16:18
+10:16:18.625 > Trenutni čas: 1767258978
+10:16:18.655 > Vrstica 1: Master LoRa
+10:16:18.687 > Vrstica 2: Setup board...
+10:16:19.220 > Vrstica 3: WiFi: 1765845184
+10:16:19.653 > Vrstica 3: Init Lora...
+10:16:19.706 > Vrstica 2: [LORA] Ready.
+10:16:19.707 > [LORA] Init uspesen. Cakam na sporocila...
+10:16:20.140 > Vrstica 3: Init Firebase...
+10:16:20.140 > [F_RESPONSE] KLIC #1, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+10:16:20.146 > [F_RESPONSE]Event task: 🔐 authTask, msg: authenticating, code: 7
+10:16:20.151 > [F_RESPONSE] ⚠️ No available result!
+10:16:20.157 > [F_RESPONSE] KLIC #2, isResult=1, isError=0, isEvent=0, isDebug=1, available=0
+10:16:20.162 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Connecting to server...
+10:16:20.168 > [F_RESPONSE] ⚠️ No available result!
+10:16:20.173 > [F_RESPONSE] KLIC #3, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+10:16:20.178 > [F_RESPONSE]Event task: 🔐 authTask, msg: auth request sent, code: 8
+10:16:20.184 > [F_RESPONSE] ⚠️ No available result!
+10:16:20.217 > Vrstica 3: Init Firebase...OK
+10:16:20.617 > [SENSOR_QUEUE] Inicializirana.
+10:16:20.649 > Vrstica 3: Init done.
+10:16:20.682 > Vrstica 2: Setup board...OK
+10:16:20.717 > Vrstica 4: WAITING FOR DATA
+10:16:20.717 > Setup končan.
+10:16:20.717 > Thursday, January 01 2026 10:16:20
+10:16:20.721 > Trenutni čas: 1767258980
+10:16:23.592 > [F_RESPONSE] KLIC #4, isResult=1, isError=0, isEvent=1, isDebug=1, available=0
+10:16:23.598 > [F_RESPONSE]Event task: 🔐 authTask, msg: auth response received, code: 9
+10:16:23.603 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Terminating the server connection...
+10:16:23.609 > [F_RESPONSE] ⚠️ No available result!
+10:16:23.614 > [F_RESPONSE] KLIC #5, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+10:16:23.620 > [F_RESPONSE]Event task: 🔐 authTask, msg: ready, code: 10
+10:16:23.626 > [F_RESPONSE] ⚠️ No available result!
+10:16:23.658 > Vrstica 3: Init Firebase...OK
+10:16:23.692 > Vrstica 2: Link Firebase...
+10:16:23.692 > [F_CONNECT] Free Heap: 187272
+10:16:25.136 > Vrstica 2: Link Firebase...OK
+10:16:25.171 > Vrstica 5: [INIT] Reading Interval...
+10:16:25.171 > [F_GET_INTERVAL] Reading interval (poskus 1/3)...
+10:16:26.745 > [F_RESPONSE] KLIC #6, isResult=1, isError=0, isEvent=0, isDebug=1, available=1
+10:16:26.750 > [F_RESPONSE] Debug task: getChartIntervalTask, msg: Connecting to server...
+10:16:26.756 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/charts/Interval
+10:16:26.761 > [F_RESPONSE] Interval nastavljen: 4 minut ✅
+10:16:26.768 > [INIT] Uspeh pri branju intervala.
+10:16:26.768 > --- ZACENJAM INICIALIZACIJO RELE MODULA ---
+10:16:26.802 > Vrstica 5: [INIT] Starting...
+10:16:26.802 > [INIT] Korak 1: Posiljam cas...
+10:16:26.836 > Vrstica 5: [INIT] UTC time
+10:16:26.836 > Pripravljam paket za sinhronizacijo casa (CMD_SET_TIME)...
+10:16:26.841 >   Čas od polnoči: 36986 sekund
+10:16:26.841 >   Posiljam timestamp: 1767258986
+10:16:26.847 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:26.852 > OUT ID: 0, CMD: 1
+10:16:26.852 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:27.007 > [TX TASK] Stack left: 9744
+10:16:27.007 > [LORA] Paket uspesno poslan.
+10:16:27.007 > [LORA] Preklop v RX po TX uspesen.
+10:16:27.012 > -------------------------
+10:16:27.012 > 
+10:16:27.396 > [RX TASK] Stack left: 11616
+10:16:27.403 > [LORA RX] ID:0 CMD:103 RSSI:0 SNR:9.5
+10:16:27.403 > In ID: 0, CMD: 103
+10:16:27.403 > CRC OK.
+10:16:27.409 > Prejet odgovor: 36986
+10:16:27.409 > --------------------
+10:16:27.409 > [INIT] Uspeh pri čakanju na 'odgovor za čas'.
+10:16:27.414 > [INIT] Korak 3: Posiljam zahtevo za senzorje...
+10:16:27.449 > Vrstica 5: [INIT] Sensors
+10:16:27.449 > Pripravljam paket za branje senzorjev (CMD_GET_SENSORS)...
+10:16:27.454 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:27.460 > OUT ID: 1, CMD: 5
+10:16:27.460 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:27.608 > [TX TASK] Stack left: 8672
+10:16:27.608 > [LORA] Paket uspesno poslan.
+10:16:27.608 > [LORA] Preklop v RX po TX uspesen.
+10:16:27.614 > -------------------------
+10:16:27.614 > 
+10:16:27.976 > [RX TASK] Stack left: 10304
+10:16:27.983 > [LORA RX] ID:1 CMD:104 RSSI:0 SNR:9.5
+10:16:27.983 > In ID: 1, CMD: 104
+10:16:27.983 > CRC OK.
+10:16:27.988 > Prejeti podatki senzorjev:
+10:16:27.988 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+10:16:27.998 > --------------------
+10:16:27.998 > [INIT] Uspeh pri čakanju na 'odgovor za senzorje'.
+10:16:28.003 > [INIT] Posiljam zahtevo za urnik kanala 1...
+10:16:28.034 > Vrstica 5: [INIT] Urnik K1
+10:16:28.035 > Branje urnika za kanal 1 (CMD_GET_URNIK)...
+10:16:28.040 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:28.040 > OUT ID: 2, CMD: 3
+10:16:28.045 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:28.061 > [F_RESPONSE] KLIC #7, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:28.067 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767258987
+10:16:28.072 > [F_RESPONSE] Sensor data uploaded ✅
+10:16:28.194 > [TX TASK] Stack left: 8672
+10:16:28.194 > [LORA] Paket uspesno poslan.
+10:16:28.194 > [LORA] Preklop v RX po TX uspesen.
+10:16:28.200 > -------------------------
+10:16:28.200 > 
+10:16:28.571 > [RX TASK] Stack left: 10304
+10:16:28.581 > [LORA RX] ID:2 CMD:102 RSSI:0 SNR:10.0
+10:16:28.581 > In ID: 2, CMD: 102
+10:16:28.581 > CRC OK.
+10:16:28.586 > [INIT] Prejet urnik za kanal 1: 20:15 - 22:00 (Start sec=72900, End sec=79200)
+10:16:28.592 > --------------------
+10:16:28.592 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+10:16:28.598 > [INIT] Posiljam zahtevo za urnik kanala 2...
+10:16:28.627 > Vrstica 5: [INIT] Urnik K2
+10:16:28.628 > Branje urnika za kanal 2 (CMD_GET_URNIK)...
+10:16:28.633 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:28.633 > OUT ID: 3, CMD: 3
+10:16:28.639 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:28.787 > [TX TASK] Stack left: 8672
+10:16:28.787 > [LORA] Paket uspesno poslan.
+10:16:28.787 > [LORA] Preklop v RX po TX uspesen.
+10:16:28.792 > -------------------------
+10:16:28.792 > 
+10:16:29.164 > [RX TASK] Stack left: 10304
+10:16:29.172 > [LORA RX] ID:3 CMD:102 RSSI:0 SNR:9.2
+10:16:30.364 > In ID: 3, CMD: 102
+10:16:30.379 > CRC OK.
+10:16:30.379 > [INIT] Prejet urnik za kanal 2: 03:50 - 22:00 (Start sec=13800, End sec=79200)
+10:16:30.379 > --------------------
+10:16:30.379 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+10:16:30.379 > [INIT] Posiljam zahtevo za urnik kanala 3...
+10:16:30.410 > Vrstica 5: [INIT] Urnik K3
+10:16:30.413 > Branje urnika za kanal 3 (CMD_GET_URNIK)...
+10:16:30.423 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:30.423 > OUT ID: 4, CMD: 3
+10:16:30.423 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:30.571 > [TX TASK] Stack left: 8672
+10:16:30.571 > [LORA] Paket uspesno poslan.
+10:16:30.571 > [LORA] Preklop v RX po TX uspesen.
+10:16:30.579 > -------------------------
+10:16:30.579 > 
+10:16:30.955 > [RX TASK] Stack left: 10304
+10:16:30.971 > [LORA RX] ID:4 CMD:102 RSSI:0 SNR:9.8
+10:16:30.971 > In ID: 4, CMD: 102
+10:16:30.971 > CRC OK.
+10:16:30.976 > [INIT] Prejet urnik za kanal 3: 06:00 - 11:05 (Start sec=21600, End sec=39900)
+10:16:30.982 > --------------------
+10:16:30.982 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+10:16:30.987 > [INIT] Posiljam zahtevo za urnik kanala 4...
+10:16:31.016 > Vrstica 5: [INIT] Urnik K4
+10:16:31.016 > Branje urnika za kanal 4 (CMD_GET_URNIK)...
+10:16:31.022 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:31.022 > OUT ID: 5, CMD: 3
+10:16:31.027 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:31.177 > [TX TASK] Stack left: 8672
+10:16:31.177 > [LORA] Paket uspesno poslan.
+10:16:31.185 > [LORA] Preklop v RX po TX uspesen.
+10:16:31.185 > -------------------------
+10:16:31.185 > 
+10:16:31.557 > [RX TASK] Stack left: 10304
+10:16:31.562 > [LORA RX] ID:5 CMD:102 RSSI:0 SNR:9.5
+10:16:31.635 > In ID: 5, CMD: 102
+10:16:31.635 > CRC OK.
+10:16:31.635 > [INIT] Prejet urnik za kanal 4: 04:53 - 16:45 (Start sec=17580, End sec=60300)
+10:16:31.641 > --------------------
+10:16:31.646 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+10:16:31.646 > [INIT] Posiljam zahtevo za urnik kanala 5...
+10:16:31.679 > Vrstica 5: [INIT] Urnik K5
+10:16:31.679 > Branje urnika za kanal 5 (CMD_GET_URNIK)...
+10:16:31.685 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:31.685 > OUT ID: 6, CMD: 3
+10:16:31.691 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:31.842 > [TX TASK] Stack left: 8672
+10:16:31.842 > [LORA] Paket uspesno poslan.
+10:16:31.842 > [LORA] Preklop v RX po TX uspesen.
+10:16:31.848 > -------------------------
+10:16:31.848 > 
+10:16:32.216 > [RX TASK] Stack left: 10304
+10:16:32.224 > [LORA RX] ID:6 CMD:102 RSSI:0 SNR:10.0
+10:16:32.234 > In ID: 6, CMD: 102
+10:16:32.234 > CRC OK.
+10:16:32.234 > [INIT] Prejet urnik za kanal 5: 06:56 - 22:15 (Start sec=24960, End sec=80100)
+10:16:32.240 > --------------------
+10:16:32.245 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+10:16:32.245 > [INIT] Posiljam zahtevo za urnik kanala 6...
+10:16:32.279 > Vrstica 5: [INIT] Urnik K6
+10:16:32.280 > Branje urnika za kanal 6 (CMD_GET_URNIK)...
+10:16:32.285 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:32.285 > OUT ID: 7, CMD: 3
+10:16:32.291 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:32.439 > [TX TASK] Stack left: 8672
+10:16:32.439 > [LORA] Paket uspesno poslan.
+10:16:32.439 > [LORA] Preklop v RX po TX uspesen.
+10:16:32.444 > -------------------------
+10:16:32.444 > 
+10:16:32.816 > [RX TASK] Stack left: 10304
+10:16:32.821 > [LORA RX] ID:7 CMD:102 RSSI:0 SNR:9.5
+10:16:32.906 > In ID: 7, CMD: 102
+10:16:32.906 > CRC OK.
+10:16:32.906 > [INIT] Prejet urnik za kanal 6: 04:55 - 22:05 (Start sec=17700, End sec=79500)
+10:16:32.911 > --------------------
+10:16:32.916 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+10:16:32.916 > [INIT] Posiljam zahtevo za urnik kanala 7...
+10:16:32.950 > Vrstica 5: [INIT] Urnik K7
+10:16:32.951 > Branje urnika za kanal 7 (CMD_GET_URNIK)...
+10:16:32.956 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:32.956 > OUT ID: 8, CMD: 3
+10:16:32.962 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:33.110 > [TX TASK] Stack left: 8672
+10:16:33.111 > [LORA] Paket uspesno poslan.
+10:16:33.111 > [LORA] Preklop v RX po TX uspesen.
+10:16:33.116 > -------------------------
+10:16:33.116 > 
+10:16:33.489 > [RX TASK] Stack left: 10304
+10:16:37.967 > [INIT] Timeout pri čakanju na 'odgovor za urnik'. Poskus 1/3...
+10:16:37.970 > [INIT] Posiljam zahtevo za urnik kanala 8...
+10:16:38.001 > Vrstica 5: [INIT] Urnik K8
+10:16:38.001 > Branje urnika za kanal 8 (CMD_GET_URNIK)...
+10:16:38.006 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:38.006 > OUT ID: 9, CMD: 3
+10:16:38.011 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:38.159 > [TX TASK] Stack left: 8672
+10:16:38.160 > [LORA] Paket uspesno poslan.
+10:16:38.160 > [LORA] Preklop v RX po TX uspesen.
+10:16:38.165 > -------------------------
+10:16:38.165 > 
+10:16:38.538 > [RX TASK] Stack left: 10304
+10:16:38.546 > [LORA RX] ID:9 CMD:102 RSSI:0 SNR:9.2
+10:16:38.546 > In ID: 9, CMD: 102
+10:16:38.546 > CRC OK.
+10:16:38.551 > [INIT] Prejet urnik za kanal 8: 05:30 - 07:30 (Start sec=19800, End sec=27000)
+10:16:38.557 > --------------------
+10:16:38.557 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+10:16:38.563 > [INIT] Vsi urniki uspesno prebrani.
+10:16:38.563 > [INIT] Branje urnika iz Firebase za kanal 1...
+10:16:38.601 > Vrstica 5: [INIT] Branje K1
+10:16:38.601 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+10:16:38.671 > [F_RESPONSE] KLIC #8, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:38.676 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal1
+10:16:38.682 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 0, Prejet kanal: 0
+10:16:38.688 > [F_RESPONSE] Prejeta oba dela za kanal 0. Signaliziram uspeh ✅
+10:16:38.693 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:38.699 > [INIT] Branje urnika iz Firebase za kanal 2...
+10:16:38.727 > Vrstica 5: [INIT] Branje K2
+10:16:38.728 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+10:16:38.791 > [F_RESPONSE] KLIC #9, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:38.797 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal2
+10:16:38.802 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 1, Prejet kanal: 1
+10:16:38.808 > [F_RESPONSE] Prejeta oba dela za kanal 1. Signaliziram uspeh ✅
+10:16:38.813 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:38.819 > [INIT] Branje urnika iz Firebase za kanal 3...
+10:16:38.846 > Vrstica 5: [INIT] Branje K3
+10:16:38.847 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+10:16:38.911 > [F_RESPONSE] KLIC #10, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:38.917 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal3
+10:16:38.922 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 2, Prejet kanal: 2
+10:16:38.927 > [F_RESPONSE] Prejeta oba dela za kanal 2. Signaliziram uspeh ✅
+10:16:38.932 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:38.939 > [INIT] Branje urnika iz Firebase za kanal 4...
+10:16:38.966 > Vrstica 5: [INIT] Branje K4
+10:16:38.966 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+10:16:39.032 > [F_RESPONSE] KLIC #11, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:39.038 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal4
+10:16:39.043 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 3, Prejet kanal: 3
+10:16:39.049 > [F_RESPONSE] Prejeta oba dela za kanal 3. Signaliziram uspeh ✅
+10:16:39.055 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:39.060 > [INIT] Branje urnika iz Firebase za kanal 5...
+10:16:39.088 > Vrstica 5: [INIT] Branje K5
+10:16:39.088 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+10:16:39.152 > [F_RESPONSE] KLIC #12, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:39.158 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal5
+10:16:39.163 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 4, Prejet kanal: 4
+10:16:39.169 > [F_RESPONSE] Prejeta oba dela za kanal 4. Signaliziram uspeh ✅
+10:16:39.175 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:39.180 > [INIT] Branje urnika iz Firebase za kanal 6...
+10:16:39.208 > Vrstica 5: [INIT] Branje K6
+10:16:39.208 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+10:16:39.272 > [F_RESPONSE] KLIC #13, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:39.278 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal6
+10:16:39.283 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 5, Prejet kanal: 5
+10:16:39.289 > [F_RESPONSE] Prejeta oba dela za kanal 5. Signaliziram uspeh ✅
+10:16:39.294 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:39.299 > [INIT] Branje urnika iz Firebase za kanal 7...
+10:16:39.327 > Vrstica 5: [INIT] Branje K7
+10:16:39.327 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+10:16:39.393 > [F_RESPONSE] KLIC #14, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:39.399 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal7
+10:16:39.404 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 6, Prejet kanal: 6
+10:16:39.409 > [F_RESPONSE] Prejeta oba dela za kanal 6. Signaliziram uspeh ✅
+10:16:39.415 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:39.421 > [INIT] Branje urnika iz Firebase za kanal 8...
+10:16:39.449 > Vrstica 5: [INIT] Branje K8
+10:16:39.462 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+10:16:39.517 > [F_RESPONSE] KLIC #15, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:39.532 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal8
+10:16:39.532 > [F_RESPONSE] Prejet urnik. Pričakovan kanal: 7, Prejet kanal: 7
+10:16:39.538 > [F_RESPONSE] Prejeta oba dela za kanal 7. Signaliziram uspeh ✅
+10:16:39.567 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:39.567 > [INIT] Vsi urniki iz Firebase uspesno prebrani.
+10:16:39.567 > [INIT] Urnik za kanal 1 je ze usklajen.
+10:16:39.567 > [INIT] Urnik za kanal 2 je ze usklajen.
+10:16:39.567 > [INIT] Urnik za kanal 3 je ze usklajen.
+10:16:39.567 > [INIT] Urnik za kanal 4 je ze usklajen.
+10:16:39.567 > [INIT] Urnik za kanal 5 je ze usklajen.
+10:16:39.567 > [INIT] Urnik za kanal 6 je ze usklajen.
+10:16:39.567 > [INIT] Razlika za kanal 7. Posiljam posodobitev na Rele...
+10:16:39.574 > Posiljanje posodobitve urnika za kanal 7 (CMD_UPDATE_URNIK)...
+10:16:39.578 >   Nov urnik - Start sec: 34500, End sec: 36000
+10:16:39.583 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:39.589 > OUT ID: 10, CMD: 4
+10:16:39.589 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:39.742 > [TX TASK] Stack left: 8672
+10:16:39.742 > [LORA] Paket uspesno poslan.
+10:16:39.742 > [LORA] Preklop v RX po TX uspesen.
+10:16:39.748 > -------------------------
+10:16:39.748 > 
+10:16:40.133 > [RX TASK] Stack left: 10304
+10:16:40.140 > [LORA RX] ID:10 CMD:109 RSSI:0 SNR:9.5
+10:16:40.140 > In ID: 10, CMD: 109
+10:16:40.140 > CRC OK.
+10:16:40.146 > ACK OK za posodobitev urnika kanala 7. Posodabljam lokalno stanje.
+10:16:40.152 >   Nov urnik kanala 7: 09:35 - 10:00
+10:16:40.152 > --------------------
+10:16:40.157 > [INIT] Urnik za kanal 8 je ze usklajen.
+10:16:40.157 > [INIT] Korak 2: Posiljam zahtevo za status relejev...
+10:16:40.197 > Vrstica 5: [INIT] Status
+10:16:40.197 > Preverjanje stanja relejev (CMD_GET_STATUS)...
+10:16:40.202 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:40.202 > OUT ID: 11, CMD: 2
+10:16:40.208 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:40.356 > [TX TASK] Stack left: 8672
+10:16:40.356 > [LORA] Paket uspesno poslan.
+10:16:40.356 > [LORA] Preklop v RX po TX uspesen.
+10:16:40.361 > -------------------------
+10:16:40.361 > 
+10:16:40.753 > [RX TASK] Stack left: 10304
+10:16:40.763 > [LORA RX] ID:11 CMD:101 RSSI:0 SNR:10.0
+10:16:40.763 > In ID: 11, CMD: 101
+10:16:40.763 > CRC OK.
+10:16:40.769 > Prejeto stanje relejev:
+10:16:40.769 >   Rele 1: OFF
+10:16:40.769 >   Rele 2: ON
+10:16:40.769 >   Rele 3: ON
+10:16:40.774 >   Rele 4: ON
+10:16:40.774 >   Rele 5: ON
+10:16:40.774 >   Rele 6: ON
+10:16:40.774 >   Rele 7: OFF
+10:16:40.774 >   Rele 8: OFF
+10:16:40.779 > --------------------
+10:16:40.779 > [INIT] Uspeh pri čakanju na 'odgovor za status'.
+10:16:40.785 > [INIT] Posodabljanje stanja v Firebase za kanal 1...
+10:16:40.818 > Vrstica 5: [INIT] Posodabljanje K1
+10:16:40.818 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+10:16:40.891 > [F_RESPONSE] KLIC #16, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:40.897 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal1/state
+10:16:40.902 > [F_RESPONSE] State data uploaded ✅
+10:16:40.908 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:40.908 > [INIT] Posodabljanje stanja v Firebase za kanal 2...
+10:16:40.947 > Vrstica 5: [INIT] Posodabljanje K2
+10:16:40.947 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+10:16:41.015 > [F_RESPONSE] KLIC #17, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:41.021 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal2/state
+10:16:41.026 > [F_RESPONSE] State data uploaded ✅
+10:16:41.031 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:41.031 > [INIT] Posodabljanje stanja v Firebase za kanal 3...
+10:16:41.071 > Vrstica 5: [INIT] Posodabljanje K3
+10:16:41.071 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+10:16:41.136 > [F_RESPONSE] KLIC #18, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:41.142 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal3/state
+10:16:41.148 > [F_RESPONSE] State data uploaded ✅
+10:16:41.153 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:41.153 > [INIT] Posodabljanje stanja v Firebase za kanal 4...
+10:16:41.192 > Vrstica 5: [INIT] Posodabljanje K4
+10:16:41.192 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+10:16:41.258 > [F_RESPONSE] KLIC #19, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:41.263 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal4/state
+10:16:41.269 > [F_RESPONSE] State data uploaded ✅
+10:16:41.274 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:41.274 > [INIT] Posodabljanje stanja v Firebase za kanal 5...
+10:16:41.314 > Vrstica 5: [INIT] Posodabljanje K5
+10:16:41.314 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+10:16:41.378 > [F_RESPONSE] KLIC #20, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:41.384 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal5/state
+10:16:41.389 > [F_RESPONSE] State data uploaded ✅
+10:16:41.395 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:41.395 > [INIT] Posodabljanje stanja v Firebase za kanal 6...
+10:16:41.433 > Vrstica 5: [INIT] Posodabljanje K6
+10:16:41.434 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+10:16:41.500 > [F_RESPONSE] KLIC #21, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:41.506 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal6/state
+10:16:41.511 > [F_RESPONSE] State data uploaded ✅
+10:16:41.517 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:41.517 > [INIT] Posodabljanje stanja v Firebase za kanal 7...
+10:16:41.556 > Vrstica 5: [INIT] Posodabljanje K7
+10:16:41.556 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+10:16:41.621 > [F_RESPONSE] KLIC #22, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:41.626 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal7/state
+10:16:41.632 > [F_RESPONSE] State data uploaded ✅
+10:16:41.638 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:41.638 > [INIT] Posodabljanje stanja v Firebase za kanal 8...
+10:16:41.676 > Vrstica 5: [INIT] Posodabljanje K8
+10:16:41.677 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+10:16:41.744 > [F_RESPONSE] KLIC #23, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:16:41.749 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Kanali/kanal8/state
+10:16:41.755 > [F_RESPONSE] State data uploaded ✅
+10:16:41.760 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+10:16:41.760 > [INIT] Vsi statusi kanalov iz Firebase uspesno posodobljeni.
+10:16:41.766 > [INIT] Obvestilo Rele modulu, da je inicializacija končana...
+10:16:41.799 > Vrstica 5: [INIT] Finalizing...
+10:16:41.799 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:16:41.805 > OUT ID: 12, CMD: 12
+10:16:41.805 > [LORA] Način inicializacije - brez splošnih poskusov.
+10:16:41.959 > [TX TASK] Stack left: 8672
+10:16:41.959 > [LORA] Paket uspesno poslan.
+10:16:41.959 > [LORA] Preklop v RX po TX uspesen.
+10:16:41.964 > -------------------------
+10:16:41.964 > 
+10:16:42.314 > [RX TASK] Stack left: 10304
+10:16:42.322 > [LORA RX] ID:12 CMD:107 RSSI:0 SNR:10.2
+10:16:42.322 > In ID: 12, CMD: 107
+10:16:42.322 > CRC OK.
+10:16:42.327 > Rele modul je potrdil, da je inicializacija končana.
+10:16:42.327 > --------------------
+10:16:42.333 > [INIT] Uspeh pri čakanju na 'odgovor za init done'.
+10:16:42.338 > [INIT] Inicializacija uspesno zakljucena.
+10:16:42.364 > Vrstica 5: [INIT] Done
+10:17:00.362 > [SENSORS] Prvi sinhroniziran klic ob prehodu minute.
+10:17:00.362 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+10:17:00.368 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+10:17:00.398 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+10:17:00.399 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:17:00.404 > OUT ID: 13, CMD: 5
+10:17:00.404 > [LORA] Način samo ACK - brez poskusov.
+10:17:00.533 > [STREAM] event: keep-alive
+10:17:00.557 > [TX TASK] Stack left: 8672
+10:17:00.557 > [LORA] Paket uspesno poslan.
+10:17:00.557 > [LORA] Preklop v RX po TX uspesen.
+10:17:00.563 > -------------------------
+10:17:00.563 > 
+10:17:00.958 > [RX TASK] Stack left: 10304
+10:17:00.965 > [LORA RX] ID:13 CMD:104 RSSI:0 SNR:10.0
+10:17:00.965 > In ID: 13, CMD: 104
+10:17:00.965 > CRC OK.
+10:17:00.971 > Prejeti podatki senzorjev:
+10:17:00.971 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+10:17:00.977 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+10:17:00.988 > --------------------
+10:17:01.051 > [F_RESPONSE] KLIC #24, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:17:01.057 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/Sensors/1767259020
+10:17:01.063 > [F_RESPONSE] Sensor data uploaded ✅
+10:17:01.068 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+10:17:01.068 > [STREAM] event: put
+10:17:01.103 > [SENSOR_QUEUE] Operacija USPEŠNA.
+10:17:01.207 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+10:17:01.207 > [Lora] Preostala velikost sklada: 1840 bajtov
+10:17:01.212 > OUT ID: 14, CMD: 13
+10:17:01.212 > [LORA] Način samo ACK - brez poskusov.
+10:17:01.366 > [TX TASK] Stack left: 8672
+10:17:01.366 > [LORA] Paket uspesno poslan.
+10:17:01.366 > [LORA] Preklop v RX po TX uspesen.
+10:17:01.371 > -------------------------
+10:17:01.371 > 
+10:17:01.755 > [RX TASK] Stack left: 10304
+10:17:01.762 > [LORA RX] ID:14 CMD:110 RSSI:0 SNR:11.0
+10:17:01.762 > In ID: 14, CMD: 110
+10:17:01.762 > CRC OK.
+10:17:01.768 > Prejeti podatki iz INA3221 senzorja.
+10:17:01.768 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+10:17:01.777 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+10:17:01.788 > --------------------
+10:17:01.852 > [STREAM] event: put
+10:17:01.860 > [F_RESPONSE] KLIC #25, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+10:17:01.866 > [F_RESPONSE] Path: /UserData/68TA11sAdOaFnIdmqzDtkx3QIBC2/INA3221/1767259021
+10:17:01.872 > [F_RESPONSE] INA3221 data uploaded ✅
+10:17:01.877 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+10:17:01.911 > [SENSOR_QUEUE] Operacija USPEŠNA.
+10:17:31.868 > [STREAM] event: keep-alive
+10:18:02.075 > [STREAM] event: keep-alive
+10:18:31.875 > [STREAM] event: keep-alive
+10:19:01.879 > [STREAM] event: keep-alive
+10:19:32.088 > [STREAM] event: keep-alive

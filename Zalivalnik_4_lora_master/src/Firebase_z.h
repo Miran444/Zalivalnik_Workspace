@@ -14,7 +14,7 @@
 // Deklaracije funkcij, ki bodo definirane v Firebase.cpp
 void Init_Firebase();
 void Firebase_Connect();
-void Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec);
+bool Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec);
 void Firebase_CheckStreamHealth();
 void Firebase_readInterval();
 void Firebase_readKanalUrnik(uint8_t kanalIndex);
@@ -29,8 +29,7 @@ void Firebase_CheckAndRetry();
 
 // --- DEKLARACIJA GLOBALNIH SPREMENLJIVK IZ main.cpp ---
 // S tem povemo, da te spremenljivke obstajajo in so definirane drugje.
-// extern bool firebaseUpdatePending;
-extern bool firebaseUpdatePending_OK;
+
 extern ChannelUpdateData pendingUpdateData;
 // Globalna instanca strukture in zastavica
 extern volatile bool newChannelDataAvailable;
