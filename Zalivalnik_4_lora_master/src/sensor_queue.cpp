@@ -30,6 +30,51 @@ void Sensor_InitQueue()
   Serial.println("[SENSOR_QUEUE] Inicializirana.");
 }
 
+//------------------------------------------------------------------------------
+// Funkcija za intervalno branje senzorjev
+bool Sensor_IntervalRead(uint32_t interval_ms)
+{
+  // NOVO: Sinhronizacija na cele minute
+  static bool firstReadDone = false;
+  static unsigned long lastSensorRead = 0; // Čas zadnjega branja senzorjev
+  bool readTriggered = false;
+
+  if (!firstReadDone)
+  {
+    // PRVI KLIC: Počakaj na prehod minute (sekunda == 0)
+    time_t now;
+    struct tm timeinfo;
+    time(&now);
+    localtime_r(&now, &timeinfo);
+
+    if (timeinfo.tm_sec == 0 && interval_ms > 0)
+    {
+      // Točno ob prehodu minute (XX:XX:00)
+      Serial.println("[SENSORS] Prvi sinhroniziran klic ob prehodu minute.");
+
+      lastSensorRead = millis();
+      firstReadDone = true;
+      readTriggered = true;
+      // Dodaj operacije v čakalno vrsto
+    }
+  }
+  else
+  {
+    // NASLEDNJI KLICI: Normalen interval
+    if (interval_ms > 0 && (millis() - lastSensorRead >= interval_ms))
+    {
+      lastSensorRead = millis();
+
+      Serial.println("[SENSORS] Periodično branje senzorjev.");
+      readTriggered = true;
+      // Dodaj operacije v čakalno vrsto
+
+    }
+  }
+
+  return readTriggered;
+}
+
 //------------------------------------------------------------------------------------------------------------------------
 static void reset_operation(SensorOperation *op)
 {
@@ -104,7 +149,16 @@ static void execute_sensor_operation(SensorOperation *op)
 
 //------------------------------------------------------------------------------------------------------------------------
 void Sensor_ProcessQueue()
-{
+{  
+  static unsigned long lastSensorCheck = 0;
+
+  // Procesiranje senzorske čakalne vrste 10x na sekundo
+  if (millis() - lastSensorCheck < 100)
+  {
+    return; 
+  }
+  lastSensorCheck = millis();
+
   // Če imamo aktivno operacijo, najprej obdelaj njo
   if (current_sensor_op != nullptr)
   {

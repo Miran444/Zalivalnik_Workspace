@@ -20,6 +20,8 @@
 #include "message_protocol.h"
 #include "sensor_queue.h"
 
+
+
 #define IS_MASTER
 #define DEFAULT_SENSOR_READ_INTERVAL_MINUTES 5 // Privzeti interval branja senzorjev v minutah
 // // --- NOVO: Struktura in čakalna vrsta za Firebase naloge ---
@@ -62,7 +64,7 @@ ChannelUpdateData channelUpdate;
 uint32_t timestamp;           // Trenutni timestamp (vsaj enkrat na sekundo posodobljen)
 uint32_t secFromMidnight = 0; // Čas od polnoči v sekundah
 uint32_t Interval_mS = 0;     // Interval v milisekundah
-unsigned long lastSensorRead = 0; // Čas zadnjega branja senzorjev
+
 
 // --- SPREMENLJIVKE ZA SEKVENČNI AVTOMAT (STATE MACHINE) ---
 
@@ -111,7 +113,7 @@ bool lora_response_received = false;     // Ali je bil prejet Lora odgovor
 bool firebase_response_received = false; // Ali smo prejeli odgovor iz Firebase?
 // LoRaPacket last_received_packet;         // Shranimo zadnji prejeti paket za obdelavo v avtomatu
 
-// bool firebase_sensor_update = false; // zastavica za posodobitev senzorjev v Firebase
+bool read_sensor = false; // zastavica za posodobitev senzorjev v Firebase
 bool reset_occured = false; // zastavica, da je prišlo do ponovnega zagona na Rele modulu
 // bool system_time_set = false; // zastavica, da je bil sistemski čas nastavljen
 // bool notification_awaiting_ack = false; // zastavica, da čakamo na potrditev obvestila
@@ -167,18 +169,19 @@ float BatteryVoltage = 0.0;     // trenutna napetost baterije
 float CurrentConsumption = 0.0; // trenutna poraba toka
 float WaterConsumption = 0.0;   // skupna poraba vode
 
-// spremenljivke za Firebase
-FirebaseApp app;
-WiFiClientSecure ssl_client;
-WiFiClientSecure stream_ssl_client;
-using AsyncClient = AsyncClientClass;
-AsyncClient streamClient(stream_ssl_client);
-AsyncClient aClient(ssl_client);
-RealtimeDatabase Database;
-AsyncResult databaseResult;
-AsyncResult streamResult; // Za Firebase streaming
+// // spremenljivke za Firebase
 
-bool firebase_init_flag = false; // Ali je Firebase inicializiran?
+// using AsyncClient = AsyncClientClass;
+// WiFiClientSecure ssl_client;
+// AsyncClient aClient(ssl_client);
+// RealtimeDatabase Database;
+// FirebaseApp app;
+// AsyncResult databaseResult;
+
+// WiFiClientSecure stream_ssl_client;
+// AsyncClient streamClient(stream_ssl_client);
+// AsyncResult streamResult; // Za Firebase streaming
+
 bool taskComplete = false;
 unsigned long lastSync = 0; // Čas zadnje sinhronizacije s Firebase
 
@@ -871,7 +874,6 @@ void manageReleInitialization()
     init_done_flag = true;              // Nastavi zastavico, da je inicializacija zaključena
     currentInitState = InitState::STOP; // Postavi avtomat v stanje mirovanja
     lastSync = millis();                // Zapomni si čas zadnje sinhronizacije
-    lastSensorRead = millis();          // Postavi čas zadnjega branja senzorjev
     break;
 
   //============================================================================
@@ -1267,6 +1269,7 @@ void setup()
   delay(400);
   displayLogOnLine(LINE_RSSI_SNR, "Init Firebase...");
   Init_Firebase(); // Inicializiraj Firebase
+  Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
   displayLogOnLine(LINE_RSSI_SNR, "Init Firebase...OK");
   delay(400);
 
@@ -1290,17 +1293,17 @@ void setup()
 //---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
-  // 1. FIREBASE PROCESSING (najprej!)
-  app.loop();
-
   //-------------------------------------------------------------------------------------
-  // 2. Preverimo WiFi povezavo
+  // 1. Preverimo WiFi povezavo
   if (WiFi.status() != WL_CONNECTED)
   {
     Serial.println("WiFi povezava izgubljena! Poskušam ponovno...");
     displayLogOnLine(LINE_RSSI_SNR, "WiFi lost! "); // display ima samo 16 znakov!
     connectToWiFi();
   }
+
+  // 2. FIREBASE PROCESSING (najprej!)
+  app.loop();
 
   //-------------------------------------------------------------------------------------
   // 3. Firebase je pripravljen
@@ -1312,67 +1315,60 @@ void loop()
       taskComplete = true;
       displayLogOnLine(LINE_LORA_STATUS, "Link Firebase...");
       Firebase_Connect();
-      displayLogOnLine(LINE_LORA_STATUS, "Link Firebase...OK");
+      if (Firebase_IsReady()){
+        Firebase.printf("[INIT] Firebase is ready ✅\n");
+      }
+      else
+      {
+        Firebase.printf("[INIT] Firebase is not ready ..❌\n");
+      }
+        // Print authentication info
+        // Serial.println("Authentication Information");
+        // Firebase.printf("User UID: %s\n", app.getUid().c_str());
+        // Firebase.printf("Auth Token: %s\n", app.getToken().c_str());
+        // Firebase.printf("Refresh Token: %s\n", app.getRefreshToken().c_str());
+        // print_token_type(app);
 
       // --- Zaženemo avtomatiko za inicializacijo ---
       initState_timeout_start = millis();                   // Zaženemo timer za timeout
       currentInitState = InitState::READ_FIREBASE_INTERVAL; // ZAČNEMO Z BRANJEM INTERVALA
 
-      firebase_init_flag = true; // Nastavimo flag, da je Firebase inicializiran
+      
     }
     else
     {
       //---- Periodične naloge----
       // Tukaj lahko izvajamo periodične naloge ko smo končali z inicializacijo
 
-      // Procesiranje senzorske čakalne vrste
-      static unsigned long lastSensorCheck = 0;
-      if (millis() - lastSensorCheck > 100)
-      { // 10x na sekundo
-        lastSensorCheck = millis();
-        Sensor_ProcessQueue();
-      }
-
-      // NOVO: Sinhronizacija na cele minute
-      static bool firstReadDone = false;
-
-      if (!firstReadDone)
+      // Funkcija za intervalno branje senzorjev
+      if (init_done_flag)
       {
-        // PRVI KLIC: Počakaj na prehod minute (sekunda == 0)
-        time_t now;
-        struct tm timeinfo;
-        time(&now);
-        localtime_r(&now, &timeinfo);
-
-        if (timeinfo.tm_sec == 0 && init_done_flag && Interval_mS > 0)
+        // Periodično branje senzorjev
+        if (Sensor_IntervalRead(Interval_mS)) // Če je čas za branje, pokliči funkcijo
         {
-          // Točno ob prehodu minute (XX:XX:00)
-          Serial.println("[SENSORS] Prvi sinhroniziran klic ob prehodu minute.");
-
-          lastSensorRead = millis();
-          firstReadDone = true;
-
-          // Dodaj operacije v čakalno vrsto
-          Sensor_QueueOperation(SensorTaskType::READ_SENSORS);
-          Sensor_QueueOperation(SensorTaskType::READ_INA);
+          read_sensor = true; // Zastavica za branje senzorjev          
         }
-      }
-      else
-      {
-        // NASLEDNJI KLICI: Normalen interval
-        if (init_done_flag && Interval_mS > 0 && (millis() - lastSensorRead >= Interval_mS))
+
+        // Preverimo ali smo povezani z Firebase
+        if (read_sensor)
         {
-          lastSensorRead = millis();
-
-          Serial.println("[SENSORS] Periodično branje senzorjev.");
-
-          // Dodaj operacije v čakalno vrsto
-          Sensor_QueueOperation(SensorTaskType::READ_SENSORS);
-          Sensor_QueueOperation(SensorTaskType::READ_INA);
+          if (Firebase_IsReady()) {
+            Serial.println("[SENSOR] Čas za branje senzorjev. Dodajam v čakalno vrsto...");
+            Sensor_QueueOperation(SensorTaskType::READ_SENSORS);
+            Sensor_QueueOperation(SensorTaskType::READ_INA);
+            read_sensor = false; // Ponastavimo zastavico
+          }
+          
         }
       }
 
-      // NOVO: Procesiranje Firebase čakalne vrste v glavnem loop-u
+      // Procesiranje senzorske čakalne vrste 10x na sekundo
+      Sensor_ProcessQueue();
+
+      // Preveri stanje Firebase povezave
+      Firebase_Check_Active_State(true);
+
+      // Procesiranje Firebase čakalne vrste v glavnem loop-u
       static unsigned long lastFirebaseCheck = 0;
       if (millis() - lastFirebaseCheck > 200) // 5x na sekundo
       {
@@ -1382,31 +1378,31 @@ void loop()
         Firebase_CheckAndRetry();
 
         // 3. Stream monitoring
-        Firebase_CheckStreamHealth();
+        // Firebase_CheckStreamHealth();
 
         // Preveri, ali so na voljo novi podatki iz Firebase streama
-        if (newChannelDataAvailable)
-        {
-          // Tukaj pokličite funkcijo za pošiljanje podatkov Rele modulu
-          if (Firebase_handleStreamUpdate(channelUpdate.kanalIndex, channelUpdate.start_sec, channelUpdate.end_sec))
-          {
-            firebaseUpdatePending = true; // čakamo na prosto LoRa
-          }
-          // Počisti zastavico, da ne obdelamo istih podatkov večkrat
-          newChannelDataAvailable = false;
-        }
+        // if (newChannelDataAvailable)
+        // {
+        //   // Tukaj pokličite funkcijo za pošiljanje podatkov Rele modulu
+        //   if (Firebase_handleStreamUpdate(channelUpdate.kanalIndex, channelUpdate.start_sec, channelUpdate.end_sec))
+        //   {
+        //     firebaseUpdatePending = true; // čakamo na prosto LoRa
+        //   }
+        //   // Počisti zastavico, da ne obdelamo istih podatkov večkrat
+        //   newChannelDataAvailable = false;
+        // }
 
         // Ko je Lora prosta, pošlji posodobitev prek LoRa
-        if (firebaseUpdatePending && !lora_is_busy())
-        {
-          Firebase.printf("[STREAM] LoRa prosta. Pošiljam posodobitev.\n");
-          // Pošljemo podatke, ki so bili shranjeni v nabiralniku
-          Rele_updateRelayUrnik(
-              pendingUpdateData.kanalIndex,
-              pendingUpdateData.start_sec,
-              pendingUpdateData.end_sec);
-          firebaseUpdatePending = false;
-        }
+        // if (firebaseUpdatePending && !lora_is_busy())
+        // {
+        //   Firebase.printf("[STREAM] LoRa prosta. Pošiljam posodobitev.\n");
+        //   // Pošljemo podatke, ki so bili shranjeni v nabiralniku
+        //   Rele_updateRelayUrnik(
+        //       pendingUpdateData.kanalIndex,
+        //       pendingUpdateData.start_sec,
+        //       pendingUpdateData.end_sec);
+        //   firebaseUpdatePending = false;
+        // }
       }
       // --- konec periodičnih nalog ---
     }
@@ -1428,6 +1424,16 @@ void loop()
       currentInitState = InitState::START;
       reset_occured = false; // Ponastavi zastavico
     }
+  }
+
+  // Preveri stanje staka vsakih 10 s
+  static unsigned long lastStackCheck = 0;
+  if (millis() - lastStackCheck > 10000) // 10s
+  {
+    lastStackCheck = millis();
+
+    UBaseType_t stackLeft = uxTaskGetStackHighWaterMark(NULL);
+    Serial.printf("[Loop] Stack left: %d\n", stackLeft);
   }
 
   // --- ONBOARD LED BLINK ---

@@ -118,9 +118,9 @@ void lora_initialize(PacketHandlerCallback callback)
   }
 
   // Kreiranje taskov za obdelavo LoRa dogodkov
-  xTaskCreate(lora_dispatch_task, "LoRaDispatch", 16384, NULL, 2, &loraDispatchTaskHandle); // Visoka prioriteta
-  xTaskCreate(lora_rx_task, "LoRaRX", 12288, NULL, 1, &loraRxTaskHandle);
-  xTaskCreate(lora_tx_task, "LoRaTX", 10240, NULL, 1, &loraTxTaskHandle);
+  xTaskCreate(lora_dispatch_task, "LoRaDispatch", 3072, NULL, 2, &loraDispatchTaskHandle); // Visoka prioriteta
+  xTaskCreate(lora_rx_task, "LoRaRX", 3072, NULL, 1, &loraRxTaskHandle);
+  xTaskCreate(lora_tx_task, "LoRaTX", 3072, NULL, 1, &loraTxTaskHandle);
   // --- KONEC NOVO ---
 
   // int state = radio.begin();
@@ -212,22 +212,32 @@ bool lora_send_packet(const LoRaPacket &packet)
 // --- NOVO: Implementacija FreeRTOS taskov ---
 
 // Task, ki ga prebudi ISR in ugotovi, ali gre za RX ali TX dogodek
-void lora_dispatch_task(void *pvParameters) {
-    for (;;) {
-        // Čakaj na prekinitev od LoRa modula (sproži jo ISR)
-        if (xSemaphoreTake(loraInterruptSemaphore, portMAX_DELAY) == pdTRUE) {
-            // Preverimo, ali je bila prekinitev od pošiljanja ali prejema
-            uint16_t irqFlags = radio.getIRQFlags();
+void lora_dispatch_task(void *pvParameters)
+{
+  for (;;)
+  {
+    // Čakaj na prekinitev od LoRa modula (sproži jo ISR)
+    if (xSemaphoreTake(loraInterruptSemaphore, portMAX_DELAY) == pdTRUE)
+    {
+      // Preverimo, ali je bila prekinitev od pošiljanja ali prejema
+      uint16_t irqFlags = radio.getIRQFlags();
 
-            if (irqFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_TX_DONE) {
-                // Obvesti TX task, da je oddajanje končano
-                xTaskNotifyGive(loraTxTaskHandle);
-            } else if (irqFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_DONE) {
-                // Obvesti RX task, da je prispel nov paket
-                xTaskNotifyGive(loraRxTaskHandle);
-            }
-        }
+      if (irqFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_TX_DONE)
+      {
+        // Obvesti TX task, da je oddajanje končano
+        xTaskNotifyGive(loraTxTaskHandle);
+      }
+      else if (irqFlags & RADIOLIB_SX127X_CLEAR_IRQ_FLAG_RX_DONE)
+      {
+        // Obvesti RX task, da je prispel nov paket
+        xTaskNotifyGive(loraRxTaskHandle);
+      }
+        // DODAJ DIAGNOSTIKO
+        UBaseType_t txStackLeft = uxTaskGetStackHighWaterMark(loraDispatchTaskHandle);
+        Serial.printf("[DISPATCH TASK] Stack left: %d\n", txStackLeft);
+
     }
+  }
 }
 
 // Task za obdelavo končanega oddajanja

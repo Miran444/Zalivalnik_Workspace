@@ -1,0 +1,985 @@
+20:49:05.546 > ets Jun  8 2016 00:22:57
+20:49:05.546 > 
+20:49:05.546 > rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+20:49:05.552 > configsip: 188777542, SPIWP:0xee
+20:49:05.552 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+20:49:05.563 > mode:DIO, clock div:2
+20:49:05.563 > load:0x3fff0030,len:1184
+20:49:05.563 > load:0x40078000,len:13232
+20:49:05.682 > load:0x40080400,len:3028
+20:49:05.682 > entry 0x400805e4
+20:49:06.415 > Vrstica 2: Povezujem WiFi...
+20:49:07.012 > .Vrstica 2: WiFi povezan!
+20:49:07.050 > 
+20:49:07.050 > WiFi povezan
+20:49:07.050 > IP naslov: 192.168.64.105
+20:49:07.083 > Vrstica 3: Sync cas...
+20:49:07.083 > Cakam na NTP sinhronizacijo... 
+20:49:10.591 > NTP sinhronizacija uspesna!
+20:49:10.627 > Vrstica 3: NTP OK
+20:49:10.627 > Friday, January 02 2026 20:49:10
+20:49:10.627 > Trenutni čas: 1767383350
+20:49:10.656 > Vrstica 1: Master LoRa
+20:49:10.690 > Vrstica 2: Setup board...
+20:49:11.222 > Vrstica 3: WiFi: 1765845184
+20:49:11.654 > Vrstica 3: Init Lora...
+20:49:11.708 > Vrstica 2: [LORA] Ready.
+20:49:11.709 > [LORA] Init uspesen. Cakam na sporocila...
+20:49:12.142 > Vrstica 3: Init Firebase...
+20:49:12.142 > [F_INIT] Free Heap before Firebase: 215964
+20:49:12.147 > 
+20:49:12.147 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:49:12.153 > [F_RESPONSE] KLIC #1, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:49:12.158 > [F_RESPONSE] Event task: 🔐 authTask, msg: authenticating, code: 7
+20:49:12.163 > 
+20:49:12.163 > [F_DEBUG] Active tasks: 1, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:49:12.170 > [F_RESPONSE] KLIC #2, isResult=1, isError=0, isEvent=0, isDebug=1, available=0
+20:49:12.181 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Connecting to server...
+20:49:12.187 > 
+20:49:12.187 > [F_DEBUG] Active tasks: 1, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:49:12.192 > [F_RESPONSE] KLIC #3, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:49:12.198 > [F_RESPONSE] Event task: 🔐 authTask, msg: auth request sent, code: 8
+20:49:12.203 > Firebase Client v2.2.3
+20:49:12.229 > Vrstica 3: Init Firebase...OK
+20:49:12.630 > [SENSOR_QUEUE] Inicializirana.
+20:49:12.661 > Vrstica 3: Init done.
+20:49:12.695 > Vrstica 2: Setup board...OK
+20:49:12.730 > Vrstica 4: WAITING FOR DATA
+20:49:12.730 > Setup končan.
+20:49:12.730 > Friday, January 02 2026 20:49:12
+20:49:12.734 > Trenutni čas: 1767383352
+20:49:14.735 > 
+20:49:14.735 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:49:14.740 > [F_RESPONSE] KLIC #4, isResult=1, isError=0, isEvent=1, isDebug=1, available=0
+20:49:14.746 > [F_RESPONSE] Event task: 🔐 authTask, msg: auth response received, code: 9
+20:49:14.751 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Terminating the server connection...
+20:49:14.756 > 
+20:49:14.756 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:49:14.768 > [F_RESPONSE] KLIC #5, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:49:14.773 > [F_RESPONSE] Event task: 🔐 authTask, msg: ready, code: 10
+20:49:14.779 > [F_AUTH] ✅ Avtentikacija uspešna!
+20:49:14.809 > Vrstica 3: Init Firebase...OK
+20:49:14.845 > Vrstica 2: Link Firebase...
+20:49:14.845 > [F_READY] SSL ni povezan. Vzpostavljam on-demand...
+20:49:15.559 > [F_READY] SSL re-inicializiran. Čakam na odgovor...
+20:49:15.559 > [INIT] Firebase is ready ✅
+20:49:15.593 > Vrstica 5: [INIT] Reading Interval...
+20:49:15.593 > [F_GET_INTERVAL] Reading interval (poskus 1/3)...
+20:49:15.610 > 
+20:49:15.611 > [F_DEBUG] Active tasks: 2, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:15.622 > [F_RESPONSE] KLIC #6, isResult=1, isError=0, isEvent=0, isDebug=1, available=1
+20:49:15.628 > [F_RESPONSE] Debug task: dummyTask, msg: Connecting to server...
+20:49:15.633 > [F_RESPONSE] Task: dummyTask
+20:49:15.633 > [F_RESPONSE] Payload length: 1
+20:49:15.638 > [F_RESPONSE] Dummy task executed ✅
+20:49:15.684 > 
+20:49:15.684 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:15.695 > [F_RESPONSE] KLIC #7, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:15.701 > [F_RESPONSE] Task: getChartIntervalTask
+20:49:15.707 > [F_RESPONSE] Payload length: 1
+20:49:15.707 > [F_RESPONSE] Interval nastavljen: 4 minut ✅
+20:49:15.712 > [INIT] Uspeh pri branju intervala.
+20:49:15.712 > --- ZACENJAM INICIALIZACIJO RELE MODULA ---
+20:49:15.745 > Vrstica 5: [INIT] Starting...
+20:49:15.745 > [INIT] Korak 1: Posiljam cas...
+20:49:15.778 > Vrstica 5: [INIT] UTC time
+20:49:15.780 > Pripravljam paket za sinhronizacijo casa (CMD_SET_TIME)...
+20:49:15.784 >   Čas od polnoči: 74955 sekund
+20:49:15.784 >   Posiljam timestamp: 1767383355
+20:49:15.789 > [Lora] Stack left: 9804
+20:49:15.789 > OUT ID: 0, CMD: 1
+20:49:15.795 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:15.937 > [DISPATCH TASK] Stack left: 2388
+20:49:15.937 > [TX TASK] Stack left: 2580
+20:49:15.937 > [LORA] Paket uspesno poslan.
+20:49:15.943 > [LORA] Preklop v RX po TX uspesen.
+20:49:15.943 > -------------------------
+20:49:15.946 > 
+20:49:15.993 > [Loop] Stack left: 9804
+20:49:16.329 > [DISPATCH TASK] Stack left: 1736
+20:49:16.329 > [RX TASK] Stack left: 2404
+20:49:16.329 > [LORA RX] ID:0 CMD:103 RSSI:0 SNR:9.5
+20:49:16.334 > In ID: 0, CMD: 103
+20:49:16.334 > CRC OK.
+20:49:16.334 > Prejet odgovor: 74955
+20:49:16.339 > --------------------
+20:49:16.339 > [INIT] Uspeh pri čakanju na 'odgovor za čas'.
+20:49:16.346 > [INIT] Korak 3: Posiljam zahtevo za senzorje...
+20:49:16.376 > Vrstica 5: [INIT] Sensors
+20:49:16.377 > Pripravljam paket za branje senzorjev (CMD_GET_SENSORS)...
+20:49:16.383 > [Lora] Stack left: 9804
+20:49:16.383 > OUT ID: 1, CMD: 5
+20:49:16.388 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:16.535 > [DISPATCH TASK] Stack left: 1736
+20:49:16.535 > [TX TASK] Stack left: 1508
+20:49:16.535 > [LORA] Paket uspesno poslan.
+20:49:16.541 > [LORA] Preklop v RX po TX uspesen.
+20:49:16.541 > -------------------------
+20:49:16.544 > 
+20:49:16.937 > [DISPATCH TASK] Stack left: 1736
+20:49:16.937 > [RX TASK] Stack left: 1092
+20:49:16.937 > [LORA RX] ID:1 CMD:104 RSSI:0 SNR:9.5
+20:49:16.943 > In ID: 1, CMD: 104
+20:49:16.943 > CRC OK.
+20:49:16.943 > Prejeti podatki senzorjev:
+20:49:16.948 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+20:49:16.966 > --------------------
+20:49:16.966 > [INIT] Uspeh pri čakanju na 'odgovor za senzorje'.
+20:49:16.971 > [INIT] Posiljam zahtevo za urnik kanala 1...
+20:49:17.001 > Vrstica 5: [INIT] Urnik K1
+20:49:17.002 > Branje urnika za kanal 1 (CMD_GET_URNIK)...
+20:49:17.007 > [Lora] Stack left: 9804
+20:49:17.007 > OUT ID: 2, CMD: 3
+20:49:17.007 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:17.025 > 
+20:49:17.025 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:17.030 > [F_RESPONSE] KLIC #8, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:17.036 > [F_RESPONSE] Task: updateSensorTask
+20:49:17.041 > [F_RESPONSE] Payload length: 90
+20:49:17.041 > [F_RESPONSE] Sensor data uploaded ✅
+20:49:17.160 > [DISPATCH TASK] Stack left: 1736
+20:49:17.160 > [TX TASK] Stack left: 1508
+20:49:17.160 > [LORA] Paket uspesno poslan.
+20:49:17.166 > [LORA] Preklop v RX po TX uspesen.
+20:49:17.166 > -------------------------
+20:49:17.168 > 
+20:49:17.540 > [DISPATCH TASK] Stack left: 1736
+20:49:17.541 > [RX TASK] Stack left: 1092
+20:49:17.541 > [LORA RX] ID:2 CMD:102 RSSI:0 SNR:9.5
+20:49:17.546 > In ID: 2, CMD: 102
+20:49:17.546 > CRC OK.
+20:49:17.546 > [INIT] Prejet urnik za kanal 1: 10:15 - 13:05 (Start sec=36900, End sec=47100)
+20:49:17.557 > --------------------
+20:49:17.557 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+20:49:17.562 > [INIT] Posiljam zahtevo za urnik kanala 2...
+20:49:17.600 > Vrstica 5: [INIT] Urnik K2
+20:49:17.600 > Branje urnika za kanal 2 (CMD_GET_URNIK)...
+20:49:17.605 > [Lora] Stack left: 9804
+20:49:17.605 > OUT ID: 3, CMD: 3
+20:49:17.605 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:17.758 > [TX TASK] Stack left: 1508
+20:49:17.758 > [DISPATCH TASK] Stack left: 1736
+20:49:17.758 > [LORA] Paket uspesno poslan.
+20:49:17.764 > [LORA] Preklop v RX po TX uspesen.
+20:49:17.764 > -------------------------
+20:49:17.766 > 
+20:49:18.138 > [DISPATCH TASK] Stack left: 1736
+20:49:18.138 > [RX TASK] Stack left: 1092
+20:49:18.138 > [LORA RX] ID:3 CMD:102 RSSI:0 SNR:10.2
+20:49:18.144 > In ID: 3, CMD: 102
+20:49:18.144 > CRC OK.
+20:49:18.150 > [INIT] Prejet urnik za kanal 2: 03:50 - 22:00 (Start sec=13800, End sec=79200)
+20:49:18.155 > --------------------
+20:49:18.155 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+20:49:18.161 > [INIT] Posiljam zahtevo za urnik kanala 3...
+20:49:18.197 > Vrstica 5: [INIT] Urnik K3
+20:49:18.198 > Branje urnika za kanal 3 (CMD_GET_URNIK)...
+20:49:18.202 > [Lora] Stack left: 9804
+20:49:18.202 > OUT ID: 4, CMD: 3
+20:49:18.202 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:18.355 > [DISPATCH TASK] Stack left: 1736
+20:49:18.355 > [TX TASK] Stack left: 1508
+20:49:18.355 > [LORA] Paket uspesno poslan.
+20:49:18.361 > [LORA] Preklop v RX po TX uspesen.
+20:49:18.361 > -------------------------
+20:49:18.365 > 
+20:49:18.736 > [DISPATCH TASK] Stack left: 1508
+20:49:18.736 > [RX TASK] Stack left: 1092
+20:49:18.736 > [LORA RX] ID:4 CMD:102 RSSI:0 SNR:9.5
+20:49:18.741 > In ID: 4, CMD: 102
+20:49:18.741 > CRC OK.
+20:49:18.741 > [INIT] Prejet urnik za kanal 3: 06:00 - 11:05 (Start sec=21600, End sec=39900)
+20:49:18.753 > --------------------
+20:49:18.753 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+20:49:18.758 > [INIT] Posiljam zahtevo za urnik kanala 4...
+20:49:18.794 > Vrstica 5: [INIT] Urnik K4
+20:49:18.795 > Branje urnika za kanal 4 (CMD_GET_URNIK)...
+20:49:18.801 > [Lora] Stack left: 9804
+20:49:18.801 > OUT ID: 5, CMD: 3
+20:49:18.801 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:18.954 > [DISPATCH TASK] Stack left: 1508
+20:49:18.954 > [TX TASK] Stack left: 1508
+20:49:18.954 > [LORA] Paket uspesno poslan.
+20:49:18.959 > [LORA] Preklop v RX po TX uspesen.
+20:49:18.959 > -------------------------
+20:49:18.962 > 
+20:49:19.333 > [DISPATCH TASK] Stack left: 1508
+20:49:19.333 > [RX TASK] Stack left: 1092
+20:49:19.333 > [LORA RX] ID:5 CMD:102 RSSI:0 SNR:9.2
+20:49:19.339 > In ID: 5, CMD: 102
+20:49:19.339 > CRC OK.
+20:49:19.339 > [INIT] Prejet urnik za kanal 4: 04:53 - 09:45 (Start sec=17580, End sec=35100)
+20:49:19.350 > --------------------
+20:49:19.350 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+20:49:19.356 > [INIT] Posiljam zahtevo za urnik kanala 5...
+20:49:19.392 > Vrstica 5: [INIT] Urnik K5
+20:49:19.392 > Branje urnika za kanal 5 (CMD_GET_URNIK)...
+20:49:19.398 > [Lora] Stack left: 9804
+20:49:19.398 > OUT ID: 6, CMD: 3
+20:49:19.398 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:19.550 > [DISPATCH TASK] Stack left: 1508
+20:49:19.550 > [TX TASK] Stack left: 1508
+20:49:19.550 > [LORA] Paket uspesno poslan.
+20:49:19.556 > [LORA] Preklop v RX po TX uspesen.
+20:49:19.556 > -------------------------
+20:49:19.559 > 
+20:49:19.930 > [DISPATCH TASK] Stack left: 1508
+20:49:19.930 > [RX TASK] Stack left: 1092
+20:49:19.930 > [LORA RX] ID:6 CMD:102 RSSI:0 SNR:9.8
+20:49:19.936 > In ID: 6, CMD: 102
+20:49:19.936 > CRC OK.
+20:49:19.936 > [INIT] Prejet urnik za kanal 5: 06:56 - 22:15 (Start sec=24960, End sec=80100)
+20:49:19.947 > --------------------
+20:49:19.947 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+20:49:19.953 > [INIT] Posiljam zahtevo za urnik kanala 6...
+20:49:19.989 > Vrstica 5: [INIT] Urnik K6
+20:49:19.989 > Branje urnika za kanal 6 (CMD_GET_URNIK)...
+20:49:19.994 > [Lora] Stack left: 9804
+20:49:19.994 > OUT ID: 7, CMD: 3
+20:49:19.994 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:20.148 > [DISPATCH TASK] Stack left: 1508
+20:49:20.148 > [TX TASK] Stack left: 1508
+20:49:20.148 > [LORA] Paket uspesno poslan.
+20:49:20.154 > [LORA] Preklop v RX po TX uspesen.
+20:49:20.154 > -------------------------
+20:49:20.156 > 
+20:49:20.528 > [DISPATCH TASK] Stack left: 1508
+20:49:20.528 > [RX TASK] Stack left: 1092
+20:49:20.528 > [LORA RX] ID:7 CMD:102 RSSI:0 SNR:10.2
+20:49:20.534 > In ID: 7, CMD: 102
+20:49:20.534 > CRC OK.
+20:49:20.539 > [INIT] Prejet urnik za kanal 6: 04:55 - 10:05 (Start sec=17700, End sec=36300)
+20:49:20.547 > --------------------
+20:49:20.547 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+20:49:20.550 > [INIT] Posiljam zahtevo za urnik kanala 7...
+20:49:20.587 > Vrstica 5: [INIT] Urnik K7
+20:49:20.587 > Branje urnika za kanal 7 (CMD_GET_URNIK)...
+20:49:20.592 > [Lora] Stack left: 9804
+20:49:20.592 > OUT ID: 8, CMD: 3
+20:49:20.592 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:20.745 > [DISPATCH TASK] Stack left: 1508
+20:49:20.745 > [TX TASK] Stack left: 1508
+20:49:20.745 > [LORA] Paket uspesno poslan.
+20:49:20.751 > [LORA] Preklop v RX po TX uspesen.
+20:49:20.751 > -------------------------
+20:49:20.754 > 
+20:49:21.127 > [DISPATCH TASK] Stack left: 1508
+20:49:21.127 > [RX TASK] Stack left: 1092
+20:49:21.127 > [LORA RX] ID:8 CMD:102 RSSI:0 SNR:9.8
+20:49:21.132 > In ID: 8, CMD: 102
+20:49:21.132 > CRC OK.
+20:49:21.132 > [INIT] Prejet urnik za kanal 7: 09:35 - 10:35 (Start sec=34500, End sec=38100)
+20:49:21.143 > --------------------
+20:49:21.143 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+20:49:21.148 > [INIT] Posiljam zahtevo za urnik kanala 8...
+20:49:21.185 > Vrstica 5: [INIT] Urnik K8
+20:49:21.185 > Branje urnika za kanal 8 (CMD_GET_URNIK)...
+20:49:21.191 > [Lora] Stack left: 9804
+20:49:21.191 > OUT ID: 9, CMD: 3
+20:49:21.191 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:21.343 > [DISPATCH TASK] Stack left: 1508
+20:49:21.344 > [TX TASK] Stack left: 1508
+20:49:21.344 > [LORA] Paket uspesno poslan.
+20:49:21.349 > [LORA] Preklop v RX po TX uspesen.
+20:49:21.349 > -------------------------
+20:49:21.352 > 
+20:49:21.723 > [DISPATCH TASK] Stack left: 1508
+20:49:21.724 > [RX TASK] Stack left: 1092
+20:49:21.724 > [LORA RX] ID:9 CMD:102 RSSI:0 SNR:9.2
+20:49:21.729 > In ID: 9, CMD: 102
+20:49:21.729 > CRC OK.
+20:49:21.729 > [INIT] Prejet urnik za kanal 8: 05:30 - 13:30 (Start sec=19800, End sec=48600)
+20:49:21.740 > --------------------
+20:49:21.740 > [INIT] Uspeh pri čakanju na 'odgovor za urnik'.
+20:49:21.746 > [INIT] Vsi urniki uspesno prebrani.
+20:49:21.746 > [INIT] Branje urnika iz Firebase za kanal 1...
+20:49:21.782 > Vrstica 5: [INIT] Branje K1
+20:49:21.783 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+20:49:21.856 > 
+20:49:21.861 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:21.867 > [F_RESPONSE] KLIC #9, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:21.873 > [F_RESPONSE] Task: getUrnikTask
+20:49:21.873 > [F_RESPONSE] Payload length: 79
+20:49:21.878 > [F_RESPONSE] Prejet urnik za kanal: 0 (pričakovan: 0)
+20:49:21.884 > [F_RESPONSE] ✅ Urnik prebran: 36900 - 47100
+20:49:21.889 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:21.889 > [INIT] Branje urnika iz Firebase za kanal 2...
+20:49:21.927 > Vrstica 5: [INIT] Branje K2
+20:49:21.927 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+20:49:21.984 > 
+20:49:21.988 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:21.994 > [F_RESPONSE] KLIC #10, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:22.000 > [F_RESPONSE] Task: getUrnikTask
+20:49:22.000 > [F_RESPONSE] Payload length: 78
+20:49:22.006 > [F_RESPONSE] Prejet urnik za kanal: 1 (pričakovan: 1)
+20:49:22.011 > [F_RESPONSE] ✅ Urnik prebran: 13800 - 79200
+20:49:22.017 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:22.017 > [INIT] Branje urnika iz Firebase za kanal 3...
+20:49:22.054 > Vrstica 5: [INIT] Branje K3
+20:49:22.055 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+20:49:22.142 > 
+20:49:22.147 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:22.153 > [F_RESPONSE] KLIC #11, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:22.158 > [F_RESPONSE] Task: getUrnikTask
+20:49:22.158 > [F_RESPONSE] Payload length: 79
+20:49:22.164 > [F_RESPONSE] Prejet urnik za kanal: 2 (pričakovan: 2)
+20:49:22.170 > [F_RESPONSE] ✅ Urnik prebran: 21600 - 39900
+20:49:22.175 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:22.175 > [INIT] Branje urnika iz Firebase za kanal 4...
+20:49:22.213 > Vrstica 5: [INIT] Branje K4
+20:49:22.213 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+20:49:22.268 > 
+20:49:22.274 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:22.279 > [F_RESPONSE] KLIC #12, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:22.284 > [F_RESPONSE] Task: getUrnikTask
+20:49:22.284 > [F_RESPONSE] Payload length: 79
+20:49:22.290 > [F_RESPONSE] Prejet urnik za kanal: 3 (pričakovan: 3)
+20:49:22.295 > [F_RESPONSE] ✅ Urnik prebran: 17580 - 35100
+20:49:22.301 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:22.301 > [INIT] Branje urnika iz Firebase za kanal 5...
+20:49:22.338 > Vrstica 5: [INIT] Branje K5
+20:49:22.339 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+20:49:22.394 > 
+20:49:22.400 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:22.406 > [F_RESPONSE] KLIC #13, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:22.411 > [F_RESPONSE] Task: getUrnikTask
+20:49:22.411 > [F_RESPONSE] Payload length: 78
+20:49:22.417 > [F_RESPONSE] Prejet urnik za kanal: 4 (pričakovan: 4)
+20:49:22.422 > [F_RESPONSE] ✅ Urnik prebran: 24960 - 80100
+20:49:22.428 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:22.428 > [INIT] Branje urnika iz Firebase za kanal 6...
+20:49:22.466 > Vrstica 5: [INIT] Branje K6
+20:49:22.466 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+20:49:22.518 > 
+20:49:22.524 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:22.529 > [F_RESPONSE] KLIC #14, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:22.535 > [F_RESPONSE] Task: getUrnikTask
+20:49:22.535 > [F_RESPONSE] Payload length: 79
+20:49:22.540 > [F_RESPONSE] Prejet urnik za kanal: 5 (pričakovan: 5)
+20:49:22.546 > [F_RESPONSE] ✅ Urnik prebran: 17700 - 36300
+20:49:22.552 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:22.552 > [INIT] Branje urnika iz Firebase za kanal 7...
+20:49:22.589 > Vrstica 5: [INIT] Branje K7
+20:49:22.589 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+20:49:22.641 > 
+20:49:22.647 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:22.653 > [F_RESPONSE] KLIC #15, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:22.658 > [F_RESPONSE] Task: getUrnikTask
+20:49:22.658 > [F_RESPONSE] Payload length: 79
+20:49:22.664 > [F_RESPONSE] Prejet urnik za kanal: 6 (pričakovan: 6)
+20:49:22.670 > [F_RESPONSE] ✅ Urnik prebran: 34500 - 38100
+20:49:22.675 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:22.675 > [INIT] Branje urnika iz Firebase za kanal 8...
+20:49:22.713 > Vrstica 5: [INIT] Branje K8
+20:49:22.713 > [F_GET_URNIK] Reading schedule (poskus 1/3)...
+20:49:22.767 > 
+20:49:22.773 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:22.778 > [F_RESPONSE] KLIC #16, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:22.784 > [F_RESPONSE] Task: getUrnikTask
+20:49:22.784 > [F_RESPONSE] Payload length: 79
+20:49:22.789 > [F_RESPONSE] Prejet urnik za kanal: 7 (pričakovan: 7)
+20:49:22.795 > [F_RESPONSE] ✅ Urnik prebran: 19800 - 48600
+20:49:22.800 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:22.800 > [INIT] Vsi urniki iz Firebase uspesno prebrani.
+20:49:22.806 > [INIT] Urnik za kanal 1 je ze usklajen.
+20:49:22.812 > [INIT] Urnik za kanal 2 je ze usklajen.
+20:49:22.812 > [INIT] Urnik za kanal 3 je ze usklajen.
+20:49:22.817 > [INIT] Urnik za kanal 4 je ze usklajen.
+20:49:22.823 > [INIT] Urnik za kanal 5 je ze usklajen.
+20:49:22.823 > [INIT] Urnik za kanal 6 je ze usklajen.
+20:49:22.829 > [INIT] Urnik za kanal 7 je ze usklajen.
+20:49:22.829 > [INIT] Urnik za kanal 8 je ze usklajen.
+20:49:22.834 > [INIT] Korak 2: Posiljam zahtevo za status relejev...
+20:49:22.871 > Vrstica 5: [INIT] Status
+20:49:22.871 > Preverjanje stanja relejev (CMD_GET_STATUS)...
+20:49:22.877 > [Lora] Stack left: 9804
+20:49:22.877 > OUT ID: 10, CMD: 2
+20:49:22.877 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:23.029 > [DISPATCH TASK] Stack left: 1508
+20:49:23.029 > [TX TASK] Stack left: 1508
+20:49:23.029 > [LORA] Paket uspesno poslan.
+20:49:23.035 > [LORA] Preklop v RX po TX uspesen.
+20:49:23.035 > -------------------------
+20:49:23.038 > 
+20:49:23.450 > [DISPATCH TASK] Stack left: 1508
+20:49:23.450 > [RX TASK] Stack left: 1092
+20:49:23.450 > [LORA RX] ID:10 CMD:101 RSSI:0 SNR:9.8
+20:49:23.456 > In ID: 10, CMD: 101
+20:49:23.456 > CRC OK.
+20:49:23.462 > Prejeto stanje relejev:
+20:49:23.462 >   Rele 1: OFF
+20:49:23.462 >   Rele 2: ON
+20:49:23.462 >   Rele 3: OFF
+20:49:23.467 >   Rele 4: OFF
+20:49:23.467 >   Rele 5: ON
+20:49:23.467 >   Rele 6: OFF
+20:49:23.467 >   Rele 7: OFF
+20:49:23.467 >   Rele 8: OFF
+20:49:23.473 > --------------------
+20:49:23.473 > [INIT] Uspeh pri čakanju na 'odgovor za status'.
+20:49:23.479 > [INIT] Posodabljanje stanja v Firebase za kanal 1...
+20:49:23.510 > Vrstica 5: [INIT] Posodabljanje K1
+20:49:23.511 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+20:49:23.568 > 
+20:49:23.573 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:23.579 > [F_RESPONSE] KLIC #17, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:23.584 > [F_RESPONSE] Task: updateStateTask
+20:49:23.590 > [F_RESPONSE] Payload length: 5
+20:49:23.590 > [F_RESPONSE] State data uploaded ✅
+20:49:23.595 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:23.595 > [INIT] Posodabljanje stanja v Firebase za kanal 2...
+20:49:23.629 > Vrstica 5: [INIT] Posodabljanje K2
+20:49:23.630 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+20:49:23.687 > 
+20:49:23.687 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:23.698 > [F_RESPONSE] KLIC #18, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:23.704 > [F_RESPONSE] Task: updateStateTask
+20:49:23.704 > [F_RESPONSE] Payload length: 4
+20:49:23.709 > [F_RESPONSE] State data uploaded ✅
+20:49:23.714 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:23.714 > [INIT] Posodabljanje stanja v Firebase za kanal 3...
+20:49:23.748 > Vrstica 5: [INIT] Posodabljanje K3
+20:49:23.748 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+20:49:23.807 > 
+20:49:23.813 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:23.818 > [F_RESPONSE] KLIC #19, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:23.824 > [F_RESPONSE] Task: updateStateTask
+20:49:23.829 > [F_RESPONSE] Payload length: 5
+20:49:23.829 > [F_RESPONSE] State data uploaded ✅
+20:49:23.835 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:23.835 > [INIT] Posodabljanje stanja v Firebase za kanal 4...
+20:49:23.868 > Vrstica 5: [INIT] Posodabljanje K4
+20:49:23.868 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+20:49:24.097 > 
+20:49:24.097 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:24.109 > [F_RESPONSE] KLIC #20, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:24.113 > [F_RESPONSE] Task: updateStateTask
+20:49:24.113 > [F_RESPONSE] Payload length: 5
+20:49:24.119 > [F_RESPONSE] State data uploaded ✅
+20:49:24.124 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:24.124 > [INIT] Posodabljanje stanja v Firebase za kanal 5...
+20:49:24.158 > Vrstica 5: [INIT] Posodabljanje K5
+20:49:24.158 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+20:49:24.214 > 
+20:49:24.219 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:24.225 > [F_RESPONSE] KLIC #21, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:24.230 > [F_RESPONSE] Task: updateStateTask
+20:49:24.236 > [F_RESPONSE] Payload length: 4
+20:49:24.236 > [F_RESPONSE] State data uploaded ✅
+20:49:24.241 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:24.241 > [INIT] Posodabljanje stanja v Firebase za kanal 6...
+20:49:24.275 > Vrstica 5: [INIT] Posodabljanje K6
+20:49:24.276 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+20:49:24.330 > 
+20:49:24.330 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:24.341 > [F_RESPONSE] KLIC #22, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:24.347 > [F_RESPONSE] Task: updateStateTask
+20:49:24.347 > [F_RESPONSE] Payload length: 5
+20:49:24.353 > [F_RESPONSE] State data uploaded ✅
+20:49:24.358 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:24.358 > [INIT] Posodabljanje stanja v Firebase za kanal 7...
+20:49:24.391 > Vrstica 5: [INIT] Posodabljanje K7
+20:49:24.391 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+20:49:24.449 > 
+20:49:24.455 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:24.460 > [F_RESPONSE] KLIC #23, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:24.466 > [F_RESPONSE] Task: updateStateTask
+20:49:24.471 > [F_RESPONSE] Payload length: 5
+20:49:24.472 > [F_RESPONSE] State data uploaded ✅
+20:49:24.477 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:24.477 > [INIT] Posodabljanje stanja v Firebase za kanal 8...
+20:49:24.510 > Vrstica 5: [INIT] Posodabljanje K8
+20:49:24.510 > [F_UPDATE_RELAY] Sending relay state (poskus 1/3)...
+20:49:24.569 > 
+20:49:24.569 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:24.580 > [F_RESPONSE] KLIC #24, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:49:24.586 > [F_RESPONSE] Task: updateStateTask
+20:49:24.586 > [F_RESPONSE] Payload length: 5
+20:49:24.591 > [F_RESPONSE] State data uploaded ✅
+20:49:24.597 > [INIT] Uspeh pri čakanju na 'odgovor iz Firebase'.
+20:49:24.597 > [INIT] Vsi statusi kanalov iz Firebase uspesno posodobljeni.
+20:49:24.603 > [INIT] Obvestilo Rele modulu, da je inicializacija končana...
+20:49:24.640 > Vrstica 5: [INIT] Finalizing...
+20:49:24.641 > [Lora] Stack left: 9804
+20:49:24.641 > OUT ID: 11, CMD: 12
+20:49:24.646 > [LORA] Način inicializacije - brez splošnih poskusov.
+20:49:24.789 > [DISPATCH TASK] Stack left: 1508
+20:49:24.789 > [TX TASK] Stack left: 1508
+20:49:24.789 > [LORA] Paket uspesno poslan.
+20:49:24.795 > [LORA] Preklop v RX po TX uspesen.
+20:49:24.795 > -------------------------
+20:49:24.797 > 
+20:49:25.180 > [DISPATCH TASK] Stack left: 1508
+20:49:25.180 > [RX TASK] Stack left: 1092
+20:49:25.180 > [LORA RX] ID:11 CMD:107 RSSI:0 SNR:9.8
+20:49:25.185 > In ID: 11, CMD: 107
+20:49:25.185 > CRC OK.
+20:49:25.191 > Rele modul je potrdil, da je inicializacija končana.
+20:49:25.191 > --------------------
+20:49:25.196 > [INIT] Uspeh pri čakanju na 'odgovor za init done'.
+20:49:25.204 > [INIT] Inicializacija uspesno zakljucena.
+20:49:25.235 > Vrstica 5: [INIT] Done
+20:49:25.995 > [Loop] Stack left: 9804
+20:49:35.996 > [Loop] Stack left: 9804
+20:49:39.576 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:45.997 > [Loop] Stack left: 9804
+20:49:54.577 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:49:55.998 > [Loop] Stack left: 9804
+20:50:00.099 > [SENSORS] Prvi sinhroniziran klic ob prehodu minute.
+20:50:00.099 > [SENSOR] Čas za branje senzorjev. Dodajam v čakalno vrsto...
+20:50:00.105 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+20:50:00.110 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+20:50:00.146 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+20:50:00.146 > [Lora] Stack left: 9804
+20:50:00.152 > OUT ID: 12, CMD: 5
+20:50:00.152 > [LORA] Način samo ACK - brez poskusov.
+20:50:00.294 > [DISPATCH TASK] Stack left: 1508
+20:50:00.294 > [TX TASK] Stack left: 1508
+20:50:00.294 > [LORA] Paket uspesno poslan.
+20:50:00.299 > [LORA] Preklop v RX po TX uspesen.
+20:50:00.299 > -------------------------
+20:50:00.302 > 
+20:50:00.697 > [DISPATCH TASK] Stack left: 1508
+20:50:00.697 > [RX TASK] Stack left: 1092
+20:50:00.697 > [LORA RX] ID:12 CMD:104 RSSI:0 SNR:9.8
+20:50:00.703 > In ID: 12, CMD: 104
+20:50:00.703 > CRC OK.
+20:50:00.708 > Prejeti podatki senzorjev:
+20:50:00.708 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+20:50:00.714 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+20:50:00.723 > --------------------
+20:50:00.775 > 
+20:50:00.781 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:50:00.787 > [F_RESPONSE] KLIC #25, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:50:00.792 > [F_RESPONSE] Task: updateSensorTask
+20:50:00.798 > [F_RESPONSE] Payload length: 90
+20:50:00.798 > [F_RESPONSE] Sensor data uploaded ✅
+20:50:00.803 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+20:50:00.843 > [SENSOR_QUEUE] Operacija USPEŠNA.
+20:50:00.946 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+20:50:00.946 > [Lora] Stack left: 9804
+20:50:00.952 > OUT ID: 13, CMD: 13
+20:50:00.952 > [LORA] Način samo ACK - brez poskusov.
+20:50:01.094 > [DISPATCH TASK] Stack left: 1508
+20:50:01.094 > [TX TASK] Stack left: 1508
+20:50:01.094 > [LORA] Paket uspesno poslan.
+20:50:01.100 > [LORA] Preklop v RX po TX uspesen.
+20:50:01.100 > -------------------------
+20:50:01.102 > 
+20:50:01.486 > [DISPATCH TASK] Stack left: 1508
+20:50:01.486 > [RX TASK] Stack left: 1092
+20:50:01.486 > [LORA RX] ID:13 CMD:110 RSSI:0 SNR:9.8
+20:50:01.491 > In ID: 13, CMD: 110
+20:50:01.491 > CRC OK.
+20:50:01.498 > Prejeti podatki iz INA3221 senzorja.
+20:50:01.498 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+20:50:01.506 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+20:50:01.515 > --------------------
+20:50:01.577 > 
+20:50:01.577 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:50:01.582 > [F_RESPONSE] KLIC #26, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:50:01.588 > [F_RESPONSE] Task: updateINA3221Task
+20:50:01.593 > [F_RESPONSE] Payload length: 362
+20:50:01.593 > [F_RESPONSE] INA3221 data uploaded ✅
+20:50:01.599 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+20:50:01.644 > [SENSOR_QUEUE] Operacija USPEŠNA.
+20:50:05.999 > [Loop] Stack left: 9804
+20:50:16.001 > [Loop] Stack left: 9804
+20:50:16.577 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:50:26.001 > [Loop] Stack left: 9804
+20:50:31.578 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:50:36.003 > [Loop] Stack left: 9804
+20:50:46.003 > [Loop] Stack left: 9804
+20:50:46.580 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:50:56.004 > [Loop] Stack left: 9804
+20:51:01.581 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:51:06.006 > [Loop] Stack left: 9804
+20:51:16.007 > [Loop] Stack left: 9804
+20:51:16.581 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:51:26.008 > [Loop] Stack left: 9804
+20:51:31.591 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:51:36.009 > [Loop] Stack left: 9804
+20:51:46.010 > [Loop] Stack left: 9804
+20:51:46.583 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:51:56.012 > [Loop] Stack left: 9804
+20:52:01.585 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:52:06.012 > [Loop] Stack left: 9804
+20:52:16.014 > [Loop] Stack left: 9804
+20:52:16.586 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:52:26.015 > [Loop] Stack left: 9804
+20:52:31.587 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:52:34.030 > 
+20:52:34.031 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:52:34.037 > [F_RESPONSE] KLIC #27, isResult=0, isError=0, isEvent=0, isDebug=0, available=0
+20:52:34.042 > [F_RESPONSE] Ni rezultata, izhajam.
+20:52:34.047 > 
+20:52:34.047 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:52:34.054 > [F_RESPONSE] KLIC #28, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:52:34.059 > [F_RESPONSE] Event task: 🔐 authTask, msg: authenticating, code: 7
+20:52:34.064 > 
+20:52:34.064 > [F_DEBUG] Active tasks: 1, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:52:34.071 > [F_RESPONSE] KLIC #29, isResult=1, isError=0, isEvent=0, isDebug=1, available=0
+20:52:34.081 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Connecting to server...
+20:52:34.087 > 
+20:52:34.087 > [F_DEBUG] Active tasks: 1, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:52:34.093 > [F_RESPONSE] KLIC #30, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:52:34.097 > [F_RESPONSE] Event task: 🔐 authTask, msg: auth request sent, code: 8
+20:52:35.616 > 
+20:52:35.616 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:52:35.622 > [F_RESPONSE] KLIC #31, isResult=1, isError=0, isEvent=1, isDebug=1, available=0
+20:52:35.627 > [F_RESPONSE] Event task: 🔐 authTask, msg: auth response received, code: 9
+20:52:35.633 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Terminating the server connection...
+20:52:35.639 > 
+20:52:35.644 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:52:35.650 > [F_RESPONSE] KLIC #32, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:52:35.655 > [F_RESPONSE] Event task: 🔐 authTask, msg: ready, code: 10
+20:52:35.661 > [F_AUTH] ✅ Avtentikacija uspešna!
+20:52:36.015 > [Loop] Stack left: 9804
+20:52:46.017 > [Loop] Stack left: 9804
+20:52:50.640 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:52:56.018 > [Loop] Stack left: 9804
+20:53:05.641 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:53:06.020 > [Loop] Stack left: 9804
+20:53:16.021 > [Loop] Stack left: 9804
+20:53:20.642 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:53:26.021 > [Loop] Stack left: 9804
+20:53:35.643 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:53:36.022 > [Loop] Stack left: 9804
+20:53:46.024 > [Loop] Stack left: 9804
+20:53:50.644 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:53:56.025 > [Loop] Stack left: 9804
+20:54:00.101 > [SENSORS] Periodično branje senzorjev.
+20:54:00.102 > [F_READY] SSL ni povezan. Vzpostavljam on-demand...
+20:54:00.779 > [F_READY] SSL re-inicializiran. Čakam na odgovor...
+20:54:00.779 > [SENSOR] Čas za branje senzorjev. Dodajam v čakalno vrsto...
+20:54:00.784 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+20:54:00.790 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+20:54:00.796 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+20:54:00.801 > [Lora] Stack left: 9804
+20:54:00.801 > OUT ID: 14, CMD: 5
+20:54:00.801 > [LORA] Način samo ACK - brez poskusov.
+20:54:00.831 > 
+20:54:00.831 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:54:00.837 > [F_RESPONSE] KLIC #33, isResult=1, isError=0, isEvent=0, isDebug=1, available=1
+20:54:00.842 > [F_RESPONSE] Debug task: dummyTask, msg: Connecting to server...
+20:54:00.847 > [F_RESPONSE] Task: dummyTask
+20:54:00.847 > [F_RESPONSE] Payload length: 1
+20:54:00.854 > [F_RESPONSE] Dummy task executed ✅
+20:54:00.949 > [DISPATCH TASK] Stack left: 1508
+20:54:00.949 > [TX TASK] Stack left: 1508
+20:54:00.949 > [LORA] Paket uspesno poslan.
+20:54:00.955 > [LORA] Preklop v RX po TX uspesen.
+20:54:00.955 > -------------------------
+20:54:00.957 > 
+20:54:01.351 > [DISPATCH TASK] Stack left: 1508
+20:54:01.352 > [RX TASK] Stack left: 1092
+20:54:01.352 > [LORA RX] ID:14 CMD:104 RSSI:0 SNR:8.8
+20:54:01.357 > In ID: 14, CMD: 104
+20:54:01.357 > CRC OK.
+20:54:01.363 > Prejeti podatki senzorjev:
+20:54:01.363 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+20:54:01.368 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+20:54:01.379 > --------------------
+20:54:01.428 > 
+20:54:01.434 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:54:01.440 > [F_RESPONSE] KLIC #34, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:54:01.445 > [F_RESPONSE] Task: updateSensorTask
+20:54:01.451 > [F_RESPONSE] Payload length: 90
+20:54:01.451 > [F_RESPONSE] Sensor data uploaded ✅
+20:54:01.456 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+20:54:01.487 > [SENSOR_QUEUE] Operacija USPEŠNA.
+20:54:01.589 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+20:54:01.590 > [Lora] Stack left: 9804
+20:54:01.596 > OUT ID: 15, CMD: 13
+20:54:01.596 > [LORA] Način samo ACK - brez poskusov.
+20:54:01.737 > [DISPATCH TASK] Stack left: 1508
+20:54:01.738 > [TX TASK] Stack left: 1508
+20:54:01.738 > [LORA] Paket uspesno poslan.
+20:54:01.743 > [LORA] Preklop v RX po TX uspesen.
+20:54:01.743 > -------------------------
+20:54:01.746 > 
+20:54:02.139 > [DISPATCH TASK] Stack left: 1508
+20:54:02.140 > [RX TASK] Stack left: 1092
+20:54:02.140 > [LORA RX] ID:15 CMD:110 RSSI:0 SNR:9.8
+20:54:02.145 > In ID: 15, CMD: 110
+20:54:02.145 > CRC OK.
+20:54:02.151 > Prejeti podatki iz INA3221 senzorja.
+20:54:02.151 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+20:54:02.159 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+20:54:02.169 > --------------------
+20:54:02.222 > 
+20:54:02.223 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:54:02.234 > [F_RESPONSE] KLIC #35, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:54:02.240 > [F_RESPONSE] Task: updateINA3221Task
+20:54:02.245 > [F_RESPONSE] Payload length: 362
+20:54:02.245 > [F_RESPONSE] INA3221 data uploaded ✅
+20:54:02.250 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+20:54:02.287 > [SENSOR_QUEUE] Operacija USPEŠNA.
+20:54:06.026 > [Loop] Stack left: 9804
+20:54:16.027 > [Loop] Stack left: 9804
+20:54:17.229 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:54:26.028 > [Loop] Stack left: 9804
+20:54:32.230 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:54:36.029 > [Loop] Stack left: 9804
+20:54:46.031 > [Loop] Stack left: 9804
+20:54:47.232 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:54:56.032 > [Loop] Stack left: 9804
+20:55:02.232 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:55:06.033 > [Loop] Stack left: 9804
+20:55:16.034 > [Loop] Stack left: 9804
+20:55:17.234 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:55:26.035 > [Loop] Stack left: 9804
+20:55:32.241 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:55:36.036 > [Loop] Stack left: 9804
+20:55:46.038 > [Loop] Stack left: 9804
+20:55:47.236 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:55:55.037 > 
+20:55:55.037 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:55:55.043 > [F_RESPONSE] KLIC #36, isResult=0, isError=0, isEvent=0, isDebug=0, available=0
+20:55:55.049 > [F_RESPONSE] Ni rezultata, izhajam.
+20:55:55.054 > 
+20:55:55.054 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:55:55.060 > [F_RESPONSE] KLIC #37, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:55:55.065 > [F_RESPONSE] Event task: 🔐 authTask, msg: authenticating, code: 7
+20:55:55.071 > 
+20:55:55.071 > [F_DEBUG] Active tasks: 1, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:55:55.076 > [F_RESPONSE] KLIC #38, isResult=1, isError=0, isEvent=0, isDebug=1, available=0
+20:55:55.087 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Connecting to server...
+20:55:55.093 > 
+20:55:55.093 > [F_DEBUG] Active tasks: 1, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:55:55.099 > [F_RESPONSE] KLIC #39, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:55:55.104 > [F_RESPONSE] Event task: 🔐 authTask, msg: auth request sent, code: 8
+20:55:56.324 > [Loop] Stack left: 9804
+20:55:56.632 > 
+20:55:56.632 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:55:56.638 > [F_RESPONSE] KLIC #40, isResult=1, isError=0, isEvent=1, isDebug=1, available=0
+20:55:56.643 > [F_RESPONSE] Event task: 🔐 authTask, msg: auth response received, code: 9
+20:55:56.649 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Terminating the server connection...
+20:55:56.655 > 
+20:55:56.660 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:55:56.666 > [F_RESPONSE] KLIC #41, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:55:56.671 > [F_RESPONSE] Event task: 🔐 authTask, msg: ready, code: 10
+20:55:56.677 > [F_AUTH] ✅ Avtentikacija uspešna!
+20:56:06.325 > [Loop] Stack left: 9804
+20:56:11.657 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:56:16.326 > [Loop] Stack left: 9804
+20:56:26.327 > [Loop] Stack left: 9804
+20:56:26.658 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:56:36.328 > [Loop] Stack left: 9804
+20:56:41.659 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:56:46.329 > [Loop] Stack left: 9804
+20:56:56.330 > [Loop] Stack left: 9804
+20:56:56.660 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:57:06.332 > [Loop] Stack left: 9804
+20:57:11.312 > [DISPATCH TASK] Stack left: 1508
+20:57:11.313 > [RX TASK] Stack left: 1092
+20:57:11.661 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:57:16.333 > [Loop] Stack left: 9804
+20:57:26.333 > [Loop] Stack left: 9804
+20:57:26.662 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:57:36.334 > [Loop] Stack left: 9804
+20:57:41.664 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:57:46.336 > [Loop] Stack left: 9804
+20:57:56.337 > [Loop] Stack left: 9804
+20:57:56.665 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:58:00.105 > [SENSORS] Periodično branje senzorjev.
+20:58:00.105 > [F_READY] SSL ni povezan. Vzpostavljam on-demand...
+20:58:00.869 > [F_READY] SSL re-inicializiran. Čakam na odgovor...
+20:58:00.870 > [SENSOR] Čas za branje senzorjev. Dodajam v čakalno vrsto...
+20:58:00.875 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+20:58:00.881 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+20:58:00.887 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+20:58:00.892 > [Lora] Stack left: 9804
+20:58:00.892 > OUT ID: 16, CMD: 5
+20:58:00.892 > [LORA] Način samo ACK - brez poskusov.
+20:58:00.918 > 
+20:58:00.919 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:58:00.924 > [F_RESPONSE] KLIC #42, isResult=1, isError=0, isEvent=0, isDebug=1, available=1
+20:58:00.930 > [F_RESPONSE] Debug task: dummyTask, msg: Connecting to server...
+20:58:00.936 > [F_RESPONSE] Task: dummyTask
+20:58:00.936 > [F_RESPONSE] Payload length: 1
+20:58:00.941 > [F_RESPONSE] Dummy task executed ✅
+20:58:01.039 > [DISPATCH TASK] Stack left: 1508
+20:58:01.039 > [TX TASK] Stack left: 1460
+20:58:01.039 > [LORA] Paket uspesno poslan.
+20:58:01.045 > [LORA] Preklop v RX po TX uspesen.
+20:58:01.045 > -------------------------
+20:58:01.048 > 
+20:58:01.441 > [DISPATCH TASK] Stack left: 1508
+20:58:01.441 > [RX TASK] Stack left: 1092
+20:58:01.441 > [LORA RX] ID:16 CMD:104 RSSI:0 SNR:8.8
+20:58:01.447 > In ID: 16, CMD: 104
+20:58:01.447 > CRC OK.
+20:58:01.453 > Prejeti podatki senzorjev:
+20:58:01.453 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+20:58:01.459 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+20:58:01.469 > --------------------
+20:58:01.518 > 
+20:58:01.523 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:58:01.529 > [F_RESPONSE] KLIC #43, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:58:01.535 > [F_RESPONSE] Task: updateSensorTask
+20:58:01.540 > [F_RESPONSE] Payload length: 90
+20:58:01.540 > [F_RESPONSE] Sensor data uploaded ✅
+20:58:01.545 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+20:58:01.577 > [SENSOR_QUEUE] Operacija USPEŠNA.
+20:58:01.679 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+20:58:01.680 > [Lora] Stack left: 9804
+20:58:01.686 > OUT ID: 17, CMD: 13
+20:58:01.686 > [LORA] Način samo ACK - brez poskusov.
+20:58:01.828 > [DISPATCH TASK] Stack left: 1508
+20:58:01.828 > [TX TASK] Stack left: 1460
+20:58:01.828 > [LORA] Paket uspesno poslan.
+20:58:01.834 > [LORA] Preklop v RX po TX uspesen.
+20:58:01.834 > -------------------------
+20:58:01.836 > 
+20:58:02.220 > [DISPATCH TASK] Stack left: 1508
+20:58:02.220 > [RX TASK] Stack left: 1092
+20:58:02.220 > [LORA RX] ID:17 CMD:110 RSSI:0 SNR:9.8
+20:58:02.226 > In ID: 17, CMD: 110
+20:58:02.226 > CRC OK.
+20:58:02.232 > Prejeti podatki iz INA3221 senzorja.
+20:58:02.232 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+20:58:02.240 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+20:58:02.254 > --------------------
+20:58:02.304 > 
+20:58:02.304 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:58:02.316 > [F_RESPONSE] KLIC #44, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+20:58:02.321 > [F_RESPONSE] Task: updateINA3221Task
+20:58:02.327 > [F_RESPONSE] Payload length: 362
+20:58:02.327 > [F_RESPONSE] INA3221 data uploaded ✅
+20:58:02.332 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+20:58:02.377 > [SENSOR_QUEUE] Operacija USPEŠNA.
+20:58:06.339 > [Loop] Stack left: 9804
+20:58:16.339 > [Loop] Stack left: 9804
+20:58:17.311 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:58:26.340 > [Loop] Stack left: 9804
+20:58:32.311 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:58:36.342 > [Loop] Stack left: 9804
+20:58:46.343 > [Loop] Stack left: 9804
+20:58:47.313 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:58:56.345 > [Loop] Stack left: 9804
+20:59:02.314 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:59:06.345 > [Loop] Stack left: 9804
+20:59:16.062 > 
+20:59:16.062 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:59:16.068 > [F_RESPONSE] KLIC #45, isResult=0, isError=0, isEvent=0, isDebug=0, available=0
+20:59:16.073 > [F_RESPONSE] Ni rezultata, izhajam.
+20:59:16.079 > 
+20:59:16.079 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+20:59:16.084 > [F_RESPONSE] KLIC #46, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:59:16.090 > [F_RESPONSE] Event task: 🔐 authTask, msg: authenticating, code: 7
+20:59:16.096 > 
+20:59:16.096 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 0
+20:59:16.101 > [F_RESPONSE] KLIC #47, isResult=1, isError=0, isEvent=0, isDebug=1, available=0
+20:59:16.112 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Connecting to server...
+20:59:16.118 > 
+20:59:16.118 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 0
+20:59:16.123 > [F_RESPONSE] KLIC #48, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:59:16.129 > [F_RESPONSE] Event task: 🔐 authTask, msg: auth request sent, code: 8
+20:59:17.348 > [Loop] Stack left: 9804
+20:59:18.366 > 
+20:59:18.371 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:59:18.377 > [F_RESPONSE] KLIC #49, isResult=1, isError=0, isEvent=1, isDebug=1, available=0
+20:59:18.382 > [F_RESPONSE] Event task: 🔐 authTask, msg: auth response received, code: 9
+20:59:18.388 > [F_RESPONSE] Debug task: 🔐 authTask, msg: Terminating the server connection...
+20:59:18.394 > 
+20:59:18.394 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 0
+20:59:18.405 > [F_RESPONSE] KLIC #50, isResult=1, isError=0, isEvent=1, isDebug=0, available=0
+20:59:18.410 > [F_RESPONSE] Event task: 🔐 authTask, msg: ready, code: 10
+20:59:18.416 > [F_AUTH] ✅ Avtentikacija uspešna!
+20:59:27.348 > [Loop] Stack left: 9804
+20:59:33.395 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:59:37.350 > [Loop] Stack left: 9804
+20:59:47.351 > [Loop] Stack left: 9804
+20:59:48.396 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+20:59:57.351 > [Loop] Stack left: 9804
+21:00:03.397 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+21:00:07.353 > [Loop] Stack left: 9804
+21:00:17.354 > [Loop] Stack left: 9804
+21:00:18.399 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+21:00:27.355 > [Loop] Stack left: 9804
+21:00:33.399 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+21:00:37.357 > [Loop] Stack left: 9804
+21:00:47.357 > [Loop] Stack left: 9804
+21:00:48.401 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+21:00:57.358 > [Loop] Stack left: 9804
+21:01:03.402 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+21:01:07.360 > [Loop] Stack left: 9804
+21:01:17.361 > [Loop] Stack left: 9804
+21:01:18.404 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+21:01:27.362 > [Loop] Stack left: 9804
+21:01:33.404 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+21:01:37.363 > [Loop] Stack left: 9804
+21:01:47.364 > [Loop] Stack left: 9804
+21:01:48.406 > [F_DEBUG] Active tasks: 0, SSL connected: 0, SSL available: 0, Auth ready: 1
+21:01:57.366 > [Loop] Stack left: 9804
+21:02:00.108 > [SENSORS] Periodično branje senzorjev.
+21:02:00.108 > [F_READY] SSL ni povezan. Vzpostavljam on-demand...
+21:02:00.794 > [F_READY] SSL re-inicializiran. Čakam na odgovor...
+21:02:00.794 > [SENSOR] Čas za branje senzorjev. Dodajam v čakalno vrsto...
+21:02:00.800 > [SENSOR_QUEUE] Dodana operacija tipa 0. V vrsti: 1/5
+21:02:00.805 > [SENSOR_QUEUE] Dodana operacija tipa 1. V vrsti: 2/5
+21:02:00.811 > [SENSOR_QUEUE] Izvajam: SENSORS (poskus 0/3)
+21:02:00.817 > [Lora] Stack left: 9804
+21:02:00.817 > OUT ID: 18, CMD: 5
+21:02:00.817 > [LORA] Način samo ACK - brez poskusov.
+21:02:00.848 > 
+21:02:00.849 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+21:02:00.854 > [F_RESPONSE] KLIC #51, isResult=1, isError=0, isEvent=0, isDebug=1, available=1
+21:02:00.860 > [F_RESPONSE] Debug task: dummyTask, msg: Connecting to server...
+21:02:00.865 > [F_RESPONSE] Task: dummyTask
+21:02:00.865 > [F_RESPONSE] Payload length: 1
+21:02:00.871 > [F_RESPONSE] Dummy task executed ✅
+21:02:00.963 > [DISPATCH TASK] Stack left: 1508
+21:02:00.964 > [TX TASK] Stack left: 1460
+21:02:00.964 > [LORA] Paket uspesno poslan.
+21:02:00.980 > [LORA] Preklop v RX po TX uspesen.
+21:02:00.980 > -------------------------
+21:02:00.980 > 
+21:02:01.365 > [DISPATCH TASK] Stack left: 1508
+21:02:01.365 > [RX TASK] Stack left: 1092
+21:02:01.365 > [LORA RX] ID:18 CMD:104 RSSI:0 SNR:9.5
+21:02:01.371 > In ID: 18, CMD: 104
+21:02:01.371 > CRC OK.
+21:02:01.376 > Prejeti podatki senzorjev:
+21:02:01.376 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+21:02:01.382 > [F_UPDATE_SENSOR] Sending sensor data (poskus 1/3)...
+21:02:01.390 > --------------------
+21:02:01.442 > 
+21:02:01.448 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+21:02:01.454 > [F_RESPONSE] KLIC #52, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+21:02:01.459 > [F_RESPONSE] Task: updateSensorTask
+21:02:01.465 > [F_RESPONSE] Payload length: 90
+21:02:01.465 > [F_RESPONSE] Sensor data uploaded ✅
+21:02:01.470 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+21:02:01.503 > [SENSOR_QUEUE] Operacija USPEŠNA.
+21:02:01.605 > [SENSOR_QUEUE] Izvajam: INA (poskus 0/3)
+21:02:01.606 > [Lora] Stack left: 9804
+21:02:01.611 > OUT ID: 19, CMD: 13
+21:02:01.611 > [LORA] Način samo ACK - brez poskusov.
+21:02:01.753 > [DISPATCH TASK] Stack left: 1508
+21:02:01.753 > [TX TASK] Stack left: 1460
+21:02:01.753 > [LORA] Paket uspesno poslan.
+21:02:01.759 > [LORA] Preklop v RX po TX uspesen.
+21:02:01.759 > -------------------------
+21:02:01.762 > 
+21:02:02.145 > [DISPATCH TASK] Stack left: 1508
+21:02:02.145 > [RX TASK] Stack left: 1092
+21:02:02.145 > [LORA RX] ID:19 CMD:110 RSSI:0 SNR:9.2
+21:02:02.151 > In ID: 19, CMD: 110
+21:02:02.151 > CRC OK.
+21:02:02.156 > Prejeti podatki iz INA3221 senzorja.
+21:02:02.156 > [SENSOR_QUEUE] LoRa odgovor prejet. Čakam na Firebase...
+21:02:02.164 > [F_UPDATE_INA] Sending INA data (poskus 1/3)...
+21:02:02.178 > --------------------
+21:02:02.231 > 
+21:02:02.231 > [F_DEBUG] Active tasks: 1, SSL connected: 1, SSL available: 0, Auth ready: 1
+21:02:02.242 > [F_RESPONSE] KLIC #53, isResult=1, isError=0, isEvent=0, isDebug=0, available=1
+21:02:02.248 > [F_RESPONSE] Task: updateINA3221Task
+21:02:02.254 > [F_RESPONSE] Payload length: 362
+21:02:02.254 > [F_RESPONSE] INA3221 data uploaded ✅
+21:02:02.259 > [SENSOR_QUEUE] Firebase uspešno posodobljen.
+21:02:02.303 > [SENSOR_QUEUE] Operacija USPEŠNA.
+21:02:07.367 > [Loop] Stack left: 9804
+21:02:17.238 > [F_DEBUG] Active tasks: 0, SSL connected: 1, SSL available: 0, Auth ready: 1
+21:02:17.368 > [Loop] Stack left: 9804

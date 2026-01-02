@@ -6,13 +6,8 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
-
-// #include <WiFi.h>
-// #include "time.h"
-// #include "esp_sntp.h"
-// #include <ArduinoJson.h>
-
-
+#include <WiFiClientSecure.h>
+#include <FirebaseClient.h>
 
 // Struktura za shranjevanje podatkov o relejih
 struct Kanal
@@ -40,5 +35,5 @@ void PrikaziStanjeRelejevNaSerial();
 // Funkcija za update urnikov relejev v Rele modulu
 void Rele_updateRelayUrnik(uint8_t index, uint32_t startSec, uint32_t endSec);
 
-
+extern FirebaseApp app;
 

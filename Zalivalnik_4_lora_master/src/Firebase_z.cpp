@@ -11,17 +11,26 @@
 #define FIREBASE_USER_UID "68TA11sAdOaFnIdmqzDtkx3QIBC2"
 //--------------------------------------------------------------------------------------------------------
 
+using AsyncClient = AsyncClientClass;
+
+// spremenljivke za Firebase
+WiFiClientSecure ssl_client;
+AsyncClient aClient(ssl_client);
+RealtimeDatabase Database;
+FirebaseApp app;
+
+
+// spremenljivke za Stream
+// WiFiClientSecure stream_ssl_client;
+// AsyncClient streamClient(stream_ssl_client);
+// AsyncResult streamResult; // Za Firebase streaming
+
+
 // Authentication
-UserAuth user_auth(FIREBASE_API_KEY, FIREBASE_USER_EMAIL, FIREBASE_USER_PASSWORD);
+// UserAuth user_auth(FIREBASE_API_KEY, FIREBASE_USER_EMAIL, FIREBASE_USER_PASSWORD, 200);
 
-// FreeRTOS objekti
-// SemaphoreHandle_t firebaseSemaphore = NULL;
-// TaskHandle_t firebaseTaskHandle = NULL;
 
-// Prototipi funkcij
-// void Firebase_Task(void *pvParameters);
 
-// --- SPREMENJENO: Uporaba char nizov namesto String objektov ---
 // Database main path (to be updated in setup with the user UID)
 char databasePath[48];
 char sensorPath[64];
@@ -33,14 +42,14 @@ char uid[32];
 bool relayState[8]; // Stanja relejev (za 8 relejev) false = OFF, true = ON
 bool status;        // Spremenljivka za shranjevanje statusa operacij
 bool ssl_avtentikacija = false; // Spremenljivka za shranjevanje stanja SSL avtentikacije
-
+// bool firebase_SSL_connected = false; // Ali je Firebase inicializiran?
 
 
 // DODAJ retry mehanizem:
 static unsigned long lastFirebaseOperationTime = 0;
 static uint8_t firebaseRetryCount = 0;
 const uint8_t MAX_FIREBASE_RETRIES = 3;
-const unsigned long FIREBASE_RESPONSE_TIMEOUT = 10000; // 10 sekund
+const unsigned long FIREBASE_RESPONSE_TIMEOUT = 5000; // 5 sekund
 
 // DODAJ globalne spremenljivke za stream monitoring
 static unsigned long lastFirebaseActivityTime = 0;
@@ -70,32 +79,54 @@ struct LastFirebaseOperation {
     bool waiting_for_response;
 } lastOperation = {LastFirebaseOperation::Type::NONE, {}, false};
 
+// Loop funkcija za app.loop ki se kliče v loop()
+void Firebase_Loop()
+{
+  app.loop();
+
+  if (app.ready())
+  {
+    // Preveri stanje Firebase povezave
+    Firebase_Check_Active_State(true);
+
+    // Procesiranje Firebase čakalne vrste v glavnem loop-u
+    static unsigned long lastFirebaseCheck = 0;
+    if (millis() - lastFirebaseCheck > 200) // 5x na sekundo
+    {
+      lastFirebaseCheck = millis();
+
+      // 2. Preveri timeouts in retry
+      Firebase_CheckAndRetry();
+    }
+  }
+}
 
 //------------------------------------------------------------------------------------------------------------------------
 // Funkcija za inicializacijo Firebase
 void Init_Firebase()
 {
-  // Authentication
-  UserAuth user_auth(FIREBASE_API_KEY, FIREBASE_USER_EMAIL, FIREBASE_USER_PASSWORD);
+
+  Firebase.printf("[F_INIT] Free Heap before Firebase: %d\n", ESP.getFreeHeap());
 
   // Configure SSL client
   ssl_client.setInsecure();
   ssl_client.setTimeout(10000);
   ssl_client.setHandshakeTimeout(20);
 
+
   // Configure stream SSL client
-  stream_ssl_client.setInsecure();
-  stream_ssl_client.setTimeout(15000);
-  stream_ssl_client.setHandshakeTimeout(20);
+  // stream_ssl_client.setInsecure();
+  // stream_ssl_client.setTimeout(15000);
+  // stream_ssl_client.setHandshakeTimeout(20);
+
+
+  // Authentication
+  UserAuth user_auth(FIREBASE_API_KEY, FIREBASE_USER_EMAIL, FIREBASE_USER_PASSWORD, 200);
 
   // Initialize Firebase
   initializeApp(aClient, app, getAuth(user_auth), Firebase_processResponse, "🔐 authTask");
   app.getApp<RealtimeDatabase>(Database);
   Database.url(FIREBASE_DATABASE_URL);
-
-  // Ustvari Firebase task z velikim skladom
-  // xTaskCreate(Firebase_Task, "Firebase", 24576, NULL, 1, &firebaseTaskHandle); // 24KB!
-
 
 }
 
@@ -112,11 +143,50 @@ void Firebase_Connect()
   snprintf(kanaliPath, sizeof(kanaliPath), "%s/Kanali/kanal", databasePath);
   snprintf(chartIntervalPath, sizeof(chartIntervalPath), "%s/charts/Interval", databasePath);
 
-  Firebase.printf("[F_CONNECT] Free Heap: %d\n", ESP.getFreeHeap());
+  // Firebase.printf("[F_CONNECT] Free Heap before stream: %d\n", ESP.getFreeHeap());
 
-  streamClient.setSSEFilters("put,patch,cancel,auth_revoked,keep-alive");
-  Database.get(streamClient, databasePath, streamCallback, true /* SSE mode (HTTP Streaming) */, "mainStreamTask");
+  // streamClient.setSSEFilters("put,patch,cancel,auth_revoked,keep-alive");
+  // Database.get(streamClient, databasePath, streamCallback, true /* SSE mode (HTTP Streaming) */, "mainStreamTask");
 
+  // Firebase.printf("[F_CONNECT] Free Heap after Firebase: %d\n", ESP.getFreeHeap());
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+// Zapre SSL povezavo po uspešni operaciji
+void Firebase_CloseSSL()
+{
+  static unsigned long lastCloseTime = 0;
+  
+  // Ne zapri, če je bil nedavno uporabljen (debounce)
+  if (millis() - lastCloseTime < 2000) {
+    return;
+  }
+  
+  if (ssl_client.connected()) {
+    Firebase.printf("[F_SSL] Zapiranje SSL povezave (ni več potrebna)...\n");
+    ssl_client.stop();
+    lastCloseTime = millis();
+  }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+// Funkcija za preverjanje stanja SSL povezave
+void Firebase_Check_Active_State(bool wait) {
+
+  // če je wait true, preverimo stanje vsakih 15 sekund, če je false, preverimo takoj
+  static unsigned long lastCheckTime = 0;
+  bool checkNow = !wait || (millis() - lastCheckTime > 15000);
+
+  if (checkNow) {
+    lastCheckTime = millis();
+    Firebase.printf("[F_DEBUG] Active tasks: %d, SSL connected: %d, SSL available: %d, Auth ready: %d\n",
+                  aClient.taskCount(),
+                  ssl_client.connected(),
+                  ssl_client.available(),
+                  // stream_ssl_client.connected(),
+                  ssl_avtentikacija);
+  }
+  // ssl_client.
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -147,31 +217,52 @@ int extractIntValue(const char* json, const char* key) {
 // Funkcija za preverjanje če je Firebase pripravljen
 bool Firebase_IsReady()
 {
-  // DODAJ PREVERJANJE PROSTEGA HEAP-a PRED OPERACIJO
+  // 1. Preveri heap
   size_t freeHeap = ESP.getFreeHeap();
-  if (freeHeap < 30000) { // Potrebuješ vsaj ~30KB za SSL
-    Firebase.printf("[F_READY] OPOZORILO: Premalo prostega heap-a: %d bajtov. Preskakujem posodobitev.\n", freeHeap);
+  if (freeHeap < 30000) {
+    Firebase.printf("[F_READY] ⚠️ Premalo heap-a: %d B\n", freeHeap);
     return false;
   }
 
+  // 2. Preveri app status
   if (!app.ready())
   {
-    Firebase.printf("[F_READY] Firebase ni pripravljen za pošiljanje INA podatkov.\n");
+    Firebase.printf("[F_READY] Firebase app ni pripravljen.\n");
     return false;
   }
 
-  // NOVO: Počakaj na avtentikacijo
+  // 3. Počakaj na avtentikacijo
   if (!ssl_avtentikacija) {
-    Firebase.printf("[F_READY] Avtentikacija v teku, čakam...\n");
+    Firebase.printf("[F_READY] Avtentikacija v teku...\n");
     return false;
   }
 
+  // 4. LAZY SSL INIT - Vzpostavi povezavo samo če je potrebna
+  if (!ssl_client.connected()) {
+    // firebase_SSL_connected = false;
+    Firebase.printf("[F_READY] SSL ni povezan. Vzpostavljam on-demand...\n");
+    
+    // Re-inicializiraj
+    ssl_client.setInsecure();           // Omogoči nezavarovano povezavo
+    ssl_client.setTimeout(10000);       // Nastavi timeout na 10 sekund
+    ssl_client.setHandshakeTimeout(20); // Nastavi timeout za handshake na 20 sekund
+
+    // NE ČAKAJ na povezavo - pustimo, da se Firebase sam poveže
+
+    // Pošljemo dummy request
+    Database.get(aClient, chartIntervalPath, Firebase_processResponse, false, "dummyTask");
+    // delay(100); // Kratek delay, da se sproži povezava
+    Firebase.printf("[F_READY] SSL re-inicializiran. Čakam na odgovor...\n");
+    // return false;
+  }
+
+  
   return true;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 // Callback funkcija za obdelavo sprememb iz Firebase stream-a
-void streamCallback(AsyncResult &aResult)
+/* void streamCallback(AsyncResult &aResult)
 {
   // Exits when no result is available when calling from the loop.
   if (!aResult.isResult()) return;
@@ -289,11 +380,11 @@ void streamCallback(AsyncResult &aResult)
       Firebase.printf("[STREAM] task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
     }
   }
-}
+} */
 
 //-----------------------------------------------------------------------------------------------------------
 // Funkcija za obdelavo posodobljenih podatkov iz Streaminga Firebase
-bool Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec)
+/* bool Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec)
 {
   int index = kanalIndex - 1;
   bool updated = false;
@@ -324,14 +415,14 @@ bool Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec)
   }
 
   return updated;
-}
+} */
 
 //------------------------------------------------------------------------------------------------------------------------
 // NOVA funkcija: Preverjanje in reconnect streama
-void Firebase_CheckStreamHealth()
+/* void Firebase_CheckStreamHealth()
 {
   // Če smo v procesu Wi-Fi reconnecta, počakamo
-  if (!WiFi.isConnected() || !ssl_avtentikacija)
+  if (!WiFi.isConnected())
   {
     return;
   }
@@ -343,39 +434,37 @@ void Firebase_CheckStreamHealth()
 
   if (FirebaseNeedsReconnect || timeSinceLastActivity > get_Interval() + 1000)  // Interval + 1 sekunda
   {
-    Firebase.printf("[F_FIREBASE] ⚠️ Firebase reconnect potreben (čas od zadnje aktivnosti: %lu ms)\n", 
+    Firebase.printf("[F_RECONNECT] ⚠️ Firebase reconnect potreben (čas od zadnje aktivnosti: %lu ms)\n", 
                     timeSinceLastActivity);
 
     lastFirebaseActivityTime = millis();
     FirebaseNeedsReconnect = false;
-    Database.resetApp();  // NOVO: Ponastavi aplikacijo
 
-    reconnectAttempted = true;
+    // Prekini aktivne data operacije (NE stream!)
+    if (aClient.taskCount() > 1) {  // >1 ker stream task ostane
+      Firebase.printf("[F_RECONNECT] Prekinjam %d data taskov...\n", 
+                      aClient.taskCount() - 1);
+      // NE kliči stopAsync() - to bi ustavilo tudi stream!
+    }
+    
+    // ZAPRI SAMO DATA SSL (ne stream_ssl_client!)
+    // if (ssl_client.connected()) {
+    //   Firebase.printf("[F_RECONNECT] Zapiranje data SSL...\n");
+    //   ssl_client.stop();
+    //   delay(100);
+    // }
+    
+    // NOVO: Počisti retry states
+    lastOperation.waiting_for_response = false;
+    firebaseRetryCount = 0;    
   }
-
-  if (!connecting && reconnectAttempted)
-  {    
-    Firebase.printf("[STREAM] Firebase init...\n");
-    connecting = true;
-    reconnectAttempted = false;
-    Init_Firebase();
-    return; // Če je že v teku, ne začni znova
-  }
-
-  // Ponovno vzpostavi aplikacijo
-  if (app.ready() && connecting)
-  {
-    Firebase.printf("[STREAM] Firebase connect...\n");
-    Firebase_Connect();    
-    connecting = false;
-  }
-}
+} */
 
 //------------------------------------------------------------------------------------------------------------------------
 // Funkcija za posodobitev podatkov iz Firebase (chart interval)
 void Firebase_readInterval()
 {
-  if (!ssl_avtentikacija || !app.ready())
+  if (!Firebase_IsReady())
   {
     Firebase.printf("[F_GET_INTERVAL] Firebase ni pripravljen.\n");
     return;
@@ -396,7 +485,7 @@ void Firebase_readInterval()
 // Funkcija ki prebere urnik iz Firebase in ga shrani v globalno spremenljivko firebase_kanal
 void Firebase_readKanalUrnik(uint8_t kanalIndex)
 {
-  if (!ssl_avtentikacija || !app.ready())
+  if (!Firebase_IsReady())
   {
     Firebase.printf("[F_GET_URNIK] Firebase ni pripravljen.\n");
     return;
@@ -422,9 +511,9 @@ void Firebase_readKanalUrnik(uint8_t kanalIndex)
 // Funkcija za posodobitev podatkov v Firebase (eno polje kanala)
 void Firebase_Update_Relay_State(int kanal, bool state)
 {
-  if (!ssl_avtentikacija || !app.ready())
+  if (!Firebase_IsReady())
   {
-    Firebase.printf("[F_UPDATE_RELAY] Firebase ni pripravljen.\n");
+    Firebase.printf("[F_UPDATE_RELAY] Firebase ni pripravljen!\n");
     return;
   }
 
@@ -489,8 +578,7 @@ void Firebase_Update_Sensor_Data(unsigned long timestamp, const SensorDataPayloa
 
   if (!Firebase_IsReady())
   {
-    Firebase.printf("[F_UPDATE_SENSOR] Firebase ni pripravljen za posodobitev podatkov senzorjev.\n");
-    Sensor_OnFirebaseResponse(false);
+    Firebase.printf("[F_UPDATE_SENSOR] Firebase ni pripravljen za posodobitev podatkov senzorjev!\n");
     return;
   }
   // Pošljemo podatke
@@ -580,8 +668,7 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
 
   if (!Firebase_IsReady())
   {
-    Firebase.printf("[F_UPDATE_INA] Firebase ni pripravljen za posodobitev INA podatkov.\n");
-    Sensor_OnFirebaseResponse(false);
+    Firebase.printf("[F_UPDATE_INA] Firebase ni pripravljen za posodobitev INA podatkov!\n");
     return;
   }
 
@@ -595,6 +682,10 @@ void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload
 // Funkcija za obdelavo odgovora iz Firebase
 void Firebase_processResponse(AsyncResult &aResult)
 {
+  // Preveri in izpiši stanje SSL povezave
+  Serial.println();
+  Firebase_Check_Active_State(false);
+
   // SAMO EN KLIC available() NA ZAČETKU!
   bool hasResult = aResult.isResult();
   bool hasError = aResult.isError();
@@ -605,6 +696,7 @@ void Firebase_processResponse(AsyncResult &aResult)
   static uint32_t call_count = 0;
   Serial.printf("[F_RESPONSE] KLIC #%u, isResult=%d, isError=%d, isEvent=%d, isDebug=%d, available=%d\n",
                 ++call_count, hasResult, hasError, isEvent, isDebug, hasData);
+
 
   if (!hasResult) {
     Serial.println("[F_RESPONSE] Ni rezultata, izhajam.");
@@ -635,26 +727,45 @@ void Firebase_processResponse(AsyncResult &aResult)
   // 2. DOGODKI
   if (isEvent)
   {
-    Firebase.printf("[F_RESPONSE]Event task: %s, msg: %s, code: %d\n",
+    Firebase.printf("[F_RESPONSE] Event task: %s, msg: %s, code: %d\n",
                     aResult.uid().c_str(),
                     aResult.appEvent().message().c_str(),
                     aResult.appEvent().code());
 
     // Preverimo za avtentikacijo
-    if (strcmp(aResult.uid().c_str(), "🔐 authTask") == 0)
+    if (aResult.uid().equals("🔐 authTask"))
     {
       if (aResult.appEvent().code() == 7) // začetek avtentikacije
       {
-        ssl_avtentikacija = false; // Med avtentikacijo onemogočimo operacije
+        ssl_avtentikacija = false; // Avtentikacija v teku (traja cca 3 - 5 sekund)
+
+        // Počisti operacije
+        if (lastOperation.waiting_for_response)
+        {
+          Firebase.printf("[F_AUTH] Čiščenje operacij...\n");
+          lastOperation.waiting_for_response = false;
+          firebaseRetryCount = 0;
+        }
       }
-      else if (aResult.appEvent().code() == 10) // konec avtentikacije
+      // else if (aResult.appEvent().code() == 8) // auth request sent
+      // {
+      //   Firebase.printf("[F_AUTH] 📤 Auth request poslan...\n");
+      // }
+      // else if (aResult.appEvent().code() == 9) // auth response received
+      // {
+      //   Firebase.printf("[F_AUTH] 📥 Auth response prejet...\n");
+      // }
+
+      if (aResult.appEvent().code() == 10) // konec avtentikacije
       {
-        ssl_avtentikacija = true; // Ko se zaključi avtentikacija, omogočimo operacije
-        // Firebase.printf("[F_AUTH] Avtentikacija uspešna ob:\n");
-        // printLocalTime();
+        Firebase.printf("[F_AUTH] ✅ Avtentikacija uspešna!\n");
+        
+        // SAMO nastavi flag - SSL se bo vzpostavil ob naslednjem requestu
+        ssl_avtentikacija = true;
+        // Database.get(aClient, chartIntervalPath, Firebase_processResponse, false, "dummyTask");     
       }
     }
-    //return;
+    //return;  // Eventi imajo tudi debug
   }
 
   // ----------------------------------------------------------------------------------------
@@ -667,26 +778,44 @@ void Firebase_processResponse(AsyncResult &aResult)
                     aResult.uid().c_str(),
                     aResult.debug().c_str());
     //return; // Debug sporočila imajo tudi payload-a
+
+        // NOVO: Preveri, ali je task "obvisela"
+    if (strstr(aResult.debug().c_str(), "Connecting to server") != NULL) {
+      // static unsigned long connectingStartTime = 0;
+      // static String lastConnectingTask = "";
+      
+      // if (lastConnectingTask != aResult.uid()) {
+      //   connectingStartTime = millis();
+      //   lastConnectingTask = aResult.uid();
+      // }
+      
+      // unsigned long connectingDuration = millis() - connectingStartTime;
+      // if (connectingDuration > 15000) {  // 15 sekund "Connecting"
+      //   Firebase.printf("[F_RESPONSE] ⚠️ Task '%s' stuck connecting for %lu ms! Canceling...\n",
+      //                   aResult.uid().c_str(), connectingDuration);
+        
+      //   // KRITIČNO: Prekini task
+      //   // aClient.stopAsync();
+        
+      //   // Signaliziraj neuspeh
+      //   if (aResult.uid().equals("updateSensorTask") || 
+      //       aResult.uid().equals("updateINA3221Task")) {
+      //     Sensor_OnFirebaseResponse(false);
+      //   }
+        
+      //   lastOperation.waiting_for_response = false;
+      //   firebaseRetryCount = 0;
+      // }
+    }
   }
 
   // ----------------------------------------------------------------------------------------
   // 4. CHECK
 
   if (!hasData) {
-    Serial.println("[F_RESPONSE] ⚠️ No available result!");
+    // Serial.println("[F_RESPONSE] ⚠️ No available result!");
     return;
   }
-
-  // // DODAJ pred primerjavami:
-  // String uidDebug = aResult.uid();
-  // Serial.printf("[F_RESPONSE] UID length: %d, first char: 0x%02X\n", 
-  //               uidDebug.length(), 
-  //               uidDebug.length() > 0 ? (uint8_t)uidDebug[0] : 0);
-  // Serial.printf("[F_RESPONSE] UID bytes: ");
-  // for (size_t i = 0; i < min(uidDebug.length(), 20); i++) {
-  //   Serial.printf("%02X ", (uint8_t)uidDebug[i]);
-  // }
-  // Serial.println();
 
   // DIREKTNE PRIMERJAVE - brez vmesnih spremenljivk:
   if (aResult.path().length() == 0) {
@@ -696,14 +825,14 @@ void Firebase_processResponse(AsyncResult &aResult)
 
   // Debugging - uporabi String objekte
   Serial.printf("[F_RESPONSE] Task: %s\n", aResult.uid().c_str());
-  Serial.printf("[F_RESPONSE] Path: %s\n", aResult.path().c_str());
+  // Serial.printf("[F_RESPONSE] Path: %s\n", aResult.path().c_str());
 
   // Payload shranimo v static buffer (kot prej)
   static char payloadBuf[512];
   strncpy(payloadBuf, aResult.c_str(), sizeof(payloadBuf) - 1);
   payloadBuf[sizeof(payloadBuf) - 1] = '\0';
 
-  Serial.printf("[F_RESPONSE] RAW Payload: [%s]\n", payloadBuf);
+  // Serial.printf("[F_RESPONSE] RAW Payload: [%s]\n", payloadBuf);
   Serial.printf("[F_RESPONSE] Payload length: %d\n", strlen(payloadBuf));
 
   lastFirebaseActivityTime = millis();
@@ -740,7 +869,7 @@ void Firebase_processResponse(AsyncResult &aResult)
         formatSecondsToTime(firebase_kanal[kanalIndex].end, 
                           sizeof(firebase_kanal[kanalIndex].end), end_sec);
 
-        Firebase.printf("[F_RESPONSE] ✅ Urnik shranjen: %d - %d\n", 
+        Firebase.printf("[F_RESPONSE] ✅ Urnik prebran: %d - %d\n", 
                         start_sec, end_sec);
         
         firebase_response_received = true;
@@ -778,6 +907,10 @@ void Firebase_processResponse(AsyncResult &aResult)
     firebaseRetryCount = 0;
     lastOperation.waiting_for_response = false;
     Sensor_OnFirebaseResponse(true);
+
+    // NOVO: Zapri SSL po operaciji
+    // Firebase_CloseSSL();
+
   }
 
   //-----------------------------------------------------------------------------------------
@@ -789,6 +922,9 @@ void Firebase_processResponse(AsyncResult &aResult)
     firebaseRetryCount = 0;
     lastOperation.waiting_for_response = false;
     Sensor_OnFirebaseResponse(true);
+
+    // NOVO: Zapri SSL po operaciji
+    // Firebase_CloseSSL();
   }
 
   //-----------------------------------------------------------------------------------------
@@ -799,15 +935,24 @@ void Firebase_processResponse(AsyncResult &aResult)
     firebase_response_received = true;
     firebaseRetryCount = 0;
     lastOperation.waiting_for_response = false;
+
+    // NOVO: Zapri SSL po operaciji
+    // Firebase_CloseSSL();
+
   }
-  
+  else if (aResult.uid().equals("dummyTask"))
+  {
+    Firebase.printf("[F_RESPONSE] Dummy task executed ✅\n");
+    // firebase_response_received = true;
+    // firebaseRetryCount = 0;
+    // lastOperation.waiting_for_response = false;
+  }
   else
   {
     Firebase.printf("[F_RESPONSE] ⚠️ Neznan task: %s\n", aResult.uid().c_str());
   }
+  // Firebase.printf("[F_RESPONSE] Free Heap: %d\n", ESP.getFreeHeap());
 }
-
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // Funkcija za preverjanje timeoutov in retry Firebase
@@ -840,8 +985,21 @@ void Firebase_CheckAndRetry()
   Firebase.printf("[FB_RETRY] ⚠️ TIMEOUT! Poskus %d/%d\n",
                   firebaseRetryCount, MAX_FIREBASE_RETRIES);
 
+  // NOVO: Če so še vedno aktivni taski, prekini jih
+  if (aClient.taskCount() > 0) {
+    Firebase.printf("[FB_RETRY] Prekinjam %d aktivnih taskov...\n", aClient.taskCount());
+    // aClient.removeSlot();  // Počisti vse task-e
+    // delay(100);  // Počakaj na cleanup
+  }
+
+ // Zapri SSL (bo ponovno vzpostavljen ob retry)
+  // if (ssl_client.connected()) {
+  //   Firebase.printf("[FB_RETRY] Zapiranje SSL za retry...\n");
+  //   ssl_client.stop();
+  // }
+
   // 5. Preveri, ali je Firebase še vedno pripravljen
-  if (!app.ready() || !ssl_avtentikacija)
+  if (!Firebase_IsReady())
   {
     Firebase.printf("[FB_RETRY] Firebase ni pripravljen. Preskakujem retry.\n");
     
@@ -911,11 +1069,3 @@ void Firebase_CheckAndRetry()
   }
 }
 
-    // Preveri, ali so še aktivne naloge
-    // if (aClient.taskCount() == 0) {
-    //   Serial.println("Vse naloge so končane.");
-    // }
-    // else
-    // {
-    //   Serial.printf("Še %d nalog aktivnih.\n", aClient.taskCount());
-    // }

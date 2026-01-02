@@ -5,24 +5,27 @@
 #define ENABLE_DATABASE
 
 #include <Arduino.h>
-#include <WiFiClientSecure.h>
-#include <FirebaseClient.h>
-//#include <Firebase_ESP_Client.h> // Predpostavljamo, da uporabljaš to knjižnico
 #include "Lora_master.h"
+// #include <WiFiClientSecure.h>
+// #include <FirebaseClient.h>
+
 #include "unified_lora_handler.h"
 
 // Deklaracije funkcij, ki bodo definirane v Firebase.cpp
+void Firebase_Loop();
 void Init_Firebase();
 void Firebase_Connect();
-bool Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec);
-void Firebase_CheckStreamHealth();
+bool Firebase_IsReady();
+void Firebase_Check_Active_State(bool wait);
+// bool Firebase_handleStreamUpdate(int kanalIndex, int start_sec, int end_sec);
+// void Firebase_CheckStreamHealth();
 void Firebase_readInterval();
 void Firebase_readKanalUrnik(uint8_t kanalIndex);
 void Firebase_Update_Relay_State(int kanal, bool state);
 void Firebase_Update_Sensor_Data(unsigned long timestamp, SensorDataPayload const& sensors);
 void Firebase_Update_INA_Data(unsigned long timestamp, const INA3221_DataPayload& data);
 void Firebase_processResponse(AsyncResult &aResult);
-void streamCallback(AsyncResult &aResult);
+// void streamCallback(AsyncResult &aResult);
 void Firebase_CheckAndRetry();
 
 #define FIREBASE_OPERATION_TIMEOUT 10000 // 10 seconds timeout
@@ -58,17 +61,17 @@ extern bool firebase_response_received; // Zastavica, ki označuje, da je bil od
 
 
 // Extern deklaracije za Firebase objekte
-extern FirebaseApp app;
-extern WiFiClientSecure ssl_client;
-extern WiFiClientSecure stream_ssl_client;
+// extern FirebaseApp app;
+// extern WiFiClientSecure ssl_client;
+// extern WiFiClientSecure stream_ssl_client;
 
-using AsyncClient = AsyncClientClass;
+// using AsyncClient = AsyncClientClass;
   
-extern AsyncClient aClient;
-extern AsyncClient streamClient;
-extern RealtimeDatabase Database;
-extern AsyncResult databaseResult;
-extern AsyncResult streamResult;               // Za Firebase streaming
+// extern AsyncClient aClient;
+// extern AsyncClient streamClient;
+// extern RealtimeDatabase Database;
+// extern AsyncResult databaseResult;
+// extern AsyncResult streamResult;               // Za Firebase streaming
 
 // --- NOVO: Struktura in čakalna vrsta za Firebase naloge ---
 enum class FirebaseTaskType {
